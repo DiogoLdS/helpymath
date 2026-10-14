@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model alternativa {
+  id        Int     @id @default(autoincrement())
+  questaoId Int
+  texto     String
+  letra     String
+  correta   Boolean
+  questao   questao @relation(fields: [questaoId], references: [questaoId], map: "Alternativa_questaoId_fkey")
+
+  @@index([questaoId], map: "Alternativa_questaoId_fkey")
+}
+
+model conteudo {
+  titulo          String
+  tipo            Int
+  explicacao      String?           @db.Text
+  conteudoId      Int               @id @default(autoincrement())
+  mapaconteudo    mapaconteudo[]
+  usuarioconteudo usuarioconteudo[]
+}
+
+model mapaconceitual {
+  nome         String
+  mapaId       Int            @id @default(autoincrement())
+  mapaconteudo mapaconteudo[]
+  questao      questao[]
+}
+
+model mapaconteudo {
+  mapaId         Int
+  conteudoId     Int
+  conteudo       conteudo       @relation(fields: [conteudoId], references: [conteudoId], map: "MapaConteudo_conteudoId_fkey")
+  mapaconceitual mapaconceitual @relation(fields: [mapaId], references: [mapaId], map: "MapaConteudo_mapaId_fkey")
+
+  @@id([mapaId, conteudoId])
+  @@index([conteudoId], map: "MapaConteudo_conteudoId_fkey")
+}
+
+model questao {
+  mapaId         Int
+  data           DateTime       @db.Date
+  enunciado      String
+  questaoId      Int            @id @default(autoincrement())
+  alternativa    alternativa[]
+  mapaconceitual mapaconceitual @relation(fields: [mapaId], references: [mapaId], map: "Questao_mapaId_fkey")
+
+  @@index([mapaId], map: "Questao_mapaId_fkey")
+}
+
+model usuario {
+  nome            String
+  email           String            @unique(map: "Usuario_email_key")
+  senha           String
+  usuarioId       Int               @id @default(autoincrement())
+  admin           Boolean           @default(false)
+  usuarioconteudo usuarioconteudo[]
+}
+
+model usuarioconteudo {
+  usuarioId  Int
+  conteudoId Int
+  concluido  Boolean  @default(false)
+  conteudo   conteudo @relation(fields: [conteudoId], references: [conteudoId], map: "UsuarioConteudo_conteudoId_fkey")
+  usuario    usuario  @relation(fields: [usuarioId], references: [usuarioId], map: "UsuarioConteudo_usuarioId_fkey")
+
+  @@id([usuarioId, conteudoId])
+  @@index([conteudoId], map: "UsuarioConteudo_conteudoId_fkey")
+}

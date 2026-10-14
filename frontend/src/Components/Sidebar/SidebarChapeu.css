@@ -1,0 +1,101 @@
+.art {
+    width: 10%;
+    height: 90vh;
+    background-color: #2B4C7E;
+    border-radius: 20px 0px 0px 20px;
+    max-width: 90px;
+    display: grid;
+    grid-template-rows: 2% 9% 6% 13% 9% 9% 9% 9% 9% auto;
+    align-items: center;
+    justify-items: center;
+    border-right: 7px solid #567EBB;
+}
+.iconspace {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btnSB {
+  background-color: transparent;
+  display: flex;
+  border: none;
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+}   
+.logo {
+    width: 70%;
+    height: 70%;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.linhaLogo {
+    width: 80%;
+    height: 5px;
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    grid-row: 3;
+}
+#iconspace1 {
+    grid-row: 5;
+    position: relative;
+}
+#iconspace2 {
+    grid-row: 6;
+}
+#iconspace3 {
+    grid-row: 7;
+}
+#iconspace4 {
+    grid-row: 8;
+}
+#iconspace5 {
+    grid-row: 9;
+}
+#form {
+    width: 60%;
+    height: 60%;
+    position: relative;
+    z-index: 2;
+}
+#chat {
+    width: 50%;
+    height: 50%;
+    position: relative;
+    z-index: 2;
+}
+#chat {
+    width: 50%;
+    height: 50%;
+}
+#sino {
+    width: 50%;
+    height: 50%;
+}
+#pess {
+    width: 50%;
+    height: 50%;
+}
+#mais {
+    width: 50%;
+    height: 50%;
+}
+#logo {
+    width: 100%;
+    height: 100%;
+}
+#logospace1 {
+    grid-row: 2;
+}
+.space {
+    width: 100%;
+    height: 100%;
+    background-color: #567EBB;
+    position: absolute;
+    z-index: 1;
+    border-radius: 12% 0 0 12%;
+}

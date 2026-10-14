@@ -1,0 +1,298 @@
+/* Telas de administrador (criar e editar mapa): mesmo visual da Home e do mapa conceitual,
+   com a Sidebar à esquerda e o painel azul-acinzentado com borda #567EBB. */
+
+.mainAdmin {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #D9D9D9;
+}
+
+.adminPainel {
+    width: 90%;
+    height: 90vh;
+    max-width: 1500px;
+    padding: 32px 40px;
+    overflow-y: auto;
+    background-color: #DCE0E6;
+    border: 5px solid #567EBB;
+    border-radius: 0px 20px 20px 0px;
+    color: #2B4C7E;
+
+    /* Variáveis usadas pelo editor de fórmulas (Formulas.css), ajustadas pra paleta do app */
+    --background-color: #E4E7EC;
+    --bg: #F4F6FA;
+    --stroke: #567EBB;
+    --stroke2: #B7C3D6;
+    --text: #1F2D44;
+    --secondary-text: #567EBB;
+    --accent: #2B4C7E;
+}
+
+.adminConteudo {
+    max-width: 780px;
+    margin: 0 auto;
+}
+
+.adminConteudo h1 {
+    font-size: clamp(26px, 3vw, 36px);
+    margin-bottom: 4px;
+}
+
+.subtitulo {
+    margin-bottom: 24px;
+    font-size: 15px;
+    color: #567EBB;
+}
+
+.mensagemAdmin {
+    font-weight: 600;
+    color: #2B4C7E;
+}
+
+/* ---------- Formulário ---------- */
+
+.formCriarMapa {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.formCriarMapa > label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #2B4C7E;
+}
+
+.formCriarMapa input[type="text"],
+.formCriarMapa select,
+.formCriarMapa textarea {
+    width: 100%;
+    padding: 12px 14px;
+    background-color: #F4F6FA;
+    color: #1F2D44;
+    font-size: 15px;
+    border: 2px solid #567EBB;
+    border-radius: 10px;
+}
+
+.formCriarMapa textarea {
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.formCriarMapa input[type="text"]:focus,
+.formCriarMapa select:focus,
+.formCriarMapa textarea:focus {
+    outline: none;
+    border-color: #2B4C7E;
+    box-shadow: 0 0 0 3px rgba(86, 126, 187, 0.3);
+}
+
+.formCriarMapa input:disabled,
+.formCriarMapa select:disabled,
+.formCriarMapa textarea:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ---------- Conteúdos ---------- */
+
+.secaoConteudos {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cabecalhoConteudos {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.cabecalhoConteudos h2 {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.vazio {
+    padding: 16px;
+    font-size: 14px;
+    color: #567EBB;
+    background-color: #F4F6FA;
+    border: 2px dashed #567EBB;
+    border-radius: 12px;
+}
+
+.cardConteudo {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    background-color: #E4E7EC;
+    border: 2px solid #B7C3D6;
+    border-radius: 14px;
+}
+
+.linhaConteudo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.linhaConteudo input[type="text"] {
+    flex: 2;
+    min-width: 160px;
+}
+
+.linhaConteudo select {
+    flex: 1;
+    min-width: 200px;
+}
+
+.formCriarMapa .opcaoFormula {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #1F2D44;
+    cursor: pointer;
+}
+
+.previaExplicacao {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px;
+    background-color: #F4F6FA;
+    border: 2px dashed #567EBB;
+    border-radius: 12px;
+    color: #1F2D44;
+    white-space: pre-line;
+}
+
+.previaExplicacao > span {
+    font-size: 12px;
+    font-weight: 700;
+    color: #567EBB;
+}
+
+.acoesConteudo {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.acoesConteudo button {
+    padding: 6px 12px;
+    background-color: #F4F6FA;
+    color: #2B4C7E;
+    font-size: 13px;
+    font-weight: 600;
+    border: 2px solid #B7C3D6;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.acoesConteudo button:hover:not(:disabled) {
+    border-color: #567EBB;
+}
+
+.acoesConteudo button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.acoesConteudo .botaoRemover {
+    color: #C0392B;
+    border-color: #E3B3AC;
+}
+
+/* ---------- Botões ---------- */
+
+.botaoSecundario {
+    padding: 8px 16px;
+    background-color: #567EBB;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.botaoSecundario:hover:not(:disabled),
+.botaoPrimario:hover:not(:disabled) {
+    opacity: 0.85;
+}
+
+.botaoSecundario:disabled,
+.botaoPrimario:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.acoesForm {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.botaoPrimario {
+    min-width: 180px;
+    padding: 13px 28px;
+    background-color: #2B4C7E;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.botaoCancelar {
+    padding: 11px 24px;
+    color: #2B4C7E;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 2px solid #567EBB;
+    border-radius: 10px;
+}
+
+.botaoCancelar:hover {
+    background-color: #567EBB;
+    color: #FFFFFF;
+}
+
+/* ---------- Mensagens ---------- */
+
+.mensagemErro {
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #C0392B;
+}
+
+.mensagemEtapa {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #567EBB;
+}
+
+/* ---------- Telas menores ---------- */
+
+@media (max-width: 700px) {
+    .adminPainel {
+        height: auto;
+        min-height: 90vh;
+        padding: 20px 16px;
+    }
+}

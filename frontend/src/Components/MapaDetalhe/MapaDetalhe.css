@@ -1,0 +1,34 @@
+.mainMapaDetalhe {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 16px;
+}
+
+.mainMapaDetalhe h1 {
+    margin-bottom: 24px;
+}
+
+.conteudos {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.conteudo-card {
+    background-color: var(--bg);
+    border: 1px solid var(--stroke);
+    border-radius: 20px;
+    padding: 16px;
+}
+
+.botao-questoes {
+    display: inline-block;
+    background-color: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 20px;
+    padding: 12px 24px;
+    font-weight: 600;
+    text-decoration: none;
+}

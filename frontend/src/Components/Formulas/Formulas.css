@@ -1,0 +1,123 @@
+/* ---------- Fórmulas renderizadas (mapa e pré-visualizações) ---------- */
+
+.formulaBloco {
+    margin: 10px 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.formulaBloco .katex-display {
+    margin: 0;
+}
+
+.formulaLinha .katex {
+    font-size: 1.1em;
+}
+
+/* ---------- Mini editor de fórmulas (tela do admin) ---------- */
+
+.formulaEditor {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px;
+    background-color: var(--background-color, #F4F2FD);
+    border: 1px solid var(--stroke2, #D7D7D9);
+    border-radius: 12px;
+}
+
+.formulaAbas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.formulaAba {
+    padding: 6px 12px;
+    background-color: transparent;
+    color: var(--text, #000);
+    font-size: 13px;
+    border: 1px solid var(--stroke2, #D7D7D9);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.formulaAba.ativa {
+    background-color: var(--accent, #8577FF);
+    color: #fff;
+    border-color: var(--accent, #8577FF);
+}
+
+.formulaSimbolos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.formulaSimbolo {
+    min-width: 44px;
+    height: 40px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg, #FBFAFF);
+    color: var(--text, #000);
+    border: 1px solid var(--stroke, #ACBCBF);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.formulaSimbolo:hover:not(:disabled) {
+    border-color: var(--accent, #8577FF);
+}
+
+.formulaSimbolo:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.formulaRotulo {
+    font-size: 13px;
+}
+
+.formCriarMapa .formulaCampo {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 14px;
+}
+
+.formulaPrevia {
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    background-color: var(--bg, #FBFAFF);
+    border: 1px dashed var(--stroke, #ACBCBF);
+    border-radius: 10px;
+    overflow-x: auto;
+}
+
+.formulaPrevia .formulaBloco {
+    margin: 0;
+}
+
+.formulaPreviaVazia {
+    font-size: 13px;
+    color: var(--secondary-text, #9BA8AA);
+}
+
+.formulaAcoes {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.formulaModo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+}

@@ -1,0 +1,292 @@
+.mainHome {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #D9D9D9;
+}
+
+.home {
+    width: 90%;
+    height: 90vh;
+    background-color: #DCE0E6;
+    border: 5px solid #567EBB;
+    border-radius: 0px 20px 20px 0px;
+    max-width: 1500px;
+    display: grid;
+    grid-template-columns: 1fr minmax(230px, 26%);
+    overflow: hidden;
+}
+
+/* ---------- Coluna central ---------- */
+
+.homeCentro {
+    padding: 28px 36px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+    text-align: center;
+    color: #2B4C7E;
+}
+
+.homeCabecalho {
+    position: relative;
+    width: 100%;
+}
+
+.homeCabecalho h1 {
+    font-size: clamp(28px, 3vw, 40px);
+}
+
+.homeCabecalho p {
+    font-size: 15px;
+    color: #567EBB;
+}
+
+.homeConfig {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    color: #567EBB;
+    border: 2px solid #567EBB;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.homeConfig:hover {
+    background-color: #567EBB;
+    color: #FFFFFF;
+}
+
+.homeSecao {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.homeSecao h2 {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.homeNiveis {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+.homeNivel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    min-height: 96px;
+    padding: 14px;
+    border-radius: 14px;
+    color: #1F2D44;
+    text-decoration: none;
+    transition: transform 0.15s ease;
+}
+
+.homeNivel:hover {
+    transform: translateY(-3px);
+}
+
+.homeNivel strong {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.homeNivel span {
+    font-size: 12px;
+}
+
+.nivel-basico { background-color: #9CCB7E; }
+.nivel-intermediario { background-color: #E8A27C; }
+.nivel-avancado { background-color: #E08A8A; }
+.nivel-treino { background-color: #8DB3EC; }
+
+.homeDica {
+    font-size: 12px;
+    color: #567EBB;
+}
+
+.homeObjetivos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+}
+
+.homeObjetivo,
+.homeDiagnostico {
+    padding: 10px 28px;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 600;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.homeObjetivo {
+    background-color: #2B4C7E;
+}
+
+.homeObjetivo.ativo {
+    background-color: #567EBB;
+    border-color: #2B4C7E;
+}
+
+.homeDiagnostico {
+    background-color: #567EBB;
+}
+
+.homeObjetivo:hover,
+.homeDiagnostico:hover {
+    opacity: 0.85;
+}
+
+.homeBlocos {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    text-align: left;
+}
+
+.homeBlocos h3 {
+    margin-bottom: 8px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.homeBlocos ul {
+    list-style: disc inside;
+    padding: 14px 18px;
+    background-color: #2B4C7E;
+    color: #FFFFFF;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.homeCitacao {
+    font-size: 13px;
+    font-style: italic;
+    color: #2B4C7E;
+}
+
+.homeCitacao cite {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 700;
+}
+
+/* ---------- Coluna lateral (pontuação) ---------- */
+
+.homeLateral {
+    margin: 16px;
+    padding: 20px;
+    background-color: #2B4C7E;
+    color: #FFFFFF;
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.homeUsuario {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.homeUsuario img {
+    width: 34px;
+    height: 34px;
+}
+
+.homeSair {
+    padding: 6px 14px;
+    background-color: #567EBB;
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.homeSair:hover {
+    opacity: 0.85;
+}
+
+.homeLateral h2 {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.homePontuacao {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    background-color: #E4E7EC;
+    color: #2B4C7E;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.homeLateral hr {
+    border: none;
+    height: 3px;
+    background-color: #567EBB;
+    border-radius: 10px;
+}
+
+/* ---------- Telas menores ---------- */
+
+@media (max-width: 900px) {
+    .home {
+        grid-template-columns: 1fr;
+        height: auto;
+        min-height: 90vh;
+    }
+
+    .homeCentro {
+        overflow-y: visible;
+    }
+
+    .homeNiveis {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 560px) {
+    .homeCentro {
+        padding: 20px 16px;
+    }
+
+    .homeNiveis,
+    .homeBlocos {
+        grid-template-columns: 1fr;
+    }
+}

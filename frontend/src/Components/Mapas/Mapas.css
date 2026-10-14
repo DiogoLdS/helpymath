@@ -1,0 +1,35 @@
+.mainMapas {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 32px 16px;
+}
+
+.mainMapas h1 {
+    margin-bottom: 24px;
+}
+
+.mapas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.mapa-card {
+    display: block;
+    background-color: var(--bg);
+    border: 1px solid var(--stroke);
+    border-radius: 20px;
+    padding: 24px 16px;
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 0.2s ease;
+}
+
+.mapa-card:hover {
+    border-color: var(--accent);
+}
+
+.mapa-card h2 {
+    font-size: 18px;
+}
