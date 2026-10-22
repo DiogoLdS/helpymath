@@ -66,11 +66,9 @@
     opacity: 0.85;
 }
 
-/* Botão direcional (tipo 3): link com cara de botão */
+/* Botão direcional (tipo 3): é um link, mas com a mesma cara do .mapaNo */
 .mapaDirecional {
-    gap: 10px;
     text-decoration: none;
-    background-color: #2B4C7E;
 }
 
 .mapaDirecional:disabled {
@@ -78,25 +76,30 @@
     cursor: not-allowed;
 }
 
-/* Indicador explicativo (tipo 2): caixa de texto curto, sem clique */
+/* Indicador explicativo (tipo 2): mesma cara do .mapaNo, mas sem clique
+   e com o texto curto (ex: fórmula) embaixo do título */
 .mapaIndicador {
-    justify-self: center;
-    max-width: 320px;
-    padding: 14px 18px;
-    background-color: #2B4C7E;
-    color: #1F2D44;
-    border-radius: 16px;
-    font-size: 18px;
-    text-align: center;
-    white-space: pre-line;
+    flex-direction: column;
+    gap: 4px;
+    cursor: default;
+    /* Cresce só se o título + fórmula não couberem na altura padrão */
+    height: auto;
+    min-height: 40%;
+}
+
+.mapaIndicador:hover {
+    opacity: 1;
 }
 
 .mapaIndicador strong {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 20px;
-    color: #FFFFFF;
     font-weight: 600;
+}
+
+.mapaIndicador > div {
+    width: auto;
+    font-size: 20px;
+    font-weight: 400;
+    white-space: pre-line;
 }
 
 .backdrop {

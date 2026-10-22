@@ -111,7 +111,7 @@ const MapaConceitual = () => {
                     // Tipo 2 - Indicador explicativo: texto curto sempre visível, sem clique
                     if (item.tipo === 2) {
                         return (
-                            <div key={item.conteudoId} className="mapaIndicador" style={estiloPosicao}>
+                            <div key={item.conteudoId} className="mapaNo mapaIndicador" style={estiloPosicao}>
                                 <strong>{item.titulo}</strong>
                                 {item.explicacao?.trim() && <div><TextoComMidia texto={item.explicacao} /></div>}
                             </div>
@@ -130,7 +130,7 @@ const MapaConceitual = () => {
                                     className="mapaNo mapaDirecional"
                                     style={estiloPosicao}
                                 >
-                                    {item.titulo} <span aria-hidden="true">↗</span>
+                                    {item.titulo}
                                 </a>
                             );
                         }
