@@ -9,6 +9,7 @@ const questaoController = controller();
 routes.get('/mapas/:mapaId/questoes', authUser, questaoController.listarQuestoesPorMapa);
 routes.post('/questoes/:id/responder', authUser, questaoController.responderQuestao);
 
+routes.get('/admin/mapas/:mapaId/questoes', authUser, authAdmin, questaoController.listarQuestoesAdmin);
 routes.post('/criarQuestao', authUser, authAdmin, questaoController.criarQuestao);
 routes.patch('/questoes/:id', authUser, authAdmin, questaoController.atualizarQuestao);
 routes.delete('/questoes/:id', authUser, authAdmin, questaoController.deletarQuestao);

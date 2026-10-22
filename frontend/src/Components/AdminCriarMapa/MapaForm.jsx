@@ -5,6 +5,8 @@ import FormulaEditor from "../Formulas/FormulaEditor.jsx";
 import MidiaEditor from "../Midia/MidiaEditor.jsx";
 import { TextoComMidia } from "../Midia/Midia.jsx";
 import { linkDestinoValido } from "../../utils/linkDestino.js";
+import QuestoesForm from "./QuestoesForm.jsx";
+import { validarQuestoes } from "./questoesUtils.js";
 import "./AdminCriarMapa.css";
 
 // Tipos de elemento de conteúdo, conforme seção 3.7 do TCC:
@@ -22,8 +24,9 @@ let proximoIdTemporario = 1;
 // Formulário usado pra criar e pra editar mapa. Ele cuida só dos campos e da validação:
 // quem salva no banco (e mostra erro/etapa) é a página que usa o formulário.
 //
-// valoresIniciais: { nome, conteudos } - conteúdos já salvos trazem "conteudoId"
-// onSubmit(nome, conteudos): chamado só depois de passar na validação
+// valoresIniciais: { nome, conteudos, questoes } - conteúdos já salvos trazem "conteudoId"
+// onSubmit(nome, conteudos, questoes): chamado só depois de passar na validação
+// mostrarQuestoes: mostra a parte de cadastrar questões embaixo dos conteúdos
 const MapaForm = ({
     valoresIniciais,
     onSubmit,
@@ -33,9 +36,11 @@ const MapaForm = ({
     rotuloBotao,
     permitirMover = true,
     linkCancelar,
+    mostrarQuestoes = false,
 }) => {
     const [nome, setNome] = useState(valoresIniciais.nome);
     const [conteudos, setConteudos] = useState(valoresIniciais.conteudos);
+    const [questoes, setQuestoes] = useState(valoresIniciais.questoes ?? []);
     const [erroValidacao, setErroValidacao] = useState("");
 
     // Guarda o <textarea> da explicação de cada conteúdo, pra inserir fórmulas na posição do cursor
@@ -111,7 +116,7 @@ const MapaForm = ({
             }
         }
 
-        return "";
+        return mostrarQuestoes ? validarQuestoes(questoes) : "";
     };
 
     const handleSubmit = (event) => {
@@ -121,7 +126,7 @@ const MapaForm = ({
         setErroValidacao(mensagemValidacao);
         if (mensagemValidacao) return;
 
-        onSubmit(nome.trim(), conteudos);
+        onSubmit(nome.trim(), conteudos, questoes);
     };
 
     const mensagemErro = erroValidacao || erro;
@@ -306,7 +311,11 @@ const MapaForm = ({
                 })}
             </div>
 
-            {mensagemErro && <p className="mensagemErro">{mensagemErro}</p>}
+            {mostrarQuestoes && (
+                <QuestoesForm questoes={questoes} setQuestoes={setQuestoes} enviando={enviando} />
+            )}
+
+            {mensagemErro &&<p className="mensagemErro">{mensagemErro}</p>}
             {enviando && etapaAtual && <p className="mensagemEtapa">{etapaAtual}</p>}
 
             <div className="acoesForm">

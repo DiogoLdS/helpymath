@@ -191,6 +191,81 @@
     color: #567EBB;
 }
 
+/* ---------- Questões do mapa ---------- */
+
+.rotuloQuestao {
+    font-weight: 700;
+    color: #1F2D44;
+}
+
+.alternativasQuestao {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 12px 14px;
+    border: 1px solid #B7C3D6;
+    border-radius: 12px;
+}
+
+.alternativasQuestao legend {
+    padding: 0 6px;
+    font-size: 13px;
+    color: #4A5A73;
+}
+
+.linhaAlternativa {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.linhaAlternativa input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.letraAlternativa {
+    width: 20px;
+    font-weight: 700;
+    color: #2B4C7E;
+}
+
+.linhaAlternativa input[type="text"] {
+    flex: 1;
+    min-width: 0;
+}
+
+.botaoRemoverAlternativa {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    font-size: 18px;
+    color: #C0392B;
+    background: transparent;
+    border: 1px solid #D7A39E;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.botaoRemoverAlternativa:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.botaoAdicionarAlternativa {
+    align-self: flex-start;
+    padding: 6px 12px;
+    font-size: 13px;
+    color: #567EBB;
+    background: transparent;
+    border: 1px dashed #567EBB;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
 .acoesConteudo {
     display: flex;
     gap: 8px;

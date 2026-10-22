@@ -4,9 +4,10 @@ import api from "../../../services/api.js";
 import { usuarioEhAdmin } from "../../utils/auth.js";
 import Sidebar from "../Sidebar/SidebarChapeu";
 import MapaForm from "./MapaForm.jsx";
+import { criarQuestaoComAlternativas } from "./questoesUtils.js";
 import "./AdminCriarMapa.css";
 
-const VALORES_INICIAIS = { nome: "", conteudos: [] };
+const VALORES_INICIAIS = { nome: "", conteudos: [], questoes: [] };
 
 const AdminCriarMapa = () => {
     const navigate = useNavigate();
@@ -30,7 +31,7 @@ const AdminCriarMapa = () => {
         }
     }, [storedToken, autorizado, navigate]);
 
-    const salvar = async (nome, conteudos) => {
+    const salvar = async (nome, conteudos, questoes) => {
         setErro("");
 
         const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
@@ -59,6 +60,11 @@ const AdminCriarMapa = () => {
                 const conteudoId = respostaConteudo.data.conteudoId;
 
                 await api.post(`/mapas/${mapaId}/conteudo`, { conteudoId }, { headers });
+            }
+
+            for (let i = 0; i < questoes.length; i++) {
+                setEtapaAtual(`Salvando questão ${i + 1} de ${questoes.length}...`);
+                await criarQuestaoComAlternativas(mapaId, questoes[i], headers);
             }
 
             navigate(`/mapas/${mapaId}`);
@@ -102,6 +108,7 @@ const AdminCriarMapa = () => {
                         erro={erro}
                         rotuloBotao="Criar mapa"
                         linkCancelar="/mapas"
+                        mostrarQuestoes
                     />
                 </div>
             </section>

@@ -94,13 +94,48 @@ function controller() {
                 res.status(500).json("Internal server error!");
             }
         },
+        // Versão do admin (tela de editar mapa): igual à listagem do aluno, mas também diz
+        // qual alternativa é a correta. A do aluno esconde isso pra não entregar a resposta.
+        async listarQuestoesAdmin(req, res) {
+            try {
+                const { mapaId } = req.params;
+
+                const questoes = await prisma.questao.findMany({
+                    where: { mapaId: parseInt(mapaId) },
+                    orderBy: { questaoId: 'asc' },
+                    select: {
+                        questaoId: true,
+                        enunciado: true,
+                        data: true,
+                        alternativa: {
+                            orderBy: { letra: 'asc' },
+                            select: {
+                                id: true,
+                                texto: true,
+                                letra: true,
+                                correta: true
+                            }
+                        }
+                    }
+                });
+
+                res.status(200).json(questoes);
+            } catch (error) {
+                console.log(error.message);
+                res.status(500).json("Internal server error!");
+            }
+        },
         async deletarQuestao(req, res) {
             try {
                 const { id } = req.params;
+                const questaoId = parseInt(id);
 
-                await prisma.questao.delete({
-                    where: { questaoId: parseInt(id) }
-                });
+                // O banco não deixa apagar a questão com alternativas ligadas (ON DELETE RESTRICT),
+                // então apaga as alternativas antes. A transação garante que é tudo ou nada.
+                await prisma.$transaction([
+                    prisma.alternativa.deleteMany({ where: { questaoId: questaoId } }),
+                    prisma.questao.delete({ where: { questaoId: questaoId } })
+                ]);
 
                 res.status(200).json("Questão removida com sucesso");
             } catch (error) {
@@ -108,11 +143,6 @@ function controller() {
 
                 if (error.code === 'P2025') {
                     return res.status(404).json("Questão não encontrada");
-                }
-
-                // Erro de chave estrangeira: existem alternativas vinculadas a essa questão
-                if (error.code === 'P2003') {
-                    return res.status(409).json("Não é possível remover: existem alternativas vinculadas a essa questão. Remova-as primeiro.");
                 }
 
                 res.status(500).json("Internal server error!");

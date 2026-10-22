@@ -4,6 +4,11 @@ import api from "../../../services/api.js";
 import { usuarioEhAdmin } from "../../utils/auth.js";
 import Sidebar from "../Sidebar/SidebarChapeu";
 import MapaForm from "../AdminCriarMapa/MapaForm.jsx";
+import {
+    LETRAS,
+    criarQuestaoComAlternativas,
+    questaoDoBanco,
+} from "../AdminCriarMapa/questoesUtils.js";
 import "../AdminCriarMapa/AdminCriarMapa.css";
 
 const AdminEditarMapa = () => {
@@ -12,6 +17,7 @@ const AdminEditarMapa = () => {
 
     // Mapa como veio do banco: serve de base pra descobrir o que o admin mudou
     const [mapaOriginal, setMapaOriginal] = useState(null);
+    const [questoesOriginais, setQuestoesOriginais] = useState([]);
     const [carregando, setCarregando] = useState(true);
     const [erroCarga, setErroCarga] = useState("");
 
@@ -39,11 +45,16 @@ const AdminEditarMapa = () => {
             setErroCarga("");
 
             try {
-                const resposta = await api.get(`/mapas/${id}`, {
-                    headers: { Authorization: `Bearer ${storedToken}` }
-                });
+                const headers = { Authorization: `Bearer ${storedToken}` };
 
-                setMapaOriginal(resposta.data);
+                // Mapa (nome + conteúdos) e questões vêm de rotas diferentes; busca as duas juntas
+                const [respostaMapa, respostaQuestoes] = await Promise.all([
+                    api.get(`/mapas/${id}`, { headers }),
+                    api.get(`/admin/mapas/${id}/questoes`, { headers }),
+                ]);
+
+                setMapaOriginal(respostaMapa.data);
+                setQuestoesOriginais(respostaQuestoes.data);
             } catch (error) {
                 if (error.response?.status === 401) {
                     navigate("/login");
@@ -64,7 +75,7 @@ const AdminEditarMapa = () => {
         buscarMapa();
     }, [id, storedToken, autorizado, navigate]);
 
-    const salvar = async (nome, conteudos) => {
+    const salvar = async (nome, conteudos, questoes) => {
         setErro("");
 
         const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
@@ -138,6 +149,75 @@ const AdminEditarMapa = () => {
                 );
             }
 
+            // 5) Questões que o admin tirou da lista (o backend apaga as alternativas junto)
+            const questoesMantidas = questoes.filter((q) => q.questaoId).map((q) => q.questaoId);
+
+            for (const original of questoesOriginais) {
+                if (!questoesMantidas.includes(original.questaoId)) {
+                    setEtapaAtual("Removendo questões...");
+                    await api.delete(`/questoes/${original.questaoId}`, { headers });
+                }
+            }
+
+            // 6) Questões que já existiam: só manda pro banco o que mudou
+            for (const questao of questoes.filter((q) => q.questaoId)) {
+                const original = questoesOriginais.find((o) => o.questaoId === questao.questaoId);
+
+                setEtapaAtual("Atualizando questões...");
+
+                if (questao.enunciado.trim() !== original.enunciado) {
+                    await api.patch(
+                        `/questoes/${questao.questaoId}`,
+                        { enunciado: questao.enunciado.trim() },
+                        { headers }
+                    );
+                }
+
+                // Alternativas removidas
+                const alternativasMantidas = questao.alternativas
+                    .filter((a) => a.alternativaId)
+                    .map((a) => a.alternativaId);
+
+                for (const alternativaOriginal of original.alternativa) {
+                    if (!alternativasMantidas.includes(alternativaOriginal.id)) {
+                        await api.delete(`/alternativas/${alternativaOriginal.id}`, { headers });
+                    }
+                }
+
+                // Alternativas que ficaram (podem ter mudado de texto, de letra ou de correta) e as novas
+                for (let j = 0; j < questao.alternativas.length; j++) {
+                    const alternativa = questao.alternativas[j];
+                    const dados = {
+                        texto: alternativa.texto.trim(),
+                        letra: LETRAS[j],
+                        correta: j === questao.indiceCorreta,
+                    };
+
+                    if (!alternativa.alternativaId) {
+                        await api.post(`/questoes/${questao.questaoId}/alternativas`, dados, { headers });
+                        continue;
+                    }
+
+                    const alternativaOriginal = original.alternativa.find((a) => a.id === alternativa.alternativaId);
+                    const mudou =
+                        dados.texto !== alternativaOriginal.texto ||
+                        dados.letra !== alternativaOriginal.letra ||
+                        dados.correta !== alternativaOriginal.correta;
+
+                    if (mudou) {
+                        await api.patch(`/alternativas/${alternativa.alternativaId}`, dados, { headers });
+                    }
+                }
+            }
+
+            // 7) Questões novas
+            const questoesNovas = questoes.filter((q) => !q.questaoId);
+
+            for (let i = 0; i < questoesNovas.length; i++) {
+                setEtapaAtual(`Salvando questão nova ${i + 1} de ${questoesNovas.length}...`);
+                await criarQuestaoComAlternativas(id, questoesNovas[i], headers);
+            }
+
             navigate(`/mapas/${id}`);
         } catch (error) {
             if (error.response?.status === 401) {
@@ -171,6 +251,7 @@ const AdminEditarMapa = () => {
             tipo: c.tipo,
             formulaAtiva: (c.explicacao ?? "").includes("$"),
         })),
+        questoes: questoesOriginais.map(questaoDoBanco),
     };
 
     return (
@@ -181,7 +262,7 @@ const AdminEditarMapa = () => {
                 <div className="adminConteudo">
                     <h1>Editar mapa conceitual</h1>
                     <p className="subtitulo">
-                        Altere o nome do mapa e adicione, edite ou remova os conteúdos dele.
+                        Altere o nome do mapa e adicione, edite ou remova os conteúdos e as questões dele.
                     </p>
 
                     {carregando && <p className="mensagemAdmin">Carregando...</p>}
@@ -199,6 +280,7 @@ const AdminEditarMapa = () => {
                             rotuloBotao="Salvar alterações"
                             permitirMover={false}
                             linkCancelar={`/mapas/${id}`}
+                            mostrarQuestoes
                         />
                     )}
                 </div>
