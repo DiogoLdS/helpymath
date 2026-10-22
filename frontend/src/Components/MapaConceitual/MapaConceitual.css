@@ -8,6 +8,7 @@
 }
 
 .mapaGrid {
+    position: relative;
     width: 90%;
     height: 90vh;
     display: grid;
@@ -145,12 +146,21 @@
     font-weight: 600;
 }
 
-.mapaAcoes {
-    position: fixed;
+/* Botões ficam presos à caixa do mapa (.mapaGrid tem position: relative) */
+.mapaAcoesTopo {
+    position: absolute;
+    top: 24px;
     right: 24px;
-    bottom: 24px;
     display: flex;
     gap: 10px;
+    z-index: 5;
+}
+
+.mapaQuestoes {
+    position: absolute;
+    top: 50%;
+    right: 24px;
+    transform: translateY(-50%);
     z-index: 5;
 }
 
@@ -167,6 +177,36 @@
     background-color: #2B4C7E;
 }
 
+.mapaExcluir,
+.mapaImprimir {
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 600;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.mapaExcluir {
+    background-color: #C0392B;
+}
+
+.mapaImprimir {
+    background-color: #2B4C7E;
+}
+
+.mapaImprimir:hover,
+.mapaExcluir:hover:not(:disabled) {
+    opacity: 0.85;
+}
+
+.mapaExcluir:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
 .mapaEditar {
     background-color: #567EBB;
 }
@@ -174,4 +214,43 @@
 .mapaQuestoes:hover,
 .mapaEditar:hover {
     opacity: 0.85;
+}
+
+/* ---------- Impressão / Salvar como PDF ----------
+   Só vale na hora de imprimir: some com a barra lateral e os botões,
+   e o mapa ocupa uma folha A4 deitada, mantendo as cores. */
+@page {
+    size: A4 landscape;
+    margin: 10mm;
+}
+
+@media print {
+    body {
+        background-color: #FFFFFF;
+    }
+
+    .art,
+    .mapaAcoesTopo,
+    .mapaQuestoes,
+    .backdrop,
+    .mapaExplicacao {
+        display: none !important;
+    }
+
+    .mapaConceitualPage {
+        min-height: 0;
+        background-color: #FFFFFF;
+    }
+
+    .mapaGrid {
+        width: 100%;
+        max-width: none;
+        /* altura da folha A4 deitada (210mm) menos as margens */
+        height: 185mm;
+        padding: 40px;
+        border-radius: 20px;
+        break-inside: avoid;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
 }

@@ -19,6 +19,7 @@ const MapaConceitual = () => {
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState("");
     const [abertoId, setAbertoId] = useState(null);
+    const [excluindo, setExcluindo] = useState(false);
 
     useEffect(() => {
         const buscarMapa = async () => {
@@ -74,10 +75,69 @@ const MapaConceitual = () => {
         return <p className="mapaMensagem">{erro || "Não foi possível carregar este mapa conceitual."}</p>;
     }
 
+    // Só admin vê o botão; quem bloqueia de verdade é o backend (authAdmin)
+    const excluirMapa = async () => {
+        const confirmou = window.confirm(
+            `Excluir o mapa "${mapa.nome}"?\n\nAs questões dele também serão apagadas. Essa ação não pode ser desfeita.`
+        );
+        if (!confirmou) return;
+
+        setExcluindo(true);
+
+        try {
+            await api.delete(`/mapas/${id}`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+            });
+            navigate("/mapas");
+        } catch (error) {
+            if (error.response?.status === 401) {
+                navigate("/login");
+                return;
+            }
+            window.alert(
+                error.response?.status === 403
+                    ? "Acesso restrito a administradores."
+                    : "Não foi possível excluir o mapa. Tente novamente em instantes."
+            );
+            console.log(error.message);
+            setExcluindo(false);
+        }
+    };
+
+    // Ficam dentro do .mapaGrid, posicionados em relação à caixa do mapa:
+    // imprimir/editar/excluir no canto de cima à direita, "Fazer questões" no meio da lateral direita.
+    // Imprimir abre a janela de impressão do navegador, que também tem a opção "Salvar como PDF".
+    const acoes = (
+        <>
+            <div className="mapaAcoesTopo">
+                <button type="button" className="mapaImprimir" onClick={() => window.print()}>
+                    Imprimir / PDF
+                </button>
+                {usuarioEhAdmin() && (
+                    <>
+                        <Link to={`/admin/mapas/${id}/editar`} className="mapaEditar">Editar mapa</Link>
+                        <button type="button" className="mapaExcluir" onClick={excluirMapa} disabled={excluindo}>
+                            {excluindo ? "Excluindo..." : "Excluir mapa"}
+                        </button>
+                    </>
+                )}
+            </div>
+            <Link to={`/mapas/${id}/questoes`} className="mapaQuestoes">Fazer questões</Link>
+        </>
+    );
+
     const itens = mapa.conteudos;
 
     if (itens.length === 0) {
-        return <p className="mapaMensagem">Este mapa ainda não tem conteúdos cadastrados.</p>;
+        return (
+            <div className="mapaConceitualPage">
+                <Sidebar />
+                <div className="mapaGrid">
+                    <p className="mapaMensagem">Este mapa ainda não tem conteúdos cadastrados.</p>
+                    {acoes}
+                </div>
+            </div>
+        );
     }
 
     // Variante cadastrada em layouts.js; se não existir pra essa quantidade, usa o layout de reserva
@@ -176,13 +236,8 @@ const MapaConceitual = () => {
                         </button>
                     );
                 })}
-            </div>
 
-            <div className="mapaAcoes">
-                {usuarioEhAdmin() && (
-                    <Link to={`/admin/mapas/${id}/editar`} className="mapaEditar">Editar mapa</Link>
-                )}
-                <Link to={`/mapas/${id}/questoes`} className="mapaQuestoes">Fazer questões</Link>
+                {acoes}
             </div>
 
             {itemAberto && (<> <div className="backdrop" onClick={() => setAbertoId(null)} /> <div className="mapaExplicacao"> <h3>{itemAberto.titulo}</h3> <div className="mapaExplicacaoTexto"> {itemAberto.explicacao ? <TextoComMidia texto={itemAberto.explicacao} /> : "Sem explicação cadastrada ainda."} </div> <button type="button" onClick={() => setAbertoId(null)} > Fechar </button> </div> </>)}

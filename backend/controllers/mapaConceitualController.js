@@ -93,10 +93,18 @@ function controller() {
         async deletarMapa(req, res) {
             try {
                 const { id } = req.params;
+                const mapaId = parseInt(id);
 
-                await prisma.mapaconceitual.delete({
-                    where: { mapaId: parseInt(id) }
-                });
+                // O banco não deixa apagar o mapa enquanto algo aponta pra ele (ON DELETE RESTRICT),
+                // então apaga antes, na ordem certa: alternativas -> questões -> vínculos com conteúdos -> mapa.
+                // Os conteúdos em si ficam, porque podem estar sendo usados em outros mapas.
+                // A transação garante que, se algum passo falhar, nada é apagado.
+                await prisma.$transaction([
+                    prisma.alternativa.deleteMany({ where: { questao: { mapaId: mapaId } } }),
+                    prisma.questao.deleteMany({ where: { mapaId: mapaId } }),
+                    prisma.mapaconteudo.deleteMany({ where: { mapaId: mapaId } }),
+                    prisma.mapaconceitual.delete({ where: { mapaId: mapaId } })
+                ]);
 
                 res.status(200).json("Mapa removido com sucesso");
             } catch (error) {
