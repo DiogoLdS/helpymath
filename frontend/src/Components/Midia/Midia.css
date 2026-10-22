@@ -119,3 +119,27 @@
     justify-content: flex-end;
     gap: 10px;
 }
+
+/* ---------- Versão de impressão (PDF do mapa) ---------- */
+
+/* O <img> só serve pra carregar; quem aparece é o <canvas> com o primeiro quadro */
+.midiaImagemOriginal {
+    display: none !important;
+}
+
+.midiaImagemImpressa {
+    display: block;
+    /* auto + max-* mantém a proporção da imagem ao reduzir */
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 120mm;
+    margin: 0 auto;
+    border-radius: 10px;
+}
+
+.midiaLinkImpressao {
+    margin: 10px 0;
+    font-size: 14px;
+    word-break: break-all;
+}

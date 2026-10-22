@@ -216,6 +216,16 @@
     opacity: 0.85;
 }
 
+.mapaImprimir:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+/* Conteúdos "abertos" pro PDF: escondidos na tela */
+.mapaImpressao {
+    display: none;
+}
+
 /* ---------- Impressão / Salvar como PDF ----------
    Só vale na hora de imprimir: some com a barra lateral e os botões,
    e o mapa ocupa uma folha A4 deitada, mantendo as cores. */
@@ -237,9 +247,46 @@
         display: none !important;
     }
 
+    /* Na tela é flex (lado a lado com a barra lateral); no papel, um bloco embaixo do outro */
     .mapaConceitualPage {
+        display: block;
         min-height: 0;
         background-color: #FFFFFF;
+    }
+
+    .mapaImpressao {
+        display: block;
+        break-before: page;
+        color: #1F2D44;
+    }
+
+    .mapaImpressao h2 {
+        margin: 0 0 16px;
+        color: #2B4C7E;
+    }
+
+    .mapaImpressaoItem {
+        padding: 12px 0;
+        border-bottom: 1px solid #B7C3D6;
+        white-space: pre-line;
+        break-inside: avoid;
+    }
+
+    .mapaImpressaoItem h3 {
+        margin: 0;
+        color: #2B4C7E;
+    }
+
+    .mapaImpressaoTipo {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 12px;
+        color: #567EBB;
+    }
+
+    .mapaImpressaoItem p {
+        margin: 0;
+        word-break: break-word;
     }
 
     .mapaGrid {

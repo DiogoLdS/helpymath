@@ -8,6 +8,13 @@ import { TextoComMidia } from "../Midia/Midia.jsx";
 import { linkExterno, linkInterno } from "../../utils/linkDestino.js";
 import "./MapaConceitual.css";
 
+// Nome de cada tipo de conteúdo na versão impressa (mesmos tipos do MapaForm)
+const ROTULOS_TIPO = {
+    1: "Botão explicativo",
+    2: "Indicador explicativo",
+    3: "Botão direcional",
+};
+
 // Página do mapa conceitual: busca o mapa (nome + conteúdos + explicações) direto da API,
 // e usa layouts.js só pra decidir onde cada botão fica no grid.
 const MapaConceitual = () => {
@@ -20,6 +27,7 @@ const MapaConceitual = () => {
     const [erro, setErro] = useState("");
     const [abertoId, setAbertoId] = useState(null);
     const [excluindo, setExcluindo] = useState(false);
+    const [preparandoImpressao, setPreparandoImpressao] = useState(false);
 
     useEffect(() => {
         const buscarMapa = async () => {
@@ -104,14 +112,28 @@ const MapaConceitual = () => {
         }
     };
 
+    // Antes de abrir a impressão, espera as imagens da parte "Conteúdos do mapa" carregarem
+    // (senão elas saem em branco no PDF). Se alguma demorar demais, imprime assim mesmo.
+    const imprimirMapa = async () => {
+        setPreparandoImpressao(true);
+
+        const limite = Date.now() + 8000;
+        while (document.querySelector(".mapaImpressao [data-carregando]") && Date.now() < limite) {
+            await new Promise((resolve) => setTimeout(resolve, 200));
+        }
+
+        setPreparandoImpressao(false);
+        window.print();
+    };
+
     // Ficam dentro do .mapaGrid, posicionados em relação à caixa do mapa:
     // imprimir/editar/excluir no canto de cima à direita, "Fazer questões" no meio da lateral direita.
     // Imprimir abre a janela de impressão do navegador, que também tem a opção "Salvar como PDF".
     const acoes = (
         <>
             <div className="mapaAcoesTopo">
-                <button type="button" className="mapaImprimir" onClick={() => window.print()}>
-                    Imprimir / PDF
+                <button type="button" className="mapaImprimir" onClick={imprimirMapa} disabled={preparandoImpressao}>
+                    {preparandoImpressao ? "Preparando..." : "Imprimir / PDF"}
                 </button>
                 {usuarioEhAdmin() && (
                     <>
@@ -239,6 +261,30 @@ const MapaConceitual = () => {
 
                 {acoes}
             </div>
+
+            {/* Só aparece na impressão/PDF: cada conteúdo "aberto", depois da página do mapa */}
+            <section className="mapaImpressao">
+                <h2>{mapa.nome}: conteúdos</h2>
+
+                {itens.map((item) => {
+                    const destino = (item.explicacao ?? "").trim();
+
+                    return (
+                        <article key={item.conteudoId} className="mapaImpressaoItem">
+                            <h3>{item.titulo}</h3>
+                            <span className="mapaImpressaoTipo">{ROTULOS_TIPO[item.tipo]}</span>
+
+                            {item.tipo === 3 ? (
+                                <p>{destino ? `Link: ${destino}` : "Link de destino não cadastrado."}</p>
+                            ) : destino ? (
+                                <div><TextoComMidia texto={item.explicacao} impressao /></div>
+                            ) : (
+                                <p>Sem explicação cadastrada.</p>
+                            )}
+                        </article>
+                    );
+                })}
+            </section>
 
             {itemAberto && (<> <div className="backdrop" onClick={() => setAbertoId(null)} /> <div className="mapaExplicacao"> <h3>{itemAberto.titulo}</h3> <div className="mapaExplicacaoTexto"> {itemAberto.explicacao ? <TextoComMidia texto={itemAberto.explicacao} /> : "Sem explicação cadastrada ainda."} </div> <button type="button" onClick={() => setAbertoId(null)} > Fechar </button> </div> </>)}
         </div>
