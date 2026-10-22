@@ -2,7 +2,8 @@ import { useRef, useState } from "react";
 import { Link } from "react-router";
 import { MAX_CONTEUDOS } from "../../data/layouts.js";
 import FormulaEditor from "../Formulas/FormulaEditor.jsx";
-import { TextoComFormulas } from "../Formulas/Formula.jsx";
+import MidiaEditor from "../Midia/MidiaEditor.jsx";
+import { TextoComMidia } from "../Midia/Midia.jsx";
 import "./AdminCriarMapa.css";
 
 // Tipos de elemento de conteúdo, conforme seção 3.7 do TCC:
@@ -204,19 +205,37 @@ const MapaForm = ({
                         </label>
 
                         {conteudo.formulaAtiva && (
-                            <>
-                                <FormulaEditor
-                                    onInserir={(trecho) => inserirNaExplicacao(conteudo.idTemp, trecho)}
-                                    disabled={enviando}
-                                />
+                            <FormulaEditor
+                                onInserir={(trecho) => inserirNaExplicacao(conteudo.idTemp, trecho)}
+                                disabled={enviando}
+                            />
+                        )}
 
-                                {conteudo.explicacao.includes("$") && (
-                                    <div className="previaExplicacao">
-                                        <span>Pré-visualização da explicação</span>
-                                        <div><TextoComFormulas texto={conteudo.explicacao} /></div>
-                                    </div>
-                                )}
-                            </>
+                        <button
+                            type="button"
+                            className="botaoSecundario botaoInserirMidia"
+                            onClick={() =>
+                                atualizarConteudo(conteudo.idTemp, "midiaAberta", !conteudo.midiaAberta)
+                            }
+                            aria-expanded={Boolean(conteudo.midiaAberta)}
+                            disabled={enviando}
+                        >
+                            {conteudo.midiaAberta ? "Fechar mídia" : "+ Inserir mídia"}
+                        </button>
+
+                        {conteudo.midiaAberta && (
+                            <MidiaEditor
+                                onInserir={(trecho) => inserirNaExplicacao(conteudo.idTemp, trecho)}
+                                disabled={enviando}
+                            />
+                        )}
+
+                        {((conteudo.formulaAtiva && conteudo.explicacao.includes("$")) ||
+                            conteudo.explicacao.includes("[[")) && (
+                            <div className="previaExplicacao">
+                                <span>Pré-visualização da explicação</span>
+                                <div><TextoComMidia texto={conteudo.explicacao} /></div>
+                            </div>
                         )}
 
                         <div className="acoesConteudo">

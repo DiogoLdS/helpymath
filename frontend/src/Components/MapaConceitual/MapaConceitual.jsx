@@ -4,7 +4,7 @@ import api from "../../../services/api.js";
 import { usuarioEhAdmin } from "../../utils/auth.js";
 import layouts, { gerarLayoutPadrao } from "../../data/layouts.js";
 import Sidebar from "../Sidebar/SidebarChapeu";
-import { TextoComFormulas } from "../Formulas/Formula.jsx";
+import { TextoComMidia } from "../Midia/Midia.jsx";
 import "./MapaConceitual.css";
 
 // Página do mapa conceitual: busca o mapa (nome + conteúdos + explicações) direto da API,
@@ -126,7 +126,7 @@ const MapaConceitual = () => {
                 <Link to={`/mapas/${id}/questoes`} className="mapaQuestoes">Fazer questões</Link>
             </div>
 
-            {itemAberto && (<> <div className="backdrop" onClick={() => setAbertoId(null)} /> <div className="mapaExplicacao"> <h3>{itemAberto.titulo}</h3> <div className="mapaExplicacaoTexto"> {itemAberto.explicacao ? <TextoComFormulas texto={itemAberto.explicacao} /> : "Sem explicação cadastrada ainda."} </div> <button type="button" onClick={() => setAbertoId(null)} > Fechar </button> </div> </>)}
+            {itemAberto && (<> <div className="backdrop" onClick={() => setAbertoId(null)} /> <div className="mapaExplicacao"> <h3>{itemAberto.titulo}</h3> <div className="mapaExplicacaoTexto"> {itemAberto.explicacao ? <TextoComMidia texto={itemAberto.explicacao} /> : "Sem explicação cadastrada ainda."} </div> <button type="button" onClick={() => setAbertoId(null)} > Fechar </button> </div> </>)}
         </div>
     );
 };

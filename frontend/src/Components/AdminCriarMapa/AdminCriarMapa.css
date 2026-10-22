@@ -163,6 +163,10 @@
     cursor: pointer;
 }
 
+.botaoInserirMidia {
+    align-self: flex-start;
+}
+
 .previaExplicacao {
     display: flex;
     flex-direction: column;
