@@ -70,7 +70,7 @@
 .mapaDirecional {
     gap: 10px;
     text-decoration: none;
-    background-color: #567EBB;
+    background-color: #2B4C7E;
 }
 
 .mapaDirecional:disabled {
@@ -83,9 +83,8 @@
     justify-self: center;
     max-width: 320px;
     padding: 14px 18px;
-    background-color: #FFFFFF;
+    background-color: #2B4C7E;
     color: #1F2D44;
-    border: 2px solid #2B4C7E;
     border-radius: 16px;
     font-size: 18px;
     text-align: center;
@@ -96,7 +95,8 @@
     display: block;
     margin-bottom: 6px;
     font-size: 20px;
-    color: #2B4C7E;
+    color: #FFFFFF;
+    font-weight: 600;
 }
 
 .backdrop {

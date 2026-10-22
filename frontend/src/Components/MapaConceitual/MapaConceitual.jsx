@@ -143,7 +143,7 @@ const MapaConceitual = () => {
                                     className="mapaNo mapaDirecional"
                                     style={estiloPosicao}
                                 >
-                                    {item.titulo} <span aria-hidden="true">→</span>
+                                    {item.titulo}
                                 </Link>
                             );
                         }
