@@ -163,6 +163,12 @@
     cursor: pointer;
 }
 
+.dicaTipo {
+    margin: 0;
+    font-size: 13px;
+    color: #4A5A73;
+}
+
 .botaoInserirMidia {
     align-self: flex-start;
 }

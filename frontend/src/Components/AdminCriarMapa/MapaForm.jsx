@@ -4,6 +4,7 @@ import { MAX_CONTEUDOS } from "../../data/layouts.js";
 import FormulaEditor from "../Formulas/FormulaEditor.jsx";
 import MidiaEditor from "../Midia/MidiaEditor.jsx";
 import { TextoComMidia } from "../Midia/Midia.jsx";
+import { linkDestinoValido } from "../../utils/linkDestino.js";
 import "./AdminCriarMapa.css";
 
 // Tipos de elemento de conteúdo, conforme seção 3.7 do TCC:
@@ -104,6 +105,10 @@ const MapaForm = ({
             if (!c.titulo.trim()) {
                 return "Todos os conteúdos precisam de um título.";
             }
+
+            if (Number(c.tipo) === 3 && !linkDestinoValido(c.explicacao)) {
+                return `O botão direcional "${c.titulo.trim()}" precisa de um link de destino (https://... ou /pagina-do-site).`;
+            }
         }
 
         return "";
@@ -153,123 +158,152 @@ const MapaForm = ({
                     </p>
                 )}
 
-                {conteudos.map((conteudo, index) => (
-                    <div className="cardConteudo" key={conteudo.idTemp}>
-                        <div className="linhaConteudo">
-                            <input
-                                type="text"
-                                value={conteudo.titulo}
-                                onChange={(e) =>
-                                    atualizarConteudo(conteudo.idTemp, "titulo", e.target.value)
-                                }
-                                placeholder="Título do conteúdo"
-                                disabled={enviando}
-                            />
+                {conteudos.map((conteudo, index) => {
+                    const tipo = Number(conteudo.tipo);
 
-                            <select
-                                value={conteudo.tipo}
-                                onChange={(e) =>
-                                    atualizarConteudo(conteudo.idTemp, "tipo", e.target.value)
-                                }
-                                disabled={enviando}
-                            >
-                                {TIPOS_CONTEUDO.map((t) => (
-                                    <option key={t.valor} value={t.valor}>
-                                        {t.rotulo}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                    return (
+                        <div className="cardConteudo" key={conteudo.idTemp}>
+                            <div className="linhaConteudo">
+                                <input
+                                    type="text"
+                                    value={conteudo.titulo}
+                                    onChange={(e) =>
+                                        atualizarConteudo(conteudo.idTemp, "titulo", e.target.value)
+                                    }
+                                    placeholder="Título do conteúdo"
+                                    disabled={enviando}
+                                />
 
-                        <textarea
-                            ref={(el) => { camposExplicacao.current[conteudo.idTemp] = el; }}
-                            value={conteudo.explicacao}
-                            onChange={(e) =>
-                                atualizarConteudo(conteudo.idTemp, "explicacao", e.target.value)
-                            }
-                            placeholder="Explicação que aparece quando o aluno clica no conteúdo"
-                            rows={5}
-                            disabled={enviando}
-                        />
-
-                        <label className="opcaoFormula">
-                            <input
-                                type="checkbox"
-                                checked={conteudo.formulaAtiva}
-                                onChange={(e) =>
-                                    atualizarConteudo(conteudo.idTemp, "formulaAtiva", e.target.checked)
-                                }
-                                disabled={enviando}
-                            />
-                            Escrever fórmulas matemáticas nesta explicação
-                        </label>
-
-                        {conteudo.formulaAtiva && (
-                            <FormulaEditor
-                                onInserir={(trecho) => inserirNaExplicacao(conteudo.idTemp, trecho)}
-                                disabled={enviando}
-                            />
-                        )}
-
-                        <button
-                            type="button"
-                            className="botaoSecundario botaoInserirMidia"
-                            onClick={() =>
-                                atualizarConteudo(conteudo.idTemp, "midiaAberta", !conteudo.midiaAberta)
-                            }
-                            aria-expanded={Boolean(conteudo.midiaAberta)}
-                            disabled={enviando}
-                        >
-                            {conteudo.midiaAberta ? "Fechar mídia" : "+ Inserir mídia"}
-                        </button>
-
-                        {conteudo.midiaAberta && (
-                            <MidiaEditor
-                                onInserir={(trecho) => inserirNaExplicacao(conteudo.idTemp, trecho)}
-                                disabled={enviando}
-                            />
-                        )}
-
-                        {((conteudo.formulaAtiva && conteudo.explicacao.includes("$")) ||
-                            conteudo.explicacao.includes("[[")) && (
-                            <div className="previaExplicacao">
-                                <span>Pré-visualização da explicação</span>
-                                <div><TextoComMidia texto={conteudo.explicacao} /></div>
+                                <select
+                                    value={conteudo.tipo}
+                                    onChange={(e) =>
+                                        atualizarConteudo(conteudo.idTemp, "tipo", e.target.value)
+                                    }
+                                    disabled={enviando}
+                                >
+                                    {TIPOS_CONTEUDO.map((t) => (
+                                        <option key={t.valor} value={t.valor}>
+                                            {t.rotulo}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
-                        )}
 
-                        <div className="acoesConteudo">
-                            {permitirMover && (
+                            {tipo === 3 ? (
                                 <>
-                                    <button
-                                        type="button"
-                                        onClick={() => moverConteudo(index, -1)}
-                                        disabled={enviando || index === 0}
-                                        aria-label="Mover para cima"
-                                    >
-                                        ↑
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => moverConteudo(index, 1)}
-                                        disabled={enviando || index === conteudos.length - 1}
-                                        aria-label="Mover para baixo"
-                                    >
-                                        ↓
-                                    </button>
+                                    <input
+                                        type="text"
+                                        value={conteudo.explicacao}
+                                        onChange={(e) =>
+                                            atualizarConteudo(conteudo.idTemp, "explicacao", e.target.value)
+                                        }
+                                        placeholder="Link de destino. Ex: https://www.geogebra.org ou /simulacoes/dados"
+                                        aria-label="Link de destino"
+                                        disabled={enviando}
+                                    />
+                                    <p className="dicaTipo">
+                                        Quando o aluno clicar, ele vai para esse link. Links de outros sites abrem em
+                                        uma nova aba; caminhos começando com "/" abrem uma página da própria plataforma.
+                                    </p>
+                                </>
+                            ) : (
+                                <>
+                                    <textarea
+                                        ref={(el) => { camposExplicacao.current[conteudo.idTemp] = el; }}
+                                        value={conteudo.explicacao}
+                                        onChange={(e) =>
+                                            atualizarConteudo(conteudo.idTemp, "explicacao", e.target.value)
+                                        }
+                                        placeholder={tipo === 2
+                                            ? "Texto curto que fica sempre visível no mapa (ex: uma fórmula). Pode ficar vazio se o título já explicar."
+                                            : "Explicação que aparece quando o aluno clica no conteúdo"}
+                                        rows={tipo === 2 ? 2 : 5}
+                                        disabled={enviando}
+                                    />
+
+                                    <label className="opcaoFormula">
+                                        <input
+                                            type="checkbox"
+                                            checked={conteudo.formulaAtiva}
+                                            onChange={(e) =>
+                                                atualizarConteudo(conteudo.idTemp, "formulaAtiva", e.target.checked)
+                                            }
+                                            disabled={enviando}
+                                        />
+                                        Escrever fórmulas matemáticas nesta explicação
+                                    </label>
+
+                                    {conteudo.formulaAtiva && (
+                                        <FormulaEditor
+                                            onInserir={(trecho) => inserirNaExplicacao(conteudo.idTemp, trecho)}
+                                            disabled={enviando}
+                                        />
+                                    )}
+
+                                    {tipo === 1 && (
+                                        <button
+                                            type="button"
+                                            className="botaoSecundario botaoInserirMidia"
+                                            onClick={() =>
+                                                atualizarConteudo(conteudo.idTemp, "midiaAberta", !conteudo.midiaAberta)
+                                            }
+                                            aria-expanded={Boolean(conteudo.midiaAberta)}
+                                            disabled={enviando}
+                                        >
+                                            {conteudo.midiaAberta ? "Fechar mídia" : "+ Inserir mídia"}
+                                        </button>
+                                    )}
+
+                                    {tipo === 1 && conteudo.midiaAberta && (
+                                        <MidiaEditor
+                                            onInserir={(trecho) => inserirNaExplicacao(conteudo.idTemp, trecho)}
+                                            disabled={enviando}
+                                        />
+                                    )}
+
+                                    {((conteudo.formulaAtiva && conteudo.explicacao.includes("$")) ||
+                                        conteudo.explicacao.includes("[[")) && (
+                                        <div className="previaExplicacao">
+                                            <span>Pré-visualização da explicação</span>
+                                            <div><TextoComMidia texto={conteudo.explicacao} /></div>
+                                        </div>
+                                    )}
                                 </>
                             )}
-                            <button
-                                type="button"
-                                className="botaoRemover"
-                                onClick={() => removerConteudo(conteudo.idTemp)}
-                                disabled={enviando}
-                            >
-                                Remover
-                            </button>
+
+                            <div className="acoesConteudo">
+                                {permitirMover && (
+                                    <>
+                                        <button
+                                            type="button"
+                                            onClick={() => moverConteudo(index, -1)}
+                                            disabled={enviando || index === 0}
+                                            aria-label="Mover para cima"
+                                        >
+                                            ↑
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => moverConteudo(index, 1)}
+                                            disabled={enviando || index === conteudos.length - 1}
+                                            aria-label="Mover para baixo"
+                                        >
+                                            ↓
+                                        </button>
+                                    </>
+                                )}
+                                <button
+                                    type="button"
+                                    className="botaoRemover"
+                                    onClick={() => removerConteudo(conteudo.idTemp)}
+                                    disabled={enviando}
+                                >
+                                    Remover
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             {mensagemErro && <p className="mensagemErro">{mensagemErro}</p>}

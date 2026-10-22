@@ -5,6 +5,7 @@ import { usuarioEhAdmin } from "../../utils/auth.js";
 import layouts, { gerarLayoutPadrao } from "../../data/layouts.js";
 import Sidebar from "../Sidebar/SidebarChapeu";
 import { TextoComMidia } from "../Midia/Midia.jsx";
+import { linkExterno, linkInterno } from "../../utils/linkDestino.js";
 import "./MapaConceitual.css";
 
 // Página do mapa conceitual: busca o mapa (nome + conteúdos + explicações) direto da API,
@@ -104,13 +105,71 @@ const MapaConceitual = () => {
 
                 {itens.map((item, index) => {
                     const posicao = layout.posicoes[index];
+                    const estiloPosicao = { gridRow: posicao.row, gridColumn: posicao.col };
+                    const destino = (item.explicacao ?? "").trim();
 
+                    // Tipo 2 - Indicador explicativo: texto curto sempre visível, sem clique
+                    if (item.tipo === 2) {
+                        return (
+                            <div key={item.conteudoId} className="mapaIndicador" style={estiloPosicao}>
+                                <strong>{item.titulo}</strong>
+                                {item.explicacao?.trim() && <div><TextoComMidia texto={item.explicacao} /></div>}
+                            </div>
+                        );
+                    }
+
+                    // Tipo 3 - Botão direcional: leva pra um site externo (nova aba) ou pra uma página da plataforma
+                    if (item.tipo === 3) {
+                        if (linkExterno(destino)) {
+                            return (
+                                <a
+                                    key={item.conteudoId}
+                                    href={destino}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="mapaNo mapaDirecional"
+                                    style={estiloPosicao}
+                                >
+                                    {item.titulo} <span aria-hidden="true">↗</span>
+                                </a>
+                            );
+                        }
+
+                        if (linkInterno(destino)) {
+                            return (
+                                <Link
+                                    key={item.conteudoId}
+                                    to={destino}
+                                    className="mapaNo mapaDirecional"
+                                    style={estiloPosicao}
+                                >
+                                    {item.titulo} <span aria-hidden="true">→</span>
+                                </Link>
+                            );
+                        }
+
+                        // Sem link válido cadastrado: mostra o botão desativado em vez de quebrar
+                        return (
+                            <button
+                                type="button"
+                                key={item.conteudoId}
+                                className="mapaNo mapaDirecional"
+                                style={estiloPosicao}
+                                disabled
+                                title="Link de destino não cadastrado"
+                            >
+                                {item.titulo}
+                            </button>
+                        );
+                    }
+
+                    // Tipo 1 - Botão ampliado: abre a janela com a explicação detalhada
                     return (
                         <button
                             type="button"
                             key={item.conteudoId}
                             className="mapaNo"
-                            style={{ gridRow: posicao.row, gridColumn: posicao.col }}
+                            style={estiloPosicao}
                             onClick={() => setAbertoId(item.conteudoId)}
                         >
                             {item.titulo}

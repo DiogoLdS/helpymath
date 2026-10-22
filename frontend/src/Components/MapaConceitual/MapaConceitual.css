@@ -66,6 +66,39 @@
     opacity: 0.85;
 }
 
+/* Botão direcional (tipo 3): link com cara de botão */
+.mapaDirecional {
+    gap: 10px;
+    text-decoration: none;
+    background-color: #567EBB;
+}
+
+.mapaDirecional:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Indicador explicativo (tipo 2): caixa de texto curto, sem clique */
+.mapaIndicador {
+    justify-self: center;
+    max-width: 320px;
+    padding: 14px 18px;
+    background-color: #FFFFFF;
+    color: #1F2D44;
+    border: 2px solid #2B4C7E;
+    border-radius: 16px;
+    font-size: 18px;
+    text-align: center;
+    white-space: pre-line;
+}
+
+.mapaIndicador strong {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 20px;
+    color: #2B4C7E;
+}
+
 .backdrop {
     position: fixed;
     inset: 0;
