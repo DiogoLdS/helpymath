@@ -4,14 +4,9 @@ import { Link, useNavigate } from "react-router";
 import "./Home.css"
 import Sidebar from "../Sidebar/SidebarChapeu";
 import pessoa from "../../Assets/Images/pessoa.svg";
-
-// Cards de nível (primeira seção da tela)
-const niveis = [
-    { chave: 'basico', titulo: 'BÁSICO', descricao: 'Fundamentos e equações simples' },
-    { chave: 'intermediario', titulo: 'INTERMEDIÁRIO', descricao: 'Álgebra e funções' },
-    { chave: 'avancado', titulo: 'AVANÇADO', descricao: 'Análise e aplicações complexas' },
-    { chave: 'treino', titulo: 'TREINO', descricao: 'SIMULADOS E QUESTÕES' },
-];
+// Cards de nível (primeira seção da tela): cada um abre a lista de mapas daquela dificuldade
+import niveis from "../../data/niveis.js";
+import useTituloPagina from "../../utils/useTituloPagina.js";
 
 const objetivos = ['Escola Regular', 'ENEM', 'Concursos Públicos'];
 
@@ -28,6 +23,8 @@ const beneficios = [
 ];
 
 const Home = () => {
+    useTituloPagina("Início");
+
     const navigate = useNavigate();
 
     // Objetivo de estudo escolhido na seção "Por que você quer aprender?"
@@ -40,9 +37,10 @@ const Home = () => {
         // Pegando token salvo no localstorage
         const storedToken = localStorage.getItem('token');
 
-        // Se não existir, voltar para a página de login
+        // Se não existir, a pessoa ainda não entrou: mostra a página de apresentação do site
         if (!storedToken) {
-            navigate('/login');
+            navigate('/introducao');
+            return;
         }
 
         //  Se auth funcionar, pode entrar na página principal
@@ -78,7 +76,7 @@ const Home = () => {
             <section className='home'>
                 <div className='homeCentro'>
                     <header className='homeCabecalho'>
-                        <h1>Bem-vindo(a)!</h1>
+                        <h1>Bem-vindo(a) ao Helpy<span className='homeMath'>Math</span>!</h1>
                         <p>Vamos encontrar seu nível ideal!</p>
 
                         <button type='button' className='homeConfig' aria-label='Configurações'>
@@ -94,7 +92,7 @@ const Home = () => {
 
                         <div className='homeNiveis'>
                             {niveis.map((nivel) => (
-                                <Link to='/mapas' key={nivel.chave} className={`homeNivel nivel-${nivel.chave}`}>
+                                <Link to={`/mapas?nivel=${nivel.chave}`} key={nivel.chave} className={`homeNivel nivel-${nivel.chave}`}>
                                     <strong>{nivel.titulo}</strong>
                                     <span>{nivel.descricao}</span>
                                 </Link>

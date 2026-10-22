@@ -290,3 +290,7 @@
         grid-template-columns: 1fr;
     }
 }
+/* "Math" do nome do site no título de boas-vindas */
+.homeMath {
+    color: #567EBB;
+}

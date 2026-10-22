@@ -6,10 +6,13 @@ import Sidebar from "../Sidebar/SidebarChapeu";
 import MapaForm from "./MapaForm.jsx";
 import { criarQuestaoComAlternativas } from "./questoesUtils.js";
 import "./AdminCriarMapa.css";
+import useTituloPagina from "../../utils/useTituloPagina.js";
 
 const VALORES_INICIAIS = { nome: "", conteudos: [], questoes: [] };
 
 const AdminCriarMapa = () => {
+    useTituloPagina("Criar mapa");
+
     const navigate = useNavigate();
 
     const [enviando, setEnviando] = useState(false);
@@ -31,7 +34,7 @@ const AdminCriarMapa = () => {
         }
     }, [storedToken, autorizado, navigate]);
 
-    const salvar = async (nome, conteudos, questoes) => {
+    const salvar = async (nome, conteudos, questoes, nivel) => {
         setErro("");
 
         const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
@@ -40,7 +43,7 @@ const AdminCriarMapa = () => {
 
         try {
             setEtapaAtual("Criando mapa conceitual...");
-            const respostaMapa = await api.post("/criarMapa", { nome }, { headers });
+            const respostaMapa = await api.post("/criarMapa", { nome, nivel }, { headers });
             const mapaId = respostaMapa.data.mapaId;
 
             for (let i = 0; i < conteudos.length; i++) {

@@ -28,6 +28,7 @@ model conteudo {
 
 model mapaconceitual {
   nome         String
+  nivel        String         @default("basico") @db.VarChar(20)
   mapaId       Int            @id @default(autoincrement())
   mapaconteudo mapaconteudo[]
   questao      questao[]

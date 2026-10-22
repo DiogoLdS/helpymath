@@ -10,8 +10,11 @@ import {
     questaoDoBanco,
 } from "../AdminCriarMapa/questoesUtils.js";
 import "../AdminCriarMapa/AdminCriarMapa.css";
+import useTituloPagina from "../../utils/useTituloPagina.js";
 
 const AdminEditarMapa = () => {
+    useTituloPagina("Editar mapa");
+
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -75,7 +78,7 @@ const AdminEditarMapa = () => {
         buscarMapa();
     }, [id, storedToken, autorizado, navigate]);
 
-    const salvar = async (nome, conteudos, questoes) => {
+    const salvar = async (nome, conteudos, questoes, nivel) => {
         setErro("");
 
         const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
@@ -83,10 +86,10 @@ const AdminEditarMapa = () => {
         setEnviando(true);
 
         try {
-            // 1) Nome do mapa
-            if (nome !== mapaOriginal.nome) {
-                setEtapaAtual("Atualizando o nome do mapa...");
-                await api.patch(`/mapas/${id}`, { nome }, { headers });
+            // 1) Nome e dificuldade do mapa
+            if (nome !== mapaOriginal.nome || nivel !== mapaOriginal.nivel) {
+                setEtapaAtual("Atualizando o mapa...");
+                await api.patch(`/mapas/${id}`, { nome, nivel }, { headers });
             }
 
             // 2) Conteúdos que o admin tirou da lista saem do mapa
@@ -243,6 +246,7 @@ const AdminEditarMapa = () => {
     // Conteúdos já salvos entram no formulário com o conteudoId do banco
     const valoresIniciais = mapaOriginal && {
         nome: mapaOriginal.nome,
+        nivel: mapaOriginal.nivel,
         conteudos: mapaOriginal.conteudos.map((c) => ({
             idTemp: `existente-${c.conteudoId}`,
             conteudoId: c.conteudoId,

@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { Link } from "react-router";
 import { MAX_CONTEUDOS } from "../../data/layouts.js";
+import NIVEIS from "../../data/niveis.js";
 import FormulaEditor from "../Formulas/FormulaEditor.jsx";
 import MidiaEditor from "../Midia/MidiaEditor.jsx";
 import { TextoComMidia } from "../Midia/Midia.jsx";
@@ -24,8 +25,8 @@ let proximoIdTemporario = 1;
 // Formulário usado pra criar e pra editar mapa. Ele cuida só dos campos e da validação:
 // quem salva no banco (e mostra erro/etapa) é a página que usa o formulário.
 //
-// valoresIniciais: { nome, conteudos, questoes } - conteúdos já salvos trazem "conteudoId"
-// onSubmit(nome, conteudos, questoes): chamado só depois de passar na validação
+// valoresIniciais: { nome, nivel, conteudos, questoes } - conteúdos já salvos trazem "conteudoId"
+// onSubmit(nome, conteudos, questoes, nivel): chamado só depois de passar na validação
 // mostrarQuestoes: mostra a parte de cadastrar questões embaixo dos conteúdos
 const MapaForm = ({
     valoresIniciais,
@@ -39,6 +40,7 @@ const MapaForm = ({
     mostrarQuestoes = false,
 }) => {
     const [nome, setNome] = useState(valoresIniciais.nome);
+    const [nivel, setNivel] = useState(valoresIniciais.nivel ?? NIVEIS[0].chave);
     const [conteudos, setConteudos] = useState(valoresIniciais.conteudos);
     const [questoes, setQuestoes] = useState(valoresIniciais.questoes ?? []);
     const [erroValidacao, setErroValidacao] = useState("");
@@ -126,7 +128,7 @@ const MapaForm = ({
         setErroValidacao(mensagemValidacao);
         if (mensagemValidacao) return;
 
-        onSubmit(nome.trim(), conteudos, questoes);
+        onSubmit(nome.trim(), conteudos, questoes, nivel);
     };
 
     const mensagemErro = erroValidacao || erro;
@@ -142,6 +144,20 @@ const MapaForm = ({
                 placeholder="Ex: Probabilidades"
                 disabled={enviando}
             />
+
+            <label htmlFor="nivelMapa">Dificuldade</label>
+            <select
+                id="nivelMapa"
+                value={nivel}
+                onChange={(e) => setNivel(e.target.value)}
+                disabled={enviando}
+            >
+                {NIVEIS.map((n) => (
+                    <option key={n.chave} value={n.chave}>
+                        {n.nome} ({n.descricao.toLowerCase()})
+                    </option>
+                ))}
+            </select>
 
             <div className="secaoConteudos">
                 <div className="cabecalhoConteudos">

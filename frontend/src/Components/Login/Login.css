@@ -229,3 +229,10 @@
   opacity: 70%;
 }
 
+
+/* Nome do site em cima dos formulários de login e cadastro */
+.login form .marca,
+.register form .marca {
+    align-self: center;
+    margin-bottom: 8px;
+}

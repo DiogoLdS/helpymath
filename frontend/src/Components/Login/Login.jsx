@@ -3,8 +3,12 @@ import "./Login.css"
 import { Link, useNavigate } from "react-router";
 import api from '../../../services/api.js';
 import Sidebar from "../Sidebar/SidebarChapeu";
+import useTituloPagina from "../../utils/useTituloPagina.js";
+import Marca from "../Marca/Marca.jsx";
 
 const Login = () => {
+    useTituloPagina("Entrar");
+
   const [email, setEmail] = useState('');
   const [senha, setPassword] = useState('');
 
@@ -38,6 +42,7 @@ const Login = () => {
 
         <section className="login">
           <form onSubmit={logUser}>
+            <Marca grande />
             <h1>Faça seu login</h1>
 
             <div className="input-field">
@@ -61,6 +66,7 @@ const Login = () => {
 
             <div className="signup">
               <p>Ainda não tem uma conta? <Link to="/register">Crie uma!</Link></p>
+              <p><Link to="/introducao">Conheça o HelpyMath</Link></p>
             </div>
           </form>
         </section>

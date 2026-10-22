@@ -5,8 +5,12 @@ import Sidebar from "../Sidebar/SidebarChapeu";
 //  Integração com o servidor por meio da api
 import api from '../../../services/api.js';
 import { useState } from "react";
+import useTituloPagina from "../../utils/useTituloPagina.js";
+import Marca from "../Marca/Marca.jsx";
 
 const Register = () => {
+    useTituloPagina("Criar conta");
+
 
   const [nome, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -39,6 +43,7 @@ const Register = () => {
 
         <section className="register">
           <form onSubmit={registerUser}>
+            <Marca grande />
             <h1>Crie uma conta</h1>
 
             <div className="input-field">
@@ -66,6 +71,7 @@ const Register = () => {
 
             <div className="signup">
               <p>Já tem uma conta? <Link to="/login">Entre!</Link></p>
+              <p><Link to="/introducao">Conheça o HelpyMath</Link></p>
             </div>
           </form>
         </section>

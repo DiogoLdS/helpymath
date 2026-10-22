@@ -1,0 +1,49 @@
+.marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #2B4C7E;
+    text-decoration: none;
+}
+
+.marcaSimbolo {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background-color: #2B4C7E;
+    border-radius: 10px;
+}
+
+.marcaSimbolo img {
+    width: 80%;
+    height: 80%;
+}
+
+.marcaNome {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+/* "Math" no azul mais claro, como a borda da barra lateral */
+.marcaNome strong {
+    font-weight: 800;
+    color: #567EBB;
+}
+
+.marcaGrande .marcaSimbolo {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+}
+
+.marcaGrande .marcaNome {
+    font-size: 36px;
+}
+
+a.marca:hover {
+    opacity: 0.85;
+}

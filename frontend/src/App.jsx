@@ -8,6 +8,7 @@ import Questoes from './Components/Questoes/Questoes';
 import MapaConceitual from './Components/MapaConceitual/MapaConceitual';
 import AdminCriarMapa from './Components/AdminCriarMapa/AdminCriarMapa';
 import AdminEditarMapa from './Components/AdminEditarMapa/AdminEditarMapa';
+import Introducao from './Components/Introducao/Introducao';
 
 function App() {
   return (
@@ -19,6 +20,9 @@ function App() {
           <Route path="/register" element={<Register/>}/>
 
           <Route path="/" element={<Home/>}/>
+
+          {/* Página pública de apresentação do site (não precisa de login) */}
+          <Route path="/introducao" element={<Introducao/>}/>
 
           <Route path="/mapas" element={<Mapas/>}/>
 

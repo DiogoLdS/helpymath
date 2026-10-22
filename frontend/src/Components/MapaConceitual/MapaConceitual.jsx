@@ -7,6 +7,7 @@ import Sidebar from "../Sidebar/SidebarChapeu";
 import { TextoComMidia } from "../Midia/Midia.jsx";
 import { linkExterno, linkInterno } from "../../utils/linkDestino.js";
 import "./MapaConceitual.css";
+import useTituloPagina from "../../utils/useTituloPagina.js";
 
 // Nome de cada tipo de conteúdo na versão impressa (mesmos tipos do MapaForm)
 const ROTULOS_TIPO = {
@@ -28,6 +29,9 @@ const MapaConceitual = () => {
     const [abertoId, setAbertoId] = useState(null);
     const [excluindo, setExcluindo] = useState(false);
     const [preparandoImpressao, setPreparandoImpressao] = useState(false);
+
+    // Na aba aparece o nome do mapa (ex: "Probabilidade | HelpyMath")
+    useTituloPagina(mapa?.nome ?? "Mapa conceitual");
 
     useEffect(() => {
         const buscarMapa = async () => {

@@ -1,5 +1,8 @@
 import prisma from '../services/adapter.js';
 
+// Dificuldades possíveis de um mapa (as mesmas dos cards da página inicial)
+const NIVEIS = ['basico', 'intermediario', 'avancado', 'treino'];
+
 function controller() {
     return {
         get prisma() {
@@ -9,10 +12,15 @@ function controller() {
         // CU10 - Admin cria um novo mapa conceitual
         async criarMapa(req, res) {
             try {
-                const { nome } = req.body;
+                const { nome, nivel } = req.body;
+
+                if (nivel !== undefined && !NIVEIS.includes(nivel)) {
+                    return res.status(400).json("Nível inválido");
+                }
 
                 const novoMapa = await prisma.mapaconceitual.create({
-                    data: { nome: nome }
+                    // Sem nível informado, o banco usa "basico"
+                    data: { nome: nome, ...(nivel !== undefined && { nivel }) }
                 });
 
                 res.status(201).json(novoMapa);
@@ -26,7 +34,8 @@ function controller() {
                 const mapas = await prisma.mapaconceitual.findMany({
                     select: {
                         mapaId: true,
-                        nome: true
+                        nome: true,
+                        nivel: true
                     }
                 });
 
@@ -59,6 +68,7 @@ function controller() {
                 const mapaInfo = {
                     mapaId: mapa.mapaId,
                     nome: mapa.nome,
+                    nivel: mapa.nivel,
                     conteudos: mapa.mapaconteudo.map((mc) => mc.conteudo)
                 };
 
@@ -71,11 +81,19 @@ function controller() {
         async atualizarMapa(req, res) {
             try {
                 const { id } = req.params;
-                const { nome } = req.body;
+                const { nome, nivel } = req.body;
 
+                if (nivel !== undefined && !NIVEIS.includes(nivel)) {
+                    return res.status(400).json("Nível inválido");
+                }
+
+                // Só altera os campos enviados
                 const mapaAtualizado = await prisma.mapaconceitual.update({
                     where: { mapaId: parseInt(id) },
-                    data: { nome: nome }
+                    data: {
+                        ...(nome !== undefined && { nome }),
+                        ...(nivel !== undefined && { nivel })
+                    }
                 });
 
                 res.status(200).json(mapaAtualizado);

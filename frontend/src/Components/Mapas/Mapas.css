@@ -33,3 +33,71 @@
 .mapa-card h2 {
     font-size: 18px;
 }
+
+/* ---------- Filtro e seções por dificuldade ---------- */
+
+.mapas-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 28px;
+}
+
+.mapas-filtro {
+    padding: 8px 18px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1F2D44;
+    background-color: #FFFFFF;
+    border: 2px solid #B7C3D6;
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.mapas-filtro.ativo {
+    border-color: #2B4C7E;
+}
+
+/* O "Todos" ativo não tem cor de nível, então usa o azul do site */
+.mapas-filtro.ativo:not([class*="nivel-"]) {
+    color: #FFFFFF;
+    background-color: #2B4C7E;
+}
+
+.mapas-secao {
+    margin-bottom: 32px;
+}
+
+.mapas-secao-titulo {
+    display: inline-block;
+    margin-bottom: 14px;
+    padding: 6px 14px;
+    font-size: 17px;
+    color: #1F2D44;
+    border-radius: 10px;
+}
+
+.mapas-secao-titulo span {
+    font-size: 13px;
+    font-weight: 400;
+}
+
+.mapas-vazio {
+    font-size: 14px;
+    color: #567EBB;
+}
+
+/* Mesmas cores dos cards de nível da página inicial (Home.css) */
+.mapas-filtro.ativo.nivel-basico,
+.mapas-secao-titulo.nivel-basico { background-color: #9CCB7E; }
+.mapas-filtro.ativo.nivel-intermediario,
+.mapas-secao-titulo.nivel-intermediario { background-color: #E8A27C; }
+.mapas-filtro.ativo.nivel-avancado,
+.mapas-secao-titulo.nivel-avancado { background-color: #E08A8A; }
+.mapas-filtro.ativo.nivel-treino,
+.mapas-secao-titulo.nivel-treino { background-color: #8DB3EC; }
+
+.mainMapas .marca {
+    margin-bottom: 20px;
+}

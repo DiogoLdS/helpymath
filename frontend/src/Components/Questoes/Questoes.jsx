@@ -2,8 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import api from "../../../services/api.js";
 import "./Questoes.css";
+import useTituloPagina from "../../utils/useTituloPagina.js";
+import Marca from "../Marca/Marca.jsx";
 
 const Questoes = () => {
+    useTituloPagina("Questões");
+
     const { mapaId } = useParams();
     const navigate = useNavigate();
     const [questoes, setQuestoes] = useState([]);
@@ -66,6 +70,7 @@ const Questoes = () => {
 
     return (
         <main className='mainQuestoes'>
+            <Marca comLink />
             <h1>Questões</h1>
 
             {questoes.length === 0 && <p>Nenhuma questão cadastrada para este mapa.</p>}
