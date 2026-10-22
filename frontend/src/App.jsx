@@ -1,4 +1,5 @@
 import './App.css';
+import './responsivo.css';
 import  { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import Login from "./Components/Login/Login";
 import Register from "./Components/Register/Register";

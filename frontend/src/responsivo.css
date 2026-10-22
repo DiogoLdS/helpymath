@@ -1,0 +1,229 @@
+/* ---------- Ajustes para celular (todas as páginas) ----------
+   Fica num arquivo só pra não espalhar media queries por cada tela.
+   Os seletores começam com .App pra ganhar dos CSS de cada página, que carregam depois.
+   No desktop nada daqui vale. */
+
+@media (max-width: 768px) {
+
+    /* ----- Barra lateral vira barra de navegação fixa embaixo ----- */
+
+    .App section.art {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 50;
+        width: 100%;
+        max-width: none;
+        height: 62px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 0 8px;
+        border-right: none;
+        border-top: 4px solid #567EBB;
+        border-radius: 16px 16px 0 0;
+    }
+
+    .App section.art .linhaLogo,
+    .App section.art .space {
+        display: none;
+    }
+
+    .App section.art .logo,
+    .App section.art .iconspace {
+        width: auto;
+        height: 100%;
+        flex: 1;
+    }
+
+    /* Os ícones têm tamanho por id no CSS original, por isso o id aqui também */
+    .App section.art #logo,
+    .App section.art #form,
+    .App section.art #chat,
+    .App section.art #sino,
+    .App section.art #pess,
+    .App section.art #mais {
+        width: 28px;
+        height: 28px;
+    }
+
+    /* ----- Páginas com barra: o painel ocupa a largura toda ----- */
+
+    .App .mainLogin,
+    .App .mainRegister,
+    .App .mainHome,
+    .App .mainAdmin,
+    .App .mapaConceitualPage {
+        align-items: stretch;
+        /* espaço embaixo pra barra de navegação não cobrir o conteúdo */
+        padding: 12px 12px 78px;
+    }
+
+    .App .login,
+    .App .register,
+    .App .home,
+    .App .adminPainel,
+    .App .mapaGrid {
+        width: 100%;
+        height: auto;
+        min-height: calc(100vh - 90px);
+        padding: 24px 16px;
+        border-width: 3px;
+        border-radius: 20px;
+    }
+
+    /* ----- Login e cadastro ----- */
+
+    .App .login form,
+    .App .register form {
+        height: auto;
+    }
+
+    .App .login form h1,
+    .App .register form h1 {
+        font-size: 30px;
+        padding-bottom: 4px;
+    }
+
+    .App .marcaGrande .marcaNome {
+        font-size: 28px;
+    }
+
+    .App .marcaGrande .marcaSimbolo {
+        width: 46px;
+        height: 46px;
+    }
+
+    .App .login .remember-me,
+    .App .register .terms {
+        height: auto;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .App .login .enter,
+    .App .register .enter {
+        margin: 8px 0;
+    }
+
+    .App .login .signup,
+    .App .register .signup {
+        text-align: center;
+    }
+
+    /* ----- Painel do aluno (/inicio) ----- */
+
+    .App .home {
+        overflow: visible;
+    }
+
+    .App .homeCentro {
+        padding: 0;
+        overflow: visible;
+    }
+
+    /* O título não pode ficar embaixo do botão de configurações */
+    .App .homeCabecalho {
+        padding-right: 48px;
+    }
+
+    .App .homeNiveis {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* ----- Mapa conceitual ----- */
+
+    .App .mapaGrid {
+        /* espaço em cima e embaixo pros botões de imprimir/editar e "Fazer questões" */
+        padding: 64px 8px 72px;
+        gap: 12px;
+    }
+
+    /* min-width: 0 deixa as colunas do grid encolherem por igual (sem isso a coluna do
+       título fica larga e empurra os outros botões pra fora da caixa) */
+    .App .mapaNo {
+        min-width: 0;
+        max-width: 100%;
+        overflow-wrap: break-word;
+    }
+
+    /* O título fica sempre no centro do mapa. Aqui ele sai da conta das colunas
+       (position: absolute), assim não alarga a coluna do meio nem quebra a palavra */
+    .App .mapaTitulo {
+        /* sem célula, o "absolute" passa a ser em relação à caixa toda do mapa */
+        grid-area: auto;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: calc(100% - 32px);
+        font-size: 18px;
+        padding: 12px 14px;
+    }
+
+    .App .mapaNo {
+        height: auto;
+        min-height: 56px;
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .App .mapaIndicador > div {
+        font-size: 15px;
+    }
+
+    .App .mapaAcoesTopo {
+        top: 12px;
+        right: 12px;
+        left: 12px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 6px;
+    }
+
+    .App .mapaImprimir,
+    .App .mapaEditar,
+    .App .mapaExcluir {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    /* Na lateral direita ele cobriria os conteúdos; no celular vai pro meio, embaixo */
+    .App .mapaQuestoes {
+        top: auto;
+        bottom: 14px;
+        right: 50%;
+        transform: translateX(50%);
+        white-space: nowrap;
+    }
+
+    .App .mapaExplicacao {
+        width: calc(100% - 24px);
+        padding: 18px;
+    }
+
+    /* ----- Telas de administrador ----- */
+
+    .App .acoesForm {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .App .acoesForm .botaoPrimario,
+    .App .acoesForm .botaoCancelar {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* ----- Lista de mapas e questões (sem barra) ----- */
+
+    .App .mainMapas h1,
+    .App .mainQuestoes h1 {
+        font-size: 26px;
+    }
+
+    .App .questao-card {
+        padding: 18px;
+    }
+}
