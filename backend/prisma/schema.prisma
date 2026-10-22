@@ -9,7 +9,7 @@ datasource db {
 model alternativa {
   id        Int     @id @default(autoincrement())
   questaoId Int
-  texto     String
+  texto     String  @db.Text
   letra     String
   correta   Boolean
   questao   questao @relation(fields: [questaoId], references: [questaoId], map: "Alternativa_questaoId_fkey")
@@ -46,7 +46,7 @@ model mapaconteudo {
 model questao {
   mapaId         Int
   data           DateTime       @db.Date
-  enunciado      String
+  enunciado      String         @db.Text
   questaoId      Int            @id @default(autoincrement())
   alternativa    alternativa[]
   mapaconceitual mapaconceitual @relation(fields: [mapaId], references: [mapaId], map: "Questao_mapaId_fkey")
