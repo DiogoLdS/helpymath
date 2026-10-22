@@ -1,5 +1,5 @@
 import './App.css';
-import  { BrowserRouter, Routes, Route } from "react-router";
+import  { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import Login from "./Components/Login/Login";
 import Register from "./Components/Register/Register";
 import Home from './Components/Home/Home';
@@ -19,10 +19,14 @@ function App() {
 
           <Route path="/register" element={<Register/>}/>
 
-          <Route path="/" element={<Home/>}/>
+          {/* Primeira página do site: apresentação pública (não precisa de login) */}
+          <Route path="/" element={<Introducao/>}/>
 
-          {/* Página pública de apresentação do site (não precisa de login) */}
-          <Route path="/introducao" element={<Introducao/>}/>
+          {/* Endereço antigo da apresentação, pra links salvos não quebrarem */}
+          <Route path="/introducao" element={<Navigate to="/" replace/>}/>
+
+          {/* Painel do aluno logado (antes ficava no "/") */}
+          <Route path="/inicio" element={<Home/>}/>
 
           <Route path="/mapas" element={<Mapas/>}/>
 

@@ -39,7 +39,7 @@ const Home = () => {
 
         // Se não existir, a pessoa ainda não entrou: mostra a página de apresentação do site
         if (!storedToken) {
-            navigate('/introducao');
+            navigate('/');
             return;
         }
 

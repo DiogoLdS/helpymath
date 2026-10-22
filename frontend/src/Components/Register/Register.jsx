@@ -71,7 +71,7 @@ const Register = () => {
 
             <div className="signup">
               <p>Já tem uma conta? <Link to="/login">Entre!</Link></p>
-              <p><Link to="/introducao">Conheça o HelpyMath</Link></p>
+              <p><Link to="/">Conheça o HelpyMath</Link></p>
             </div>
           </form>
         </section>

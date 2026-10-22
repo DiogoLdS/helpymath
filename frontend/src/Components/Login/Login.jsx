@@ -22,7 +22,7 @@ const Login = () => {
 
       if (login.status == 200) {
         localStorage.setItem('token', login.data);
-        navigate('/');
+        navigate('/inicio');
       }
     } catch (error) {
       console.log(error.message);
@@ -66,7 +66,7 @@ const Login = () => {
 
             <div className="signup">
               <p>Ainda não tem uma conta? <Link to="/register">Crie uma!</Link></p>
-              <p><Link to="/introducao">Conheça o HelpyMath</Link></p>
+              <p><Link to="/">Conheça o HelpyMath</Link></p>
             </div>
           </form>
         </section>

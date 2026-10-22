@@ -177,6 +177,9 @@ const Introducao = () => {
     const [conteudoAberto, setConteudoAberto] = useState(null);
     const [respostaEscolhida, setRespostaEscolhida] = useState(null);
 
+    // Quem já entrou vê a mesma apresentação, mas com o caminho de volta pro painel no lugar de "Entrar"
+    const logado = Boolean(localStorage.getItem("token"));
+
     const itemAberto = conteudosExemplo.find((c) => c.id === conteudoAberto);
     const respondeu = respostaEscolhida !== null;
 
@@ -184,7 +187,7 @@ const Introducao = () => {
         <div className="intro">
             {/* ---------- Topo ---------- */}
             <header className="introTopo">
-                <Marca comLink />
+                <Marca comLink para="/" />
 
                 <nav className="introMenu" aria-label="Seções da página">
                     <a href="#como-funciona">Como funciona</a>
@@ -195,8 +198,14 @@ const Introducao = () => {
                 </nav>
 
                 <div className="introTopoAcoes">
-                    <Link to="/login" className="introBotao introBotaoContorno">Entrar</Link>
-                    <Link to="/register" className="introBotao">Criar conta</Link>
+                    {logado ? (
+                        <Link to="/inicio" className="introBotao">Ir para o meu painel</Link>
+                    ) : (
+                        <>
+                            <Link to="/login" className="introBotao introBotaoContorno">Entrar</Link>
+                            <Link to="/register" className="introBotao">Criar conta</Link>
+                        </>
+                    )}
                 </div>
             </header>
 
@@ -214,7 +223,9 @@ const Introducao = () => {
                             jeito visual, interativo e fácil de usar.
                         </p>
                         <div className="introHeroAcoes">
-                            <Link to="/register" className="introBotao introBotaoGrande">Começar agora, é grátis</Link>
+                            <Link to={logado ? "/inicio" : "/register"} className="introBotao introBotaoGrande">
+                                {logado ? "Continuar estudando" : "Começar agora, é grátis"}
+                            </Link>
                             <a href="#mapas" className="introBotao introBotaoGrande introBotaoContorno">Ver um exemplo</a>
                         </div>
                     </div>
@@ -509,8 +520,14 @@ const Introducao = () => {
                     <h2>Pronto para começar?</h2>
                     <p>Crie sua conta grátis e estude matemática de um jeito que faz sentido.</p>
                     <div className="introHeroAcoes">
-                        <Link to="/register" className="introBotao introBotaoGrande introBotaoClaro">Criar minha conta</Link>
-                        <Link to="/login" className="introBotao introBotaoGrande introBotaoContornoClaro">Já tenho conta</Link>
+                        {logado ? (
+                            <Link to="/inicio" className="introBotao introBotaoGrande introBotaoClaro">Ir para o meu painel</Link>
+                        ) : (
+                            <>
+                                <Link to="/register" className="introBotao introBotaoGrande introBotaoClaro">Criar minha conta</Link>
+                                <Link to="/login" className="introBotao introBotaoGrande introBotaoContornoClaro">Já tenho conta</Link>
+                            </>
+                        )}
                     </div>
                 </section>
             </main>

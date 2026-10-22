@@ -11,7 +11,7 @@ const Sidebar = () => {
     return (
         <section className="art">
             <div className="logo" id="logospace1">
-                <Link to="/" className="btnSB"><img src={logo} alt="HelpyMath, página inicial" title="HelpyMath" id="logo" /></Link>
+                <Link to="/inicio" className="btnSB"><img src={logo} alt="HelpyMath, página inicial" title="HelpyMath" id="logo" /></Link>
             </div>
             <div className="linhaLogo"></div>
             <div className="iconspace" id="iconspace1">
