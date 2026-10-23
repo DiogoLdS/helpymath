@@ -22,7 +22,9 @@
         padding: 0 8px;
         border-right: none;
         border-top: 4px solid #567EBB;
-        border-radius: 16px 16px 0 0;
+        border-radius: 0;
+        /* a sombra de recorte (identidade.css) não faz sentido numa barra presa embaixo */
+        box-shadow: none;
     }
 
     .App section.art .linhaLogo,
@@ -70,7 +72,8 @@
         min-height: calc(100vh - 90px);
         padding: 24px 16px;
         border-width: 3px;
-        border-radius: 20px;
+        border-radius: 4px;
+        box-shadow: 5px 5px 0 var(--tinta);
     }
 
     /* ----- Login e cadastro ----- */

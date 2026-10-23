@@ -1,0 +1,379 @@
+/* ---------- Identidade visual HelpyMath em todas as páginas ----------
+   Leva pro resto do site a estética da página de introdução (Introducao.css):
+   papel quadriculado de caderno, cantos quase retos, sombra sólida "de recorte"
+   e marca-texto nos títulos, nas cores dos níveis.
+   Não troca o visual de antes (barra azul, painel cinza-azulado com borda #567EBB):
+   só acrescenta por cima. Os seletores começam com .App pra ganhar dos CSS de cada página.
+   A página de introdução tem o próprio CSS e não depende deste arquivo. */
+
+.App {
+    --tinta: #1F2D44;
+    --azul-escuro: #2B4C7E;
+    --azul: #567EBB;
+    --papel: #FBF9F4;
+    --linha: #DCE3EE;
+    --verde: #9CCB7E;
+    --laranja: #E8A27C;
+    --vermelho: #E08A8A;
+    --azul-claro: #8DB3EC;
+
+    /* papel quadriculado, igual ao da introdução */
+    background-color: var(--papel);
+    background-image:
+        linear-gradient(var(--linha) 1px, transparent 1px),
+        linear-gradient(90deg, var(--linha) 1px, transparent 1px);
+    background-size: 28px 28px;
+}
+
+/* As páginas tinham fundo cinza liso; agora deixam o quadriculado aparecer */
+.App .mainLogin,
+.App .mainRegister,
+.App .mainHome,
+.App .mainAdmin,
+.App .mapaConceitualPage {
+    background-color: transparent;
+}
+
+/* ---------- Barra lateral + painel: cantos retos e sombra de recorte ---------- */
+
+.App section.art {
+    border-radius: 4px 0 0 4px;
+    /* a sombra continua a do painel ao lado, como se fossem uma peça só */
+    box-shadow: 0 8px 0 var(--tinta);
+}
+
+.App .login,
+.App .register,
+.App .home,
+.App .adminPainel,
+.App .mapaGrid {
+    border-radius: 0 4px 4px 0;
+    box-shadow: 8px 8px 0 var(--tinta);
+}
+
+/* ---------- Marca ---------- */
+
+.App .marcaSimbolo,
+.App .marcaGrande .marcaSimbolo {
+    border-radius: 4px;
+}
+
+/* ---------- Títulos principais com marca-texto ---------- */
+
+.App .login form h1,
+.App .register form h1,
+.App .homeCabecalho h1,
+.App .adminConteudo h1,
+.App .mainMapas h1,
+.App .mainQuestoes h1 {
+    display: inline;
+    background-image: linear-gradient(transparent 62%, var(--cor-titulo, var(--verde)) 62%);
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+}
+
+/* Cada página com uma das cores dos níveis */
+.App .register form h1 { --cor-titulo: var(--laranja); }
+.App .homeCabecalho h1 { --cor-titulo: var(--azul-claro); }
+.App .adminConteudo h1 { --cor-titulo: var(--laranja); }
+.App .mainQuestoes h1 { --cor-titulo: var(--vermelho); }
+
+/* Como o h1 virou "inline", o que vem depois precisa de um respiro */
+.App .adminConteudo .subtitulo,
+.App .homeCabecalho p {
+    margin-top: 10px;
+}
+
+.App .mainMapas h1,
+.App .mainQuestoes h1 {
+    display: table;
+    margin-bottom: 24px;
+}
+
+/* ---------- Botões: cantos retos e sombra que "afunda" ao clicar ---------- */
+
+.App .login .enter button,
+.App .register .enter button,
+.App .botaoPrimario,
+.App .botaoSecundario,
+.App .homeDiagnostico,
+.App .homeObjetivo,
+.App .homeSair,
+.App .mapaImprimir,
+.App .mapaEditar,
+.App .mapaExcluir,
+.App .mapaQuestoes,
+.App .mapaExplicacao button,
+.App .botao-responder {
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 var(--tinta);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.App .login .enter button:hover,
+.App .register .enter button:hover,
+.App .botaoPrimario:hover:not(:disabled),
+.App .botaoSecundario:hover:not(:disabled),
+.App .homeDiagnostico:hover,
+.App .homeObjetivo:hover,
+.App .homeSair:hover,
+.App .mapaImprimir:hover:not(:disabled),
+.App .mapaEditar:hover,
+.App .mapaExcluir:hover:not(:disabled),
+.App .mapaQuestoes:hover,
+.App .mapaExplicacao button:hover,
+.App .botao-responder:hover:not(:disabled) {
+    opacity: 1;
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 var(--tinta);
+}
+
+.App .login .enter button:active,
+.App .register .enter button:active,
+.App .botaoPrimario:active,
+.App .botaoSecundario:active,
+.App .homeDiagnostico:active,
+.App .homeObjetivo:active,
+.App .mapaImprimir:active,
+.App .mapaEditar:active,
+.App .mapaExcluir:active,
+.App .mapaQuestoes:active,
+.App .mapaExplicacao button:active,
+.App .botao-responder:active {
+    transform: translate(3px, 3px);
+    box-shadow: none;
+}
+
+/* "Fazer questões" já usa transform pra se centralizar; a sombra fica, o movimento não */
+.App .mapaQuestoes:hover,
+.App .mapaQuestoes:active {
+    transform: translateY(-50%);
+}
+
+/* O botão de cancelar é de contorno: sombra só de linha, mais discreta */
+.App .botaoCancelar {
+    border-radius: 4px;
+}
+
+/* ---------- Campos de formulário ---------- */
+
+.App .login .input-field input,
+.App .register .input-field input,
+.App .formCriarMapa input[type="text"],
+.App .formCriarMapa select,
+.App .formCriarMapa textarea {
+    border-radius: 3px;
+}
+
+/* ---------- Links embaixo do login/cadastro ---------- */
+
+/* "Crie uma!" e "Conheça o HelpyMath" um embaixo do outro, e não grudados na mesma linha */
+.App .login .signup,
+.App .register .signup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+/* =====================================================================
+   Parte 2: detalhes de cada página (fichas, cartões e janelas)
+   ===================================================================== */
+
+/* ---------- Lista de mapas ---------- */
+
+/* Cartão de mapa como uma ficha: borda fina, faixa na cor do nível em cima e sombra sólida */
+.App .mapa-card {
+    background-color: #FFFFFF;
+    border: 2px solid var(--tinta);
+    border-top: 6px solid var(--cor-nivel, var(--azul));
+    border-radius: 4px;
+    box-shadow: 5px 5px 0 var(--linha);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.App .mapa-card:hover {
+    border-color: var(--tinta);
+    border-top-color: var(--cor-nivel, var(--azul));
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 var(--azul-escuro);
+}
+
+/* Cada seção passa a cor do seu nível pros cartões dela */
+.App .mapas-secao:has(.nivel-basico) { --cor-nivel: var(--verde); }
+.App .mapas-secao:has(.nivel-intermediario) { --cor-nivel: var(--laranja); }
+.App .mapas-secao:has(.nivel-avancado) { --cor-nivel: var(--vermelho); }
+.App .mapas-secao:has(.nivel-treino) { --cor-nivel: var(--azul-claro); }
+
+/* Filtros: de pílula pra etiqueta retangular */
+.App .mapas-filtro {
+    border: 2px solid var(--tinta);
+    border-radius: 3px;
+}
+
+.App .mapas-filtro.ativo {
+    box-shadow: 3px 3px 0 var(--tinta);
+}
+
+.App .mapas-secao-titulo {
+    border: 2px solid var(--tinta);
+    border-radius: 3px;
+}
+
+/* ---------- Mapa conceitual ---------- */
+
+.App .mapaTitulo {
+    border: 2px solid var(--tinta);
+    border-radius: 4px;
+    box-shadow: 5px 5px 0 var(--tinta);
+}
+
+.App .mapaNo {
+    border: 2px solid #FFFFFF;
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 var(--tinta);
+}
+
+/* A janela da explicação vira uma ficha: faixa verde em cima e sombra de recorte */
+.App .mapaExplicacao {
+    border: 2px solid var(--tinta);
+    border-top: 8px solid var(--verde);
+    border-radius: 4px;
+    box-shadow: 8px 8px 0 var(--tinta);
+}
+
+.App .backdrop {
+    background-color: rgba(31, 45, 68, 0.45);
+}
+
+/* ---------- Painel do aluno (/inicio) ---------- */
+
+.App .homeNivel {
+    border: 2px solid var(--tinta);
+    border-radius: 4px;
+    box-shadow: 4px 4px 0 var(--tinta);
+}
+
+.App .homeNivel:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--tinta);
+}
+
+.App .homeBlocos ul {
+    border-radius: 4px;
+    box-shadow: 4px 4px 0 var(--verde);
+}
+
+/* O segundo bloco ("Benefícios") com a outra cor, pra não ficarem iguais */
+.App .homeBlocos > div:nth-child(2) ul {
+    box-shadow: 4px 4px 0 var(--laranja);
+}
+
+.App .homeLateral {
+    border-radius: 4px;
+    box-shadow: 5px 5px 0 var(--tinta);
+}
+
+.App .homePontuacao {
+    border-radius: 3px;
+    border-left: 6px solid var(--verde);
+}
+
+.App .homeLateral hr {
+    border-radius: 0;
+}
+
+/* ---------- Criar e editar mapa ---------- */
+
+/* Cada conteúdo e cada questão como uma ficha. Conteúdos com faixa verde, questões com laranja */
+.App .cardConteudo {
+    border: 2px solid var(--tinta);
+    border-top: 6px solid var(--verde);
+    border-radius: 4px;
+    box-shadow: 5px 5px 0 var(--linha);
+}
+
+.App .cardConteudo:has(.alternativasQuestao) {
+    border-top-color: var(--laranja);
+}
+
+.App .vazio,
+.App .previaExplicacao,
+.App .alternativasQuestao {
+    border-radius: 3px;
+}
+
+.App .acoesConteudo button,
+.App .botaoRemoverAlternativa,
+.App .botaoAdicionarAlternativa {
+    border-radius: 3px;
+}
+
+/* Editores de fórmula e de mídia: mesma ficha, com faixa azul */
+.App .formulaEditor,
+.App .midiaEditor {
+    border: 2px solid var(--tinta);
+    border-top: 5px solid var(--azul-claro);
+    border-radius: 4px;
+}
+
+.App .formulaAba,
+.App .midiaAba,
+.App .formulaSimbolo {
+    border-radius: 3px;
+}
+
+.App .formulaPrevia,
+.App .midiaPrevia {
+    border-radius: 3px;
+}
+
+.App .formulaCampo {
+    border-radius: 3px;
+}
+
+/* ---------- Mídia (imagens e vídeos nas explicações) ---------- */
+
+.App .midiaBloco img,
+.App .midiaVideo iframe,
+.App .midiaPrevia > img {
+    border: 2px solid var(--tinta);
+    border-radius: 3px;
+}
+
+/* ---------- Questões ---------- */
+
+.App .questao-card {
+    background-color: #FFFFFF;
+    border: 2px solid var(--tinta);
+    border-top: 6px solid var(--vermelho);
+    border-radius: 4px;
+    box-shadow: 5px 5px 0 var(--linha);
+}
+
+.App .alternativa {
+    background-color: var(--papel);
+    border: 2px solid var(--tinta);
+    border-radius: 3px;
+}
+
+.App .alternativa.selecionada {
+    border-color: var(--azul-escuro);
+    box-shadow: 3px 3px 0 var(--azul-escuro);
+}
+
+.App .alternativa.correta {
+    border-color: #4F8A31;
+    background-color: #E3F2D9;
+}
+
+.App .alternativa.incorreta {
+    border-color: #B03A2E;
+    background-color: #F8E0E0;
+}
+
+.App .botao-responder {
+    color: #FFFFFF;
+    background-color: var(--azul-escuro);
+    border: 2px solid var(--azul-escuro);
+}
