@@ -849,42 +849,6 @@
     color: var(--azul-escuro);
 }
 
-/* ---------- Para educadores ---------- */
-
-.introProfessor {
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    align-items: center;
-    gap: 40px;
-}
-
-.introProfessor p {
-    margin-top: 16px;
-    color: var(--texto-suave);
-}
-
-/* Lista como uma folha de caderno pautado */
-.introProfessor ul {
-    display: flex;
-    flex-direction: column;
-    padding: 18px 22px 18px 42px;
-    list-style: none;
-    background-color: #FFFFFF;
-    background-image: linear-gradient(90deg, transparent 28px, var(--vermelho) 28px, var(--vermelho) 30px, transparent 30px);
-    border: 2px solid var(--tinta);
-    border-radius: 3px;
-    box-shadow: 6px 6px 0 var(--linha);
-}
-
-.introProfessor li {
-    padding: 10px 0;
-    border-bottom: 1px solid var(--linha);
-}
-
-.introProfessor li:last-child {
-    border-bottom: none;
-}
-
 /* ---------- Dúvidas ---------- */
 
 .introPerguntas {
@@ -1037,8 +1001,7 @@
 
     .introHero,
     .introPorque,
-    .introMapaArea,
-    .introProfessor {
+    .introMapaArea {
         grid-template-columns: 1fr;
     }
 

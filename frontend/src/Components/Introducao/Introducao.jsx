@@ -496,25 +496,6 @@ const Introducao = () => {
                     </ul>
                 </section>
 
-                {/* ---------- Para professores ---------- */}
-                <section className="introSecao introProfessor">
-                    <div>
-                        <span className="introSobretitulo"><b aria-hidden="true">Δ</b> Para educadores</span>
-                        <h2>Para quem cria os conteúdos</h2>
-                        <p>
-                            Os administradores montam os mapas direto pelo site: escrevem as explicações,
-                            inserem fórmulas com um editor de botões, adicionam imagens e vídeos, escolhem a
-                            dificuldade e cadastram as questões. Tudo isso numa tela só.
-                        </p>
-                    </div>
-                    <ul>
-                        <li>Editor de fórmulas com pré-visualização</li>
-                        <li>Imagens e vídeos por link</li>
-                        <li>Três tipos de conteúdo por mapa</li>
-                        <li>Questões com alternativa correta</li>
-                    </ul>
-                </section>
-
                 {/* ---------- Dúvidas ---------- */}
                 <section className="introSecao introFaixa" id="perguntas">
                     <span className="introSobretitulo"><b aria-hidden="true">?</b> Perguntas</span>
