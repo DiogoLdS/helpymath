@@ -5,6 +5,10 @@ import niveis from "../../data/niveis.js";
 import Marca from "../Marca/Marca.jsx";
 import { Formula } from "../Formulas/Formula.jsx";
 import { TextoComMidia } from "../Midia/Midia.jsx";
+// Fotos (Unsplash): quadro com fórmulas de Artturi Jalli e sala de aula de Vitaly Gariev.
+// Versões reduzidas (1600px) das fotos originais, pra página carregar rápido.
+import fotoQuadro from "../../Assets/Images/quadro-formulas.jpg";
+import fotoSala from "../../Assets/Images/sala-de-aula.jpg";
 import "./Introducao.css";
 
 // Página pública de apresentação do HelpyMath (não precisa de login).
@@ -17,30 +21,30 @@ const destaques = [
     { valor: "ENEM", rotulo: "questões no estilo das provas" },
 ];
 
-// Problemas levantados no TCC (seção 2.4) e como a plataforma responde a cada um
+// Problemas levantados no TCC (seção 2.4, numerados de I a V como no texto) e como a plataforma responde a cada um
 const problemas = [
     {
-        icone: "💸",
+        icone: "I",
         problema: "Plataformas pagas",
         solucao: "O HelpyMath é gratuito: estudar não depende de quanto você pode pagar.",
     },
     {
-        icone: "🧭",
+        icone: "II",
         problema: "Sites confusos e textos enormes",
         solucao: "Os conteúdos ficam organizados em mapas visuais, em pedaços curtos e ligados entre si.",
     },
     {
-        icone: "🔕",
+        icone: "III",
         problema: "Anúncios e distrações",
         solucao: "Nada de propaganda no meio da explicação. Só você e o conteúdo.",
     },
     {
-        icone: "🎮",
+        icone: "IV",
         problema: "Falta de prática e interatividade",
         solucao: "Botões que se abrem, links para simulações e questões com resposta na hora.",
     },
     {
-        icone: "📝",
+        icone: "V",
         problema: "Pouca aplicação de questões",
         solucao: "Cada mapa tem suas próprias questões, para fixar o que acabou de estudar.",
     },
@@ -67,37 +71,37 @@ const recursos = [
         exemplo: <Formula latex="x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}" bloco />,
     },
     {
-        icone: "🖼️",
+        icone: "▶",
         titulo: "Imagens e vídeos",
         texto: "Gráficos, figuras e vídeos do YouTube direto dentro da explicação do conteúdo.",
     },
     {
-        icone: "🖨️",
+        icone: "⇩",
         titulo: "Imprima ou salve em PDF",
         texto: "Leve o mapa para o papel: o PDF traz o mapa e todos os conteúdos abertos.",
     },
     {
-        icone: "🎯",
+        icone: "√",
         titulo: "Níveis e objetivos",
         texto: "Os mapas ficam separados por dificuldade, para você começar do ponto certo.",
     },
     {
-        icone: "📈",
+        icone: "↗",
         titulo: "Acompanhe sua evolução",
         texto: "Sequência de dias estudando, pontos e metas diárias na sua página inicial.",
     },
     {
-        icone: "♿",
+        icone: "Aa",
         titulo: "Feito para todos",
         texto: "Contraste, navegação por teclado e descrição nas imagens, para quem usa leitor de tela.",
     },
 ];
 
 const recompensas = [
-    { icone: "⭐", texto: "Ganhe pontos ao completar exercícios" },
-    { icone: "🔓", texto: "Desbloqueie novos níveis" },
-    { icone: "🏆", texto: "Suba no ranking" },
-    { icone: "🔥", texto: "Mantenha sua sequência de estudos" },
+    { icone: "+10", texto: "Ganhe pontos ao completar exercícios" },
+    { icone: "▲", texto: "Desbloqueie novos níveis" },
+    { icone: "#1", texto: "Suba no ranking" },
+    { icone: "×7", texto: "Mantenha sua sequência de estudos" },
 ];
 
 const perguntas = [
@@ -230,20 +234,17 @@ const Introducao = () => {
                         </div>
                     </div>
 
-                    {/* Ilustração: um mapa conceitual feito só com CSS */}
-                    <div className="introHeroDesenho" aria-hidden="true">
-                        <svg className="introHeroLinhas" viewBox="0 0 400 320" preserveAspectRatio="none">
-                            <line x1="200" y1="160" x2="70" y2="50" />
-                            <line x1="200" y1="160" x2="330" y2="50" />
-                            <line x1="200" y1="160" x2="70" y2="270" />
-                            <line x1="200" y1="160" x2="330" y2="270" />
-                        </svg>
-                        <span className="introBolha introBolhaCentro">Funções</span>
-                        <span className="introBolha b1">Domínio</span>
-                        <span className="introBolha b2">f(x) = ax + b</span>
-                        <span className="introBolha b3">Gráfico</span>
-                        <span className="introBolha b4">Raízes</span>
-                    </div>
+                    {/* Foto do quadro com uma "ficha" do mapa conceitual por cima */}
+                    <figure className="introHeroFoto">
+                        <img src={fotoQuadro} alt="Quadro-negro verde cheio de fórmulas escritas a giz" />
+                        <figcaption className="introFicha" aria-hidden="true">
+                            <span className="introFichaTitulo">Funções</span>
+                            <span>Domínio</span>
+                            <span>Gráfico</span>
+                            <span><Formula latex="f(x) = ax + b" /></span>
+                        </figcaption>
+                        <span className="introSelo" aria-hidden="true">π</span>
+                    </figure>
                 </section>
 
                 {/* ---------- Números ---------- */}
@@ -258,12 +259,23 @@ const Introducao = () => {
 
                 {/* ---------- Por que existe ---------- */}
                 <section className="introSecao">
-                    <h2>Por que o HelpyMath existe?</h2>
-                    <p className="introSubtitulo">
-                        A matemática é uma das matérias em que os alunos mais têm dificuldade, e muitos
-                        procuram ajuda na internet. Ao analisar as plataformas que já existem, encontramos
-                        alguns problemas. O HelpyMath foi pensado para resolver cada um deles.
-                    </p>
+                    <div className="introPorque">
+                        <div>
+                            <span className="introSobretitulo"><b aria-hidden="true">π</b> O problema</span>
+                            <h2>Por que o HelpyMath existe?</h2>
+                            <p className="introSubtitulo">
+                                A matemática é uma das matérias em que os alunos mais têm dificuldade, e muitos
+                                procuram ajuda na internet. Ao analisar as plataformas que já existem, encontramos
+                                alguns problemas. O HelpyMath foi pensado para resolver cada um deles.
+                            </p>
+                        </div>
+                        <img
+                            src={fotoSala}
+                            alt="Alunos em sala de aula prestando atenção no professor"
+                            className="introFoto"
+                            loading="lazy"
+                        />
+                    </div>
 
                     <div className="introProblemas">
                         {problemas.map((p) => (
@@ -278,6 +290,7 @@ const Introducao = () => {
 
                 {/* ---------- Como funciona ---------- */}
                 <section className="introSecao introFaixa" id="como-funciona">
+                    <span className="introSobretitulo"><b aria-hidden="true">Σ</b> Passo a passo</span>
                     <h2>Como funciona</h2>
                     <p className="introSubtitulo">Do cadastro à primeira questão em poucos minutos.</p>
 
@@ -294,6 +307,7 @@ const Introducao = () => {
 
                 {/* ---------- Mapa de exemplo ---------- */}
                 <section className="introSecao" id="mapas">
+                    <span className="introSobretitulo"><b aria-hidden="true">≈</b> Na prática</span>
                     <h2>Experimente um mapa conceitual</h2>
                     <p className="introSubtitulo">
                         Os mapas conceituais organizam um assunto em ideias ligadas entre si, ligando o
@@ -376,6 +390,7 @@ const Introducao = () => {
 
                 {/* ---------- Níveis ---------- */}
                 <section className="introSecao introFaixa" id="niveis">
+                    <span className="introSobretitulo"><b aria-hidden="true">√</b> Do seu jeito</span>
                     <h2>Um nível para cada momento</h2>
                     <p className="introSubtitulo">
                         Os mapas ficam separados por dificuldade. Comece onde se sentir confortável e
@@ -404,6 +419,7 @@ const Introducao = () => {
 
                 {/* ---------- Questão de exemplo ---------- */}
                 <section className="introSecao" id="questoes">
+                    <span className="introSobretitulo"><b aria-hidden="true">∴</b> Treino</span>
                     <h2>Pratique com questões</h2>
                     <p className="introSubtitulo">
                         Cada mapa tem questões de múltipla escolha. Você responde e descobre na hora se
@@ -449,6 +465,7 @@ const Introducao = () => {
 
                 {/* ---------- Recursos ---------- */}
                 <section className="introSecao introFaixa">
+                    <span className="introSobretitulo"><b aria-hidden="true">∫</b> Recursos</span>
                     <h2>Tudo o que você encontra aqui</h2>
 
                     <div className="introRecursos">
@@ -465,6 +482,7 @@ const Introducao = () => {
 
                 {/* ---------- Recompensas ---------- */}
                 <section className="introSecao">
+                    <span className="introSobretitulo"><b aria-hidden="true">+</b> Motivação</span>
                     <h2>Estudar também pode ser divertido</h2>
                     <p className="introSubtitulo">Cada exercício conta. Veja o que você ganha estudando:</p>
 
@@ -481,6 +499,7 @@ const Introducao = () => {
                 {/* ---------- Para professores ---------- */}
                 <section className="introSecao introProfessor">
                     <div>
+                        <span className="introSobretitulo"><b aria-hidden="true">Δ</b> Para educadores</span>
                         <h2>Para quem cria os conteúdos</h2>
                         <p>
                             Os administradores montam os mapas direto pelo site: escrevem as explicações,
@@ -489,15 +508,16 @@ const Introducao = () => {
                         </p>
                     </div>
                     <ul>
-                        <li>✏️ Editor de fórmulas com pré-visualização</li>
-                        <li>🖼️ Imagens e vídeos por link</li>
-                        <li>🧩 Três tipos de conteúdo por mapa</li>
-                        <li>❓ Questões com alternativa correta</li>
+                        <li>Editor de fórmulas com pré-visualização</li>
+                        <li>Imagens e vídeos por link</li>
+                        <li>Três tipos de conteúdo por mapa</li>
+                        <li>Questões com alternativa correta</li>
                     </ul>
                 </section>
 
                 {/* ---------- Dúvidas ---------- */}
                 <section className="introSecao introFaixa" id="perguntas">
+                    <span className="introSobretitulo"><b aria-hidden="true">?</b> Perguntas</span>
                     <h2>Dúvidas frequentes</h2>
 
                     <div className="introPerguntas">
@@ -535,6 +555,7 @@ const Introducao = () => {
             <footer className="introRodape">
                 <Marca />
                 <p>Trabalho de Conclusão de Curso · Cecília Sales e Diogo Lima · 2026</p>
+                <p className="introCreditos">Fotos: Artturi Jalli e Vitaly Gariev (Unsplash)</p>
             </footer>
 
             {/* Janela do botão explicativo do mapa de exemplo */}
