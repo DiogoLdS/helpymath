@@ -37,6 +37,8 @@ const MapaConceitual = () => {
     // Mapa já concluído (conteúdos + 60% nas questões) e o próximo do mesmo nível
     const [mapaConcluido, setMapaConcluido] = useState(false);
     const [proximoMapa, setProximoMapa] = useState(null);
+    // Mapa anterior na sequência do nível (null no primeiro mapa do nível)
+    const [mapaAnterior, setMapaAnterior] = useState(null);
     // Quando o mapa ainda está trancado: qual mapa precisa ser concluído antes
     const [anteriorPendente, setAnteriorPendente] = useState(null);
 
@@ -59,6 +61,7 @@ const MapaConceitual = () => {
             setAnteriorPendente(null);
             setMapaConcluido(false);
             setProximoMapa(null);
+            setMapaAnterior(null);
 
             try {
                 const resposta = await api.get(`/mapas/${id}`, {
@@ -77,6 +80,7 @@ const MapaConceitual = () => {
                     setConcluidos(respostaProgresso.data.concluidos);
                     setMapaConcluido(Boolean(respostaProgresso.data.concluido));
                     setProximoMapa(respostaProgresso.data.proximo ?? null);
+                    setMapaAnterior(respostaProgresso.data.anterior ?? null);
                 } catch (errorProgresso) {
                     setConcluidos(null);
                     console.log(errorProgresso.message);
@@ -249,6 +253,17 @@ const MapaConceitual = () => {
                         </span>
                     )}
                 </div>
+            )}
+
+            {/* Meio da lateral esquerda (espelha o "Fazer questões" da direita): volta pro mapa anterior
+                do nível; no primeiro mapa do nível, volta pra lista de mapas */}
+            {mapaAnterior ? (
+                <Link to={`/mapas/${mapaAnterior.mapaId}`} className="mapaAnterior" title={`Voltar para ${mapaAnterior.nome}`}>
+                    ← Mapa anterior
+                    <small>{mapaAnterior.nome}</small>
+                </Link>
+            ) : (
+                <Link to="/mapas" className="mapaAnterior">← Todos os mapas</Link>
             )}
 
             {questoesLiberadas ? (

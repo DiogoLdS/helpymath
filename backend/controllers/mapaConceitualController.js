@@ -98,7 +98,9 @@ function controller() {
                     ...progresso,
                     questoes,
                     concluido: situacao?.concluido ?? false,
-                    proximo: situacao?.proximo ?? null
+                    proximo: situacao?.proximo ?? null,
+                    // Mapa que vem antes na sequência do nível (null no primeiro): botão "Mapa anterior"
+                    anterior: situacao?.anterior ?? null
                 });
             } catch (error) {
                 console.log(error.message);

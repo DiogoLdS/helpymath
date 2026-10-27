@@ -192,13 +192,32 @@
         font-size: 13px;
     }
 
-    /* Na lateral direita ele cobriria os conteúdos; no celular vai pro meio, embaixo */
+    /* Nas laterais eles cobririam os conteúdos; no celular os dois vão pra baixo, lado a lado:
+       "Mapa anterior" à esquerda e "Fazer questões" à direita */
     .App .mapaQuestoes {
         top: auto;
         bottom: 14px;
-        right: 50%;
-        transform: translateX(50%);
-        white-space: nowrap;
+        right: 12px;
+        max-width: calc(50% - 18px);
+        padding: 8px 10px;
+        font-size: 13px;
+        text-align: center;
+        transform: none;
+    }
+
+    .App .mapaAnterior {
+        top: auto;
+        bottom: 14px;
+        left: 12px;
+        max-width: calc(50% - 18px);
+        padding: 8px 10px;
+        font-size: 13px;
+        transform: none;
+    }
+
+    .App .mapaQuestoes:hover,
+    .App .mapaQuestoes:active {
+        transform: none;
     }
 
     /* Moldura de madeira mais fina e espaço embaixo pra barra de progresso */
