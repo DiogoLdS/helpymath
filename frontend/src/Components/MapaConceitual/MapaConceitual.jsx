@@ -256,14 +256,12 @@ const MapaConceitual = () => {
             )}
 
             {/* Meio da lateral esquerda (espelha o "Fazer questões" da direita): volta pro mapa anterior
-                do nível; no primeiro mapa do nível, volta pra lista de mapas */}
-            {mapaAnterior ? (
+                do nível. O primeiro mapa do nível não tem anterior, então ali o botão não aparece */}
+            {mapaAnterior && (
                 <Link to={`/mapas/${mapaAnterior.mapaId}`} className="mapaAnterior" title={`Voltar para ${mapaAnterior.nome}`}>
                     ← Mapa anterior
                     <small>{mapaAnterior.nome}</small>
                 </Link>
-            ) : (
-                <Link to="/mapas" className="mapaAnterior">← Todos os mapas</Link>
             )}
 
             {questoesLiberadas ? (
