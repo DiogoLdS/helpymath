@@ -614,3 +614,173 @@
     padding: 10px 18px;
     text-decoration: none;
 }
+
+/* ---------- Placar das questões (acertos x meta de 60%) ---------- */
+
+.App .questoes-placar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+    padding: 18px 20px;
+    background-color: #FFFFFF;
+    border: 2px solid var(--tinta);
+    border-top: 6px solid var(--azul-claro);
+    border-radius: 4px;
+    box-shadow: 5px 5px 0 var(--linha);
+}
+
+.App .questoes-placar-texto {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 16px;
+}
+
+.App .questoes-placar-texto strong {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--azul-escuro);
+}
+
+.App .questoes-placar-texto span {
+    font-size: 14px;
+    color: #4A5A73;
+}
+
+/* Barra de acertos com um tracinho marcando a meta */
+.App .questoes-placar-barra {
+    position: relative;
+    height: 14px;
+    background-color: var(--linha);
+    border: 2px solid var(--tinta);
+    border-radius: 2px;
+}
+
+.App .questoes-placar-preenchido {
+    height: 100%;
+    background-color: var(--verde);
+    transition: width 0.3s ease;
+}
+
+.App .questoes-placar-meta {
+    position: absolute;
+    top: -6px;
+    bottom: -6px;
+    width: 3px;
+    background-color: var(--tinta);
+}
+
+.App .questoes-concluido {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 14px;
+    background-color: #E3F2D9;
+    border-left: 5px solid #4F8A31;
+}
+
+.App .questoes-concluido strong {
+    font-weight: 800;
+    color: #2F6B1D;
+}
+
+.App .questoes-concluido .botao-responder {
+    padding: 10px 18px;
+    text-decoration: none;
+}
+
+.App .questoes-dica {
+    font-size: 14px;
+    color: #8A4B1F;
+}
+
+/* "Resposta incorreta." + "Tentar de novo" na mesma linha */
+.App .feedback-linha {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.App .feedback-linha .feedback {
+    margin: 0;
+}
+
+/* ---------- Sequência de mapas: trancado e concluído ---------- */
+
+/* Na lista: mapa trancado fica apagado, com faixa cinza e o aviso do que falta */
+.App .mapa-card-trancado {
+    color: #6B7480;
+    background-color: #F1F1EE;
+    border-style: dashed;
+    border-top-style: solid;
+    border-top-color: #B0B5BC;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+.App .mapa-card-trancado:hover {
+    transform: none;
+    box-shadow: none;
+    border-top-color: #B0B5BC;
+}
+
+.App .mapa-card-status {
+    display: block;
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.App .mapa-card-concluido .mapa-card-status {
+    color: #2F6B1D;
+}
+
+/* No mapa: aviso de concluído + link do próximo, dentro do quadrinho de progresso */
+.App .mapaProgressoConcluido {
+    font-size: 13px;
+    font-weight: 700;
+    color: #2F6B1D;
+}
+
+.App .mapaProgressoConcluido a {
+    color: var(--azul-escuro);
+}
+
+/* Página de um mapa ainda trancado */
+.App .mapaTrancado {
+    /* "top" em vez de margem: a margem vazaria pra fora da página e mostraria o fundo do body */
+    position: relative;
+    top: 12vh;
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    background-color: #FFFFFF;
+    border: 2px solid var(--tinta);
+    border-top: 6px solid var(--laranja);
+    border-radius: 4px;
+    box-shadow: 6px 6px 0 var(--tinta);
+}
+
+.App .mapaTrancado h1 {
+    font-size: 26px;
+    color: var(--azul-escuro);
+}
+
+/* O botão aqui não fica preso ao quadro, então volta pro fluxo normal da página */
+.App .mapaTrancado .mapaQuestoes {
+    position: static;
+    transform: none;
+    padding: 12px 20px;
+}
+
+.App .mapaTrancado .mapaQuestoes:hover,
+.App .mapaTrancado .mapaQuestoes:active {
+    transform: translate(1px, 1px);
+}

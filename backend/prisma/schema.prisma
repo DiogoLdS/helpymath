@@ -50,6 +50,7 @@ model questao {
   enunciado      String         @db.Text
   questaoId      Int            @id @default(autoincrement())
   alternativa    alternativa[]
+  usuarioquestao usuarioquestao[]
   mapaconceitual mapaconceitual @relation(fields: [mapaId], references: [mapaId], map: "Questao_mapaId_fkey")
 
   @@index([mapaId], map: "Questao_mapaId_fkey")
@@ -62,6 +63,7 @@ model usuario {
   usuarioId       Int               @id @default(autoincrement())
   admin           Boolean           @default(false)
   usuarioconteudo usuarioconteudo[]
+  usuarioquestao  usuarioquestao[]
 }
 
 model usuarioconteudo {
@@ -73,4 +75,20 @@ model usuarioconteudo {
 
   @@id([usuarioId, conteudoId])
   @@index([conteudoId], map: "UsuarioConteudo_conteudoId_fkey")
+}
+
+// Resposta de um aluno a uma questão (a última tentativa; refazer substitui).
+// alternativaId não tem chave estrangeira de propósito: se o admin apagar a alternativa, a resposta continua valendo.
+// Apagar a questão apaga as respostas dela junto (onDelete: Cascade).
+model usuarioquestao {
+  usuarioId     Int
+  questaoId     Int
+  alternativaId Int
+  correta       Boolean
+  respondidaEm  DateTime @default(now())
+  usuario       usuario  @relation(fields: [usuarioId], references: [usuarioId], map: "UsuarioQuestao_usuarioId_fkey")
+  questao       questao  @relation(fields: [questaoId], references: [questaoId], onDelete: Cascade, map: "UsuarioQuestao_questaoId_fkey")
+
+  @@id([usuarioId, questaoId])
+  @@index([questaoId], map: "UsuarioQuestao_questaoId_fkey")
 }

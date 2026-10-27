@@ -1,5 +1,5 @@
 import prisma from '../services/adapter.js';
-import { progressoNoMapa } from '../services/progresso.js';
+import { progressoNoMapa, resultadoQuestoes, situacaoDosMapas, situacaoDoMapa } from '../services/progresso.js';
 
 // Dificuldades possíveis de um mapa (as mesmas dos cards da página inicial)
 const NIVEIS = ['basico', 'intermediario', 'avancado', 'treino'];
@@ -32,13 +32,8 @@ function controller() {
         },
         async listarMapas(req, res) {
             try {
-                const mapas = await prisma.mapaconceitual.findMany({
-                    select: {
-                        mapaId: true,
-                        nome: true,
-                        nivel: true
-                    }
-                });
+                // Cada mapa vem com "liberado" e "concluido" pro usuário logado, na ordem da sequência
+                const mapas = await situacaoDosMapas(req.usuario.usuarioId, req.usuario.admin);
 
                 res.status(200).json(mapas);
             } catch (error) {
@@ -66,6 +61,16 @@ function controller() {
                     return res.status(404).json("Mapa não encontrado");
                 }
 
+                // Mapa da sequência que o aluno ainda não liberou (precisa concluir o anterior do nível)
+                const situacao = await situacaoDoMapa(mapa.mapaId, req.usuario.usuarioId, req.usuario.admin);
+                if (!situacao.liberado) {
+                    return res.status(403).json({
+                        error: "Conclua o mapa anterior para liberar este",
+                        bloqueado: true,
+                        anterior: situacao.anterior
+                    });
+                }
+
                 const mapaInfo = {
                     mapaId: mapa.mapaId,
                     nome: mapa.nome,
@@ -82,8 +87,19 @@ function controller() {
         // Progresso do usuário logado nesse mapa: { concluidos, pendentes, total }
         async progressoMapa(req, res) {
             try {
-                const progresso = await progressoNoMapa(parseInt(req.params.id), req.usuario.usuarioId);
-                res.status(200).json(progresso);
+                const mapaId = parseInt(req.params.id);
+                const { usuarioId, admin } = req.usuario;
+
+                const progresso = await progressoNoMapa(mapaId, usuarioId);
+                const questoes = await resultadoQuestoes(mapaId, usuarioId);
+                const situacao = await situacaoDoMapa(mapaId, usuarioId, admin);
+
+                res.status(200).json({
+                    ...progresso,
+                    questoes,
+                    concluido: situacao?.concluido ?? false,
+                    proximo: situacao?.proximo ?? null
+                });
             } catch (error) {
                 console.log(error.message);
                 res.status(500).json("Internal server error!");

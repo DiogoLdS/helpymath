@@ -34,6 +34,11 @@ const MapaConceitual = () => {
     // null = não deu pra buscar (ex: backend antigo); aí nada fica bloqueado.
     const [concluidos, setConcluidos] = useState(null);
     const [salvandoConclusao, setSalvandoConclusao] = useState(false);
+    // Mapa já concluído (conteúdos + 60% nas questões) e o próximo do mesmo nível
+    const [mapaConcluido, setMapaConcluido] = useState(false);
+    const [proximoMapa, setProximoMapa] = useState(null);
+    // Quando o mapa ainda está trancado: qual mapa precisa ser concluído antes
+    const [anteriorPendente, setAnteriorPendente] = useState(null);
 
     // Na aba aparece o nome do mapa (ex: "Probabilidade | HelpyMath")
     useTituloPagina(mapa?.nome ?? "Mapa conceitual");
@@ -50,6 +55,10 @@ const MapaConceitual = () => {
             setCarregando(true);
             setErro("");
             setAbertoId(null);
+            // Ao ir de um mapa pro próximo, o componente é o mesmo: zera o que era do mapa anterior
+            setAnteriorPendente(null);
+            setMapaConcluido(false);
+            setProximoMapa(null);
 
             try {
                 const resposta = await api.get(`/mapas/${id}`, {
@@ -66,6 +75,8 @@ const MapaConceitual = () => {
                         headers: { Authorization: `Bearer ${storedToken}` }
                     });
                     setConcluidos(respostaProgresso.data.concluidos);
+                    setMapaConcluido(Boolean(respostaProgresso.data.concluido));
+                    setProximoMapa(respostaProgresso.data.proximo ?? null);
                 } catch (errorProgresso) {
                     setConcluidos(null);
                     console.log(errorProgresso.message);
@@ -78,6 +89,12 @@ const MapaConceitual = () => {
             } catch (error) {
                 if (error.response?.status === 401) {
                     navigate("/login");
+                    return;
+                }
+
+                // Mapa da sequência ainda trancado: mostra qual precisa ser concluído antes
+                if (error.response?.status === 403 && error.response.data?.bloqueado) {
+                    setAnteriorPendente(error.response.data.anterior ?? { nome: "o mapa anterior" });
                     return;
                 }
 
@@ -100,6 +117,20 @@ const MapaConceitual = () => {
     }
 
     if (erro || !mapa) {
+        if (anteriorPendente) {
+            return (
+                <div className="mapaTrancado">
+                    <h1>Este mapa ainda está bloqueado</h1>
+                    <p>Conclua o mapa <strong>{anteriorPendente.nome}</strong> para liberar este.</p>
+                    {anteriorPendente.mapaId ? (
+                        <Link to={`/mapas/${anteriorPendente.mapaId}`} className="mapaQuestoes">Ir para {anteriorPendente.nome}</Link>
+                    ) : (
+                        <Link to="/mapas" className="mapaQuestoes">Ver os mapas</Link>
+                    )}
+                </div>
+            );
+        }
+
         return <p className="mapaMensagem">{erro || "Não foi possível carregar este mapa conceitual."}</p>;
     }
 
@@ -211,6 +242,12 @@ const MapaConceitual = () => {
                     <div className="mapaProgressoBarra">
                         <div style={{ width: `${(quantidadeConcluida / interativos.length) * 100}%` }} />
                     </div>
+                    {mapaConcluido && (
+                        <span className="mapaProgressoConcluido">
+                            ✓ Mapa concluído
+                            {proximoMapa && <> · <Link to={`/mapas/${proximoMapa.mapaId}`}>Próximo: {proximoMapa.nome} →</Link></>}
+                        </span>
+                    )}
                 </div>
             )}
 

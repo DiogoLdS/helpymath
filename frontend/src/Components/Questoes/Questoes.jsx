@@ -5,15 +5,22 @@ import "./Questoes.css";
 import useTituloPagina from "../../utils/useTituloPagina.js";
 import Marca from "../Marca/Marca.jsx";
 
+// Precisa bater com NOTA_MINIMA do backend (services/progresso.js)
+const NOTA_MINIMA = 0.6;
+
 const Questoes = () => {
     useTituloPagina("Questões");
 
     const { mapaId } = useParams();
     const navigate = useNavigate();
     const [questoes, setQuestoes] = useState([]);
+    // Alternativa escolhida em cada questão: { questaoId: alternativaId }
     const [respostas, setRespostas] = useState({});
+    // Correção de cada questão já respondida: { questaoId: { correto, letraCorreta } }
     const [resultados, setResultados] = useState({});
     const [bloqueado, setBloqueado] = useState(false);
+    // Placar do mapa: { acertos, total, mapaConcluido, proximo }
+    const [placar, setPlacar] = useState(null);
 
     useEffect(() => {
         const buscarQuestoes = async () => {
@@ -24,13 +31,10 @@ const Questoes = () => {
                 return;
             }
 
-            try {
-                const resposta = await api.get(`/mapas/${mapaId}/questoes`, {
-                    headers: {
-                        Authorization: `Bearer ${storedToken}`
-                    }
-                });
+            const headers = { Authorization: `Bearer ${storedToken}` };
 
+            try {
+                const resposta = await api.get(`/mapas/${mapaId}/questoes`, { headers });
                 setQuestoes(resposta.data);
             } catch (error) {
                 if (error.response?.status === 401) {
@@ -40,6 +44,30 @@ const Questoes = () => {
                 if (error.response?.status === 403) {
                     setBloqueado(true);
                 }
+                console.log(error.message);
+                return;
+            }
+
+            // Respostas que o aluno já deu antes (pra continuar de onde parou)
+            try {
+                const { data } = await api.get(`/mapas/${mapaId}/progresso`, { headers });
+
+                const anteriores = {};
+                const corrigidas = {};
+                for (const r of data.questoes.respostas) {
+                    anteriores[r.questaoId] = r.alternativaId;
+                    corrigidas[r.questaoId] = { correto: r.correta, letraCorreta: null };
+                }
+
+                setRespostas(anteriores);
+                setResultados(corrigidas);
+                setPlacar({
+                    acertos: data.questoes.acertos,
+                    total: data.questoes.total,
+                    mapaConcluido: data.concluido,
+                    proximo: data.proximo,
+                });
+            } catch (error) {
                 console.log(error.message);
             }
         };
@@ -67,11 +95,32 @@ const Questoes = () => {
                 }
             });
 
-            setResultados((anteriores) => ({ ...anteriores, [questaoId]: resposta.data }));
+            const { correto, letraCorreta, resultado, mapaConcluido, proximo } = resposta.data;
+
+            setResultados((anteriores) => ({ ...anteriores, [questaoId]: { correto, letraCorreta } }));
+
+            if (resultado) {
+                setPlacar({ acertos: resultado.acertos, total: resultado.total, mapaConcluido, proximo });
+            }
         } catch (error) {
             console.log(error.message);
         }
     };
+
+    // Libera a questão errada pra uma nova tentativa (a resposta nova substitui a antiga no banco)
+    const tentarDeNovo = (questaoId) => {
+        const semEssa = (objeto) => {
+            const copia = { ...objeto };
+            delete copia[questaoId];
+            return copia;
+        };
+
+        setResultados(semEssa);
+        setRespostas(semEssa);
+    };
+
+    const respondidas = Object.keys(resultados).length;
+    const porcentagem = placar && placar.total > 0 ? Math.round((placar.acertos / placar.total) * 100) : 0;
 
     return (
         <main className='mainQuestoes'>
@@ -88,22 +137,55 @@ const Questoes = () => {
 
             {!bloqueado && questoes.length === 0 && <p>Nenhuma questão cadastrada para este mapa.</p>}
 
-            {questoes.map((questao) => {
+            {/* Placar: quantas acertou e a meta de 60% pra concluir o mapa */}
+            {placar && placar.total > 0 && (
+                <section className='questoes-placar' aria-live='polite'>
+                    <div className='questoes-placar-texto'>
+                        <strong>{placar.acertos} de {placar.total} certas ({porcentagem}%)</strong>
+                        <span>Meta: acertar {Math.round(NOTA_MINIMA * 100)}% para concluir o mapa</span>
+                    </div>
+                    <div className='questoes-placar-barra'>
+                        <div className='questoes-placar-preenchido' style={{ width: `${porcentagem}%` }} />
+                        <div className='questoes-placar-meta' style={{ left: `${NOTA_MINIMA * 100}%` }} />
+                    </div>
+
+                    {placar.mapaConcluido ? (
+                        <div className='questoes-concluido'>
+                            <p><strong>Mapa concluído!</strong> Você atingiu a meta.</p>
+                            {placar.proximo ? (
+                                <Link to={`/mapas/${placar.proximo.mapaId}`} className='botao-responder'>
+                                    Próximo mapa: {placar.proximo.nome} →
+                                </Link>
+                            ) : (
+                                <>
+                                    <p>Você concluiu todos os mapas deste nível.</p>
+                                    <Link to='/mapas' className='botao-responder'>Ver os mapas</Link>
+                                </>
+                            )}
+                        </div>
+                    ) : respondidas === questoes.length && questoes.length > 0 && (
+                        <p className='questoes-dica'>
+                            Ainda não deu {Math.round(NOTA_MINIMA * 100)}%. Use "Tentar de novo" nas questões que você errou.
+                        </p>
+                    )}
+                </section>
+            )}
+
+            {questoes.map((questao, indice) => {
                 const resultado = resultados[questao.questaoId];
 
                 return (
                     <section className='questao-card' key={questao.questaoId}>
-                        <p className='enunciado'>{questao.enunciado}</p>
+                        <p className='enunciado'>{indice + 1}. {questao.enunciado}</p>
 
                         <div className='alternativas'>
                             {questao.alternativa.map((alternativa) => {
                                 const selecionada = respostas[questao.questaoId] === alternativa.id;
-                                const ehCorreta = resultado && alternativa.letra === resultado.letraCorreta;
 
                                 let classe = 'alternativa';
                                 if (selecionada) classe += ' selecionada';
-                                if (resultado && ehCorreta) classe += ' correta';
-                                if (resultado && selecionada && !resultado.correto) classe += ' incorreta';
+                                // Só destaca a alternativa escolhida: se errou, a certa não é revelada
+                                if (resultado && selecionada) classe += resultado.correto ? ' correta' : ' incorreta';
 
                                 return (
                                     <button
@@ -128,10 +210,19 @@ const Questoes = () => {
                             >
                                 Responder
                             </button>
+                        ) : resultado.correto ? (
+                            <p className='feedback correto'>Resposta correta!</p>
                         ) : (
-                            <p className={resultado.correto ? 'feedback correto' : 'feedback incorreto'}>
-                                {resultado.correto ? 'Resposta correta!' : `Resposta incorreta. Alternativa correta: ${resultado.letraCorreta}`}
-                            </p>
+                            <div className='feedback-linha'>
+                                <p className='feedback incorreto'>Resposta incorreta.</p>
+                                <button
+                                    type='button'
+                                    className='botao-responder'
+                                    onClick={() => tentarDeNovo(questao.questaoId)}
+                                >
+                                    Tentar de novo
+                                </button>
+                            </div>
                         )}
                     </section>
                 );

@@ -97,9 +97,20 @@ const Mapas = () => {
                         ) : (
                             <div className='mapas-grid'>
                                 {mapasDoNivel.map((mapa) => (
-                                    <Link to={`/mapas/${mapa.mapaId}`} key={mapa.mapaId} className='mapa-card'>
-                                        <h2>{mapa.nome}</h2>
-                                    </Link>
+                                    // Mapa trancado (precisa concluir o anterior do nível): cartão sem link
+                                    mapa.liberado === false ? (
+                                        <div key={mapa.mapaId} className='mapa-card mapa-card-trancado' aria-disabled='true'>
+                                            <h2>{mapa.nome}</h2>
+                                            <span className='mapa-card-status'>
+                                                Conclua {mapa.anterior ? `"${mapa.anterior.nome}"` : 'o mapa anterior'} para liberar
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <Link to={`/mapas/${mapa.mapaId}`} key={mapa.mapaId} className={mapa.concluido ? 'mapa-card mapa-card-concluido' : 'mapa-card'}>
+                                            <h2>{mapa.nome}</h2>
+                                            {mapa.concluido && <span className='mapa-card-status'>✓ Concluído</span>}
+                                        </Link>
+                                    )
                                 ))}
                             </div>
                         )}

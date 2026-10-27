@@ -1,5 +1,5 @@
 import prisma from '../services/adapter.js';
-import { progressoNoMapa } from '../services/progresso.js';
+import { progressoNoMapa, resultadoQuestoes, situacaoDoMapa } from '../services/progresso.js';
 
 function controller() {
     return {
@@ -76,6 +76,11 @@ function controller() {
                 // O aluno só vê as questões depois de concluir todos os conteúdos interativos do mapa.
                 // Admin passa direto (precisa conferir as questões que cadastrou).
                 if (!req.usuario.admin) {
+                    const situacao = await situacaoDoMapa(parseInt(mapaId), req.usuario.usuarioId, false);
+                    if (!situacao || !situacao.liberado) {
+                        return res.status(403).json({ error: "Este mapa ainda está bloqueado", bloqueado: true });
+                    }
+
                     const { pendentes } = await progressoNoMapa(parseInt(mapaId), req.usuario.usuarioId);
 
                     if (pendentes.length > 0) {
@@ -175,16 +180,43 @@ function controller() {
                     return res.status(404).json("Alternativa não encontrada para essa questão");
                 }
 
-                const alternativaCorreta = await prisma.alternativa.findFirst({
-                    where: {
-                        questaoId: parseInt(id),
-                        correta: true
-                    }
+                const questaoId = parseInt(id);
+                const { usuarioId, admin } = req.usuario;
+                const questao = await prisma.questao.findUnique({
+                    where: { questaoId },
+                    select: { mapaId: true }
                 });
 
+                // Só responde quem já concluiu os conteúdos do mapa (admin passa direto)
+                if (!admin) {
+                    const { pendentes } = await progressoNoMapa(questao.mapaId, usuarioId);
+                    if (pendentes.length > 0) {
+                        return res.status(403).json({ error: "Conclua todos os conteúdos do mapa antes de responder" });
+                    }
+                }
+
+                // Guarda a tentativa; refazer a questão substitui a resposta anterior
+                const correto = alternativaEscolhida.correta;
+                await prisma.usuarioquestao.upsert({
+                    where: { usuarioId_questaoId: { usuarioId, questaoId } },
+                    update: { alternativaId: alternativaEscolhida.id, correta: correto, respondidaEm: new Date() },
+                    create: { usuarioId, questaoId, alternativaId: alternativaEscolhida.id, correta: correto }
+                });
+
+                const alternativaCorreta = await prisma.alternativa.findFirst({
+                    where: { questaoId, correta: true }
+                });
+
+                const resultado = await resultadoQuestoes(questao.mapaId, usuarioId);
+                const situacao = await situacaoDoMapa(questao.mapaId, usuarioId, admin);
+
                 res.status(200).json({
-                    correto: alternativaEscolhida.correta,
-                    letraCorreta: alternativaCorreta ? alternativaCorreta.letra : null
+                    correto,
+                    // Se errou, não entrega a resposta certa: o aluno pode refazer a questão
+                    letraCorreta: correto && alternativaCorreta ? alternativaCorreta.letra : null,
+                    resultado,
+                    mapaConcluido: situacao?.concluido ?? false,
+                    proximo: situacao?.proximo ?? null
                 });
             } catch (error) {
                 console.log(error.message);
