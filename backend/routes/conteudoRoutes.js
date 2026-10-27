@@ -12,6 +12,9 @@ routes.post('/criarConteudo', authUser, authAdmin, conteudoController.criarConte
 // Editar conteúdo (apenas administradores)
 routes.patch('/conteudo/:id', authUser, authAdmin, conteudoController.atualizarConteudo);
 
+// Aluno marca/desmarca um conteúdo como concluído (body: { concluido: true | false })
+routes.put('/conteudo/:id/conclusao', authUser, conteudoController.marcarConclusao);
+
 // Associar conteúdo a um usuário (qualquer usuário autenticado, ex: marcar progresso)
 routes.post('/criarUsuarioConteudo', authUser, conteudoController.criarUsuarioConteudo);
 

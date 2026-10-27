@@ -9,6 +9,7 @@ const mapaController = controller();
 // Leitura: qualquer usuário autenticado
 routes.get('/mapas', authUser, mapaController.listarMapas);
 routes.get('/mapas/:id', authUser, mapaController.buscarMapa);
+routes.get('/mapas/:id/progresso', authUser, mapaController.progressoMapa);
 
 // Escrita: apenas administradores
 routes.post('/criarMapa', authUser, authAdmin, mapaController.criarMapa);

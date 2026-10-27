@@ -1,5 +1,5 @@
 {
-  "name": "outblock_main",
+  "name": "helpymath-backend",
   "version": "1.0.0",
   "description": "",
   "type": "module",
@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JoJonso/outblock_main.git"
+    "url": "git+https://github.com/DiogoLdS/helpymath.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/JoJonso/outblock_main/issues"
+    "url": "https://github.com/DiogoLdS/helpymath/issues"
   },
-  "homepage": "https://github.com/JoJonso/outblock_main#readme",
+  "homepage": "https://github.com/DiogoLdS/helpymath#readme",
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.9.1",
     "@prisma/client": "^7.9.1",

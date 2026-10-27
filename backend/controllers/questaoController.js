@@ -1,4 +1,5 @@
 import prisma from '../services/adapter.js';
+import { progressoNoMapa } from '../services/progresso.js';
 
 function controller() {
     return {
@@ -71,6 +72,19 @@ function controller() {
         async listarQuestoesPorMapa(req, res) {
             try {
                 const { mapaId } = req.params;
+
+                // O aluno só vê as questões depois de concluir todos os conteúdos interativos do mapa.
+                // Admin passa direto (precisa conferir as questões que cadastrou).
+                if (!req.usuario.admin) {
+                    const { pendentes } = await progressoNoMapa(parseInt(mapaId), req.usuario.usuarioId);
+
+                    if (pendentes.length > 0) {
+                        return res.status(403).json({
+                            error: "Conclua todos os conteúdos do mapa antes de fazer as questões",
+                            pendentes
+                        });
+                    }
+                }
 
                 const questoes = await prisma.questao.findMany({
                     where: { mapaId: parseInt(mapaId) },

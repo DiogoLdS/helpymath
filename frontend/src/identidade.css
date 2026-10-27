@@ -377,3 +377,240 @@
     background-color: var(--azul-escuro);
     border: 2px solid var(--azul-escuro);
 }
+
+/* =====================================================================
+   Mapa conceitual como quadro-negro (inspirado no mapa de exemplo da introdução)
+   ===================================================================== */
+
+.App {
+    --quadro: #2F5D46;
+    --madeira: #8A6A45;
+}
+
+/* O mapa vira um quadro: verde com textura de giz e moldura de madeira */
+.App .mapaGrid {
+    background-color: var(--quadro);
+    background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 6px 6px;
+    border: 10px solid var(--madeira);
+}
+
+/* Linhas tracejadas "de giz" do título até cada conteúdo. O SVG ocupa a grade inteira, por trás de tudo */
+.App .mapaLinhas {
+    grid-row: 1 / -1;
+    grid-column: 1 / -1;
+    align-self: stretch;
+    justify-self: stretch;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.App .mapaLinhas line {
+    stroke: rgba(255, 255, 255, 0.7);
+    stroke-width: 2.5;
+    stroke-dasharray: 7 6;
+    vector-effect: non-scaling-stroke;
+}
+
+/* Título: ficha branca presa no meio do quadro */
+.App .mapaTitulo {
+    color: var(--tinta);
+    background-color: #FFFFFF;
+    border: 2px solid var(--tinta);
+    box-shadow: 5px 5px 0 var(--verde);
+}
+
+/* Conteúdos: botões "colados" no quadro, com borda de giz */
+.App .mapaNo {
+    position: relative;
+    z-index: 1;
+    border: 2px solid #FFFFFF;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35);
+}
+
+.App button.mapaNo:hover:not(:disabled),
+.App a.mapaNo:hover {
+    opacity: 1;
+    background-color: var(--azul);
+}
+
+/* Conteúdo concluído: borda verde e o selo ✓ preenchido */
+.App .mapaNoConcluido {
+    border-color: var(--verde);
+}
+
+.App .mapaStatus {
+    position: absolute;
+    top: -11px;
+    right: -11px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--tinta);
+    background-color: var(--papel);
+    border: 2px solid var(--tinta);
+    border-radius: 50%;
+}
+
+.App .mapaNoConcluido .mapaStatus {
+    background-color: var(--verde);
+}
+
+/* Mensagem do mapa vazio fica branca, como escrita a giz */
+.App .mapaGrid .mapaMensagem {
+    color: #FFFFFF;
+}
+
+/* ---------- Progresso dos conteúdos (canto de cima à esquerda) ---------- */
+
+.App .mapaProgresso {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 220px;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: var(--tinta);
+    background-color: var(--papel);
+    border: 2px solid var(--tinta);
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 var(--tinta);
+}
+
+.App .mapaProgresso strong {
+    font-weight: 800;
+}
+
+.App .mapaProgressoBarra {
+    height: 10px;
+    background-color: var(--linha);
+    border: 1px solid var(--tinta);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.App .mapaProgressoBarra div {
+    height: 100%;
+    background-color: var(--verde);
+    transition: width 0.3s ease;
+}
+
+/* ---------- "Fazer questões" bloqueado até concluir tudo ---------- */
+
+.App .mapaQuestoesBloqueado {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-family: inherit;
+    font-size: 15px;
+    color: #E4EEE6;
+    background-color: #5C6B63;
+    border: 2px dashed #E4EEE6;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+.App .mapaQuestoesBloqueado small {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.App .mapaQuestoesBloqueado:hover {
+    box-shadow: none;
+}
+
+/* ---------- Janela da explicação: ficha de papel com "Marcar como concluído" ---------- */
+
+.App .mapaExplicacao {
+    background-color: var(--papel);
+}
+
+.App .mapaExplicacaoAcoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.App .mapaExplicacaoAcoes button {
+    margin-top: 0;
+}
+
+/* Como no protótipo do TCC (Figura 4.3.4): botão destacado "MARCAR COMO CONCLUÍDO" */
+.App .mapaExplicacao .mapaConcluir {
+    font-family: inherit;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--tinta);
+    background-color: var(--verde);
+    border: 2px solid var(--tinta);
+}
+
+.App .mapaExplicacao .mapaConcluirFeito {
+    color: #2F6B1D;
+    background-color: #FFFFFF;
+    border-color: #4F8A31;
+}
+
+.App .mapaExplicacao .mapaConcluir:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+/* ---------- Impressão: quadro claro, pra não gastar tinta ---------- */
+
+@media print {
+    .App .mapaGrid {
+        background-color: #FFFFFF;
+        background-image: none;
+        border: 3px solid var(--tinta);
+        box-shadow: none;
+    }
+
+    .App .mapaLinhas line {
+        stroke: var(--azul);
+    }
+
+    .App .mapaProgresso,
+    .App .mapaStatus {
+        display: none;
+    }
+}
+
+/* ---------- Questões ainda bloqueadas (aluno não concluiu os conteúdos) ---------- */
+
+.App .questoes-bloqueadas {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 24px;
+    background-color: #FFFFFF;
+    border: 2px solid var(--tinta);
+    border-top: 6px solid var(--laranja);
+    border-radius: 4px;
+    box-shadow: 5px 5px 0 var(--linha);
+}
+
+.App .questoes-bloqueadas p:first-child {
+    font-weight: 700;
+    color: var(--azul-escuro);
+}
+
+.App .questoes-bloqueadas .botao-responder {
+    margin-top: 8px;
+    padding: 10px 18px;
+    text-decoration: none;
+}

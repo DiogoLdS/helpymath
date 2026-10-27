@@ -1,4 +1,5 @@
 import prisma from '../services/adapter.js';
+import { progressoNoMapa } from '../services/progresso.js';
 
 // Dificuldades possíveis de um mapa (as mesmas dos cards da página inicial)
 const NIVEIS = ['basico', 'intermediario', 'avancado', 'treino'];
@@ -73,6 +74,16 @@ function controller() {
                 };
 
                 res.status(200).json(mapaInfo);
+            } catch (error) {
+                console.log(error.message);
+                res.status(500).json("Internal server error!");
+            }
+        },
+        // Progresso do usuário logado nesse mapa: { concluidos, pendentes, total }
+        async progressoMapa(req, res) {
+            try {
+                const progresso = await progressoNoMapa(parseInt(req.params.id), req.usuario.usuarioId);
+                res.status(200).json(progresso);
             } catch (error) {
                 console.log(error.message);
                 res.status(500).json("Internal server error!");

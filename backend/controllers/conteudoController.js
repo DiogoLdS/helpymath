@@ -49,6 +49,32 @@ function controller() {
                 res.status(500).json("Internal server error!");
             }
         },
+        // Aluno marca (ou desmarca) um conteúdo como concluído.
+        // O usuário vem do token, nunca do corpo da requisição: cada um só mexe no próprio progresso.
+        async marcarConclusao(req, res) {
+            try {
+                const conteudoId = parseInt(req.params.id);
+                const usuarioId = req.usuario.usuarioId;
+                const concluido = req.body.concluido !== false;
+
+                const registro = await prisma.usuarioconteudo.upsert({
+                    where: { usuarioId_conteudoId: { usuarioId, conteudoId } },
+                    update: { concluido },
+                    create: { usuarioId, conteudoId, concluido }
+                });
+
+                res.status(200).json(registro);
+            } catch (error) {
+                console.log(error.message);
+
+                // Chave estrangeira: o conteúdo (ou o usuário) não existe
+                if (error.code === 'P2003') {
+                    return res.status(404).json("Conteúdo não encontrado");
+                }
+
+                res.status(500).json("Internal server error!");
+            }
+        },
         async criarUsuarioConteudo(req, res) {
             try {
                 const { usuarioId, conteudoId } = req.body;

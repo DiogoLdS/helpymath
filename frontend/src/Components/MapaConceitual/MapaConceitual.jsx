@@ -30,6 +30,11 @@ const MapaConceitual = () => {
     const [excluindo, setExcluindo] = useState(false);
     const [preparandoImpressao, setPreparandoImpressao] = useState(false);
 
+    // Progresso do aluno: ids dos conteúdos que ele já marcou como concluídos.
+    // null = não deu pra buscar (ex: backend antigo); aí nada fica bloqueado.
+    const [concluidos, setConcluidos] = useState(null);
+    const [salvandoConclusao, setSalvandoConclusao] = useState(false);
+
     // Na aba aparece o nome do mapa (ex: "Probabilidade | HelpyMath")
     useTituloPagina(mapa?.nome ?? "Mapa conceitual");
 
@@ -54,6 +59,17 @@ const MapaConceitual = () => {
                 });
 
                 const dados = resposta.data;
+
+                // Progresso do usuário nesse mapa (se falhar, o mapa abre normalmente, sem bloqueios)
+                try {
+                    const respostaProgresso = await api.get(`/mapas/${id}/progresso`, {
+                        headers: { Authorization: `Bearer ${storedToken}` }
+                    });
+                    setConcluidos(respostaProgresso.data.concluidos);
+                } catch (errorProgresso) {
+                    setConcluidos(null);
+                    console.log(errorProgresso.message);
+                }
 
                 // Sorteia a variante de design uma vez por carregamento, conforme a quantidade de conteúdos
                 const variantes = layouts[dados.conteudos.length] || [];
@@ -130,6 +146,44 @@ const MapaConceitual = () => {
         window.print();
     };
 
+    // Marca (ou desmarca) o conteúdo aberto como concluído pro usuário logado
+    const marcarConclusao = async (conteudoId, concluido) => {
+        setSalvandoConclusao(true);
+
+        try {
+            await api.put(
+                `/conteudo/${conteudoId}/conclusao`,
+                { concluido },
+                { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+            );
+
+            setConcluidos((atual) => {
+                const lista = (atual ?? []).filter((idConcluido) => idConcluido !== conteudoId);
+                return concluido ? [...lista, conteudoId] : lista;
+            });
+        } catch (error) {
+            if (error.response?.status === 401) {
+                navigate("/login");
+                return;
+            }
+            window.alert("Não foi possível salvar seu progresso. Tente novamente em instantes.");
+            console.log(error.message);
+        } finally {
+            setSalvandoConclusao(false);
+        }
+    };
+
+    const itens = mapa.conteudos;
+
+    // Só os botões explicativos (tipo 1) precisam ser concluídos; indicadores e links não contam
+    const interativos = itens.filter((item) => item.tipo === 1);
+    const estaConcluido = (conteudoId) => (concluidos ?? []).includes(conteudoId);
+    const quantidadeConcluida = interativos.filter((item) => estaConcluido(item.conteudoId)).length;
+    const faltam = interativos.length - quantidadeConcluida;
+
+    // Admin sempre pode abrir as questões (pra conferir o que cadastrou); quem bloqueia de verdade é o backend
+    const questoesLiberadas = usuarioEhAdmin() || concluidos === null || faltam === 0;
+
     // Ficam dentro do .mapaGrid, posicionados em relação à caixa do mapa:
     // imprimir/editar/excluir no canto de cima à direita, "Fazer questões" no meio da lateral direita.
     // Imprimir abre a janela de impressão do navegador, que também tem a opção "Salvar como PDF".
@@ -148,11 +202,33 @@ const MapaConceitual = () => {
                     </>
                 )}
             </div>
-            <Link to={`/mapas/${id}/questoes`} className="mapaQuestoes">Fazer questões</Link>
+            {/* Barra de progresso dos conteúdos, no canto de cima à esquerda */}
+            {concluidos !== null && interativos.length > 0 && (
+                <div className="mapaProgresso" aria-live="polite">
+                    <span>
+                        <strong>{quantidadeConcluida}</strong> de {interativos.length} conteúdos concluídos
+                    </span>
+                    <div className="mapaProgressoBarra">
+                        <div style={{ width: `${(quantidadeConcluida / interativos.length) * 100}%` }} />
+                    </div>
+                </div>
+            )}
+
+            {questoesLiberadas ? (
+                <Link to={`/mapas/${id}/questoes`} className="mapaQuestoes">Fazer questões</Link>
+            ) : (
+                <button
+                    type="button"
+                    className="mapaQuestoes mapaQuestoesBloqueado"
+                    disabled
+                    title="Marque todos os conteúdos como concluídos para liberar as questões"
+                >
+                    Fazer questões
+                    <small>{faltam === 1 ? "Falta 1 conteúdo" : `Faltam ${faltam} conteúdos`}</small>
+                </button>
+            )}
         </>
     );
-
-    const itens = mapa.conteudos;
 
     if (itens.length === 0) {
         return (
@@ -186,6 +262,19 @@ const MapaConceitual = () => {
                     gridTemplateColumns: `repeat(${layout.cols}, 1fr)`,
                 }}
             >
+
+                {/* Linhas "de giz" ligando o título (centro) a cada conteúdo, como no quadro da introdução */}
+                <svg className="mapaLinhas" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                    {layout.posicoes.slice(0, itens.length).map((p, i) => (
+                        <line
+                            key={i}
+                            x1="50"
+                            y1="50"
+                            x2={((p.col - 0.5) / layout.cols) * 100}
+                            y2={((p.row - 0.5) / layout.rows) * 100}
+                        />
+                    ))}
+                </svg>
 
                 <div className="mapaTitulo">{mapa.nome}</div>
 
@@ -249,16 +338,24 @@ const MapaConceitual = () => {
                         );
                     }
 
-                    // Tipo 1 - Botão ampliado: abre a janela com a explicação detalhada
+                    // Tipo 1 - Botão ampliado: abre a janela com a explicação detalhada.
+                    // O selo no canto mostra se o aluno já concluiu (com ✓) ou não (vazio).
+                    const concluido = estaConcluido(item.conteudoId);
+
                     return (
                         <button
                             type="button"
                             key={item.conteudoId}
-                            className="mapaNo"
+                            className={concluido ? "mapaNo mapaNoConcluido" : "mapaNo"}
                             style={estiloPosicao}
                             onClick={() => setAbertoId(item.conteudoId)}
                         >
                             {item.titulo}
+                            {concluidos !== null && (
+                                <span className="mapaStatus" aria-label={concluido ? "concluído" : "não concluído"}>
+                                    {concluido ? "✓" : ""}
+                                </span>
+                            )}
                         </button>
                     );
                 })}
@@ -290,7 +387,47 @@ const MapaConceitual = () => {
                 })}
             </section>
 
-            {itemAberto && (<> <div className="backdrop" onClick={() => setAbertoId(null)} /> <div className="mapaExplicacao"> <h3>{itemAberto.titulo}</h3> <div className="mapaExplicacaoTexto"> {itemAberto.explicacao ? <TextoComMidia texto={itemAberto.explicacao} /> : "Sem explicação cadastrada ainda."} </div> <button type="button" onClick={() => setAbertoId(null)} > Fechar </button> </div> </>)}
+            {itemAberto && (
+                <>
+                    <div className="backdrop" onClick={() => setAbertoId(null)} />
+                    <div className="mapaExplicacao" role="dialog" aria-modal="true" aria-label={itemAberto.titulo}>
+                        <h3>{itemAberto.titulo}</h3>
+                        <div className="mapaExplicacaoTexto">
+                            {itemAberto.explicacao
+                                ? <TextoComMidia texto={itemAberto.explicacao} />
+                                : "Sem explicação cadastrada ainda."}
+                        </div>
+
+                        <div className="mapaExplicacaoAcoes">
+                            {concluidos !== null && (
+                                estaConcluido(itemAberto.conteudoId) ? (
+                                    <button
+                                        type="button"
+                                        className="mapaConcluir mapaConcluirFeito"
+                                        onClick={() => marcarConclusao(itemAberto.conteudoId, false)}
+                                        disabled={salvandoConclusao}
+                                        title="Clique para desmarcar"
+                                    >
+                                        ✓ Concluído
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        className="mapaConcluir"
+                                        onClick={() => marcarConclusao(itemAberto.conteudoId, true)}
+                                        disabled={salvandoConclusao}
+                                    >
+                                        {salvandoConclusao ? "Salvando..." : "Marcar como concluído"}
+                                    </button>
+                                )
+                            )}
+                            <button type="button" className="mapaFechar" onClick={() => setAbertoId(null)}>
+                                Fechar
+                            </button>
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
     );
 };

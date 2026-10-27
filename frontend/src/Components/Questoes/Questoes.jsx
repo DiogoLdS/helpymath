@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import api from "../../../services/api.js";
 import "./Questoes.css";
 import useTituloPagina from "../../utils/useTituloPagina.js";
@@ -13,6 +13,7 @@ const Questoes = () => {
     const [questoes, setQuestoes] = useState([]);
     const [respostas, setRespostas] = useState({});
     const [resultados, setResultados] = useState({});
+    const [bloqueado, setBloqueado] = useState(false);
 
     useEffect(() => {
         const buscarQuestoes = async () => {
@@ -34,6 +35,10 @@ const Questoes = () => {
             } catch (error) {
                 if (error.response?.status === 401) {
                     navigate('/login');
+                }
+                // O backend só libera as questões depois que o aluno conclui os conteúdos do mapa
+                if (error.response?.status === 403) {
+                    setBloqueado(true);
                 }
                 console.log(error.message);
             }
@@ -73,7 +78,15 @@ const Questoes = () => {
             <Marca comLink />
             <h1>Questões</h1>
 
-            {questoes.length === 0 && <p>Nenhuma questão cadastrada para este mapa.</p>}
+            {bloqueado && (
+                <div className='questoes-bloqueadas'>
+                    <p>As questões deste mapa ainda estão bloqueadas.</p>
+                    <p>Volte ao mapa e marque todos os conteúdos como concluídos para liberar.</p>
+                    <Link to={`/mapas/${mapaId}`} className='botao-responder'>Voltar ao mapa</Link>
+                </div>
+            )}
+
+            {!bloqueado && questoes.length === 0 && <p>Nenhuma questão cadastrada para este mapa.</p>}
 
             {questoes.map((questao) => {
                 const resultado = resultados[questao.questaoId];
