@@ -9,6 +9,8 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
+    // Os comandos do Prisma (migrate, studio...) usam a conexão direta do Neon, a DATABASE_URL (host sem "-pooler"):
+    // migrations não funcionam bem pela conexão "pooled". O servidor usa a DATABASE_URL_POOLED (services/adapter.js).
     url: process.env["DATABASE_URL"],
   },
 });

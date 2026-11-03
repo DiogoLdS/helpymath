@@ -1,16 +1,11 @@
-import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 
-const url = new URL(process.env.DATABASE_URL);
-
-const adapter = new PrismaMariaDb({
-  host: url.hostname,
-  port: Number(url.port) || 3306,
-  user: decodeURIComponent(url.username),
-  password: decodeURIComponent(url.password),
-  database: url.pathname.slice(1),
-  ssl: process.env.DATABASE_SSL === "true" ? { rejectUnauthorized: false } : undefined,
-});
+// Banco PostgreSQL no Neon. Os nomes das variáveis são os mesmos que o Neon entrega:
+// - DATABASE_URL_POOLED: conexão "pooled" (host com "-pooler"), que aguenta melhor muitas conexões do servidor
+// - DATABASE_URL: conexão direta (usada aqui só se a pooled não existir, ex: banco local)
+// As URLs já trazem "sslmode=require", então o SSL vem da própria URL.
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL_POOLED ?? process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
 export default prisma;

@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
 }
 
 model alternativa {
@@ -14,7 +14,7 @@ model alternativa {
   correta   Boolean
   questao   questao @relation(fields: [questaoId], references: [questaoId], map: "Alternativa_questaoId_fkey")
 
-  @@index([questaoId], map: "Alternativa_questaoId_fkey")
+  @@index([questaoId], map: "Alternativa_questaoId_idx")
 }
 
 model conteudo {
@@ -41,7 +41,7 @@ model mapaconteudo {
   mapaconceitual mapaconceitual @relation(fields: [mapaId], references: [mapaId], map: "MapaConteudo_mapaId_fkey")
 
   @@id([mapaId, conteudoId])
-  @@index([conteudoId], map: "MapaConteudo_conteudoId_fkey")
+  @@index([conteudoId], map: "MapaConteudo_conteudoId_idx")
 }
 
 model questao {
@@ -53,7 +53,7 @@ model questao {
   usuarioquestao usuarioquestao[]
   mapaconceitual mapaconceitual @relation(fields: [mapaId], references: [mapaId], map: "Questao_mapaId_fkey")
 
-  @@index([mapaId], map: "Questao_mapaId_fkey")
+  @@index([mapaId], map: "Questao_mapaId_idx")
 }
 
 model usuario {
@@ -74,7 +74,7 @@ model usuarioconteudo {
   usuario    usuario  @relation(fields: [usuarioId], references: [usuarioId], map: "UsuarioConteudo_usuarioId_fkey")
 
   @@id([usuarioId, conteudoId])
-  @@index([conteudoId], map: "UsuarioConteudo_conteudoId_fkey")
+  @@index([conteudoId], map: "UsuarioConteudo_conteudoId_idx")
 }
 
 // Resposta de um aluno a uma questão (a última tentativa; refazer substitui).
@@ -90,5 +90,5 @@ model usuarioquestao {
   questao       questao  @relation(fields: [questaoId], references: [questaoId], onDelete: Cascade, map: "UsuarioQuestao_questaoId_fkey")
 
   @@id([usuarioId, questaoId])
-  @@index([questaoId], map: "UsuarioQuestao_questaoId_fkey")
+  @@index([questaoId], map: "UsuarioQuestao_questaoId_idx")
 }
