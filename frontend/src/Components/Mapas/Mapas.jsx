@@ -1,15 +1,22 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import api from "../../../services/api.js";
 import niveis from "../../data/niveis.js";
+import { decodificarToken } from "../../utils/auth.js";
 import "./Mapas.css";
 import useTituloPagina from "../../utils/useTituloPagina.js";
 import Marca from "../Marca/Marca.jsx";
+import Assistente from "./Assistente.jsx";
+import Trilha from "./Trilha.jsx";
+import { recomendacao } from "./trilhaUtils.js";
 
+// Página da trilha de estudos: o assistente "Helpy" no topo e, embaixo, cada nível como um caminho de mapas
 const Mapas = () => {
-    useTituloPagina("Mapas conceituais");
+    useTituloPagina("Sua trilha");
 
+    // Cada mapa vem com { liberado, concluido, progresso } do usuário logado, na ordem da sequência
     const [mapas, setMapas] = useState([]);
+    const [carregando, setCarregando] = useState(true);
     const navigate = useNavigate();
 
     // A dificuldade escolhida fica na URL (/mapas?nivel=basico): os cards da página inicial já abrem filtrados
@@ -17,6 +24,9 @@ const Mapas = () => {
     const nivelEscolhido = niveis.some((n) => n.chave === searchParams.get('nivel'))
         ? searchParams.get('nivel')
         : null;
+
+    // Nome do aluno pro assistente cumprimentar (vem do token de login)
+    const nome = decodificarToken(localStorage.getItem('token') ?? '')?.nome ?? '';
 
     useEffect(() => {
         const buscarMapas = async () => {
@@ -40,6 +50,8 @@ const Mapas = () => {
                     navigate('/login');
                 }
                 console.log(error.message);
+            } finally {
+                setCarregando(false);
             }
         };
 
@@ -50,13 +62,17 @@ const Mapas = () => {
         setSearchParams(chave ? { nivel: chave } : {});
     };
 
-    // Sem filtro mostra todas as dificuldades, cada uma na sua seção
+    // Sem filtro mostra todos os níveis, cada um na sua trilha
     const niveisMostrados = nivelEscolhido ? niveis.filter((n) => n.chave === nivelEscolhido) : niveis;
 
     return (
         <main className='mainMapas'>
             <Marca comLink />
-            <h1>Mapas conceituais</h1>
+            <h1>Sua trilha de estudos</h1>
+
+            {!carregando && (
+                <Assistente nome={nome} recomendacao={recomendacao(mapas, niveis, nivelEscolhido)} />
+            )}
 
             <div className='mapas-filtros' role='group' aria-label='Filtrar por dificuldade'>
                 <button
@@ -80,43 +96,17 @@ const Mapas = () => {
                 ))}
             </div>
 
-            {mapas.length === 0 && <p>Nenhum mapa conceitual disponível.</p>}
+            {carregando && <p className='mapas-vazio'>Carregando sua trilha...</p>}
 
-            {mapas.length > 0 && niveisMostrados.map((n) => {
-                // Mapas antigos, sem nível salvo, entram como básico (mesmo padrão do banco)
-                const mapasDoNivel = mapas.filter((mapa) => (mapa.nivel ?? 'basico') === n.chave);
-
-                return (
-                    <section className='mapas-secao' key={n.chave}>
-                        <h2 className={`mapas-secao-titulo nivel-${n.chave}`}>
-                            {n.nome} <span>{n.descricao.toLowerCase()}</span>
-                        </h2>
-
-                        {mapasDoNivel.length === 0 ? (
-                            <p className='mapas-vazio'>Nenhum mapa nesta dificuldade ainda.</p>
-                        ) : (
-                            <div className='mapas-grid'>
-                                {mapasDoNivel.map((mapa) => (
-                                    // Mapa trancado (precisa concluir o anterior do nível): cartão sem link
-                                    mapa.liberado === false ? (
-                                        <div key={mapa.mapaId} className='mapa-card mapa-card-trancado' aria-disabled='true'>
-                                            <h2>{mapa.nome}</h2>
-                                            <span className='mapa-card-status'>
-                                                Conclua {mapa.anterior ? `"${mapa.anterior.nome}"` : 'o mapa anterior'} para liberar
-                                            </span>
-                                        </div>
-                                    ) : (
-                                        <Link to={`/mapas/${mapa.mapaId}`} key={mapa.mapaId} className={mapa.concluido ? 'mapa-card mapa-card-concluido' : 'mapa-card'}>
-                                            <h2>{mapa.nome}</h2>
-                                            {mapa.concluido && <span className='mapa-card-status'>✓ Concluído</span>}
-                                        </Link>
-                                    )
-                                ))}
-                            </div>
-                        )}
-                    </section>
-                );
-            })}
+            {!carregando && niveisMostrados.map((n) => (
+                <Trilha
+                    key={n.chave}
+                    numero={niveis.indexOf(n) + 1}
+                    nivel={n}
+                    // Mapas antigos, sem nível salvo, entram como básico (mesmo padrão do banco)
+                    mapas={mapas.filter((mapa) => (mapa.nivel ?? 'basico') === n.chave)}
+                />
+            ))}
         </main>
     );
 };

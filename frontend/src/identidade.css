@@ -176,35 +176,6 @@
     gap: 6px;
 }
 
-/* =====================================================================
-   Parte 2: detalhes de cada página (fichas, cartões e janelas)
-   ===================================================================== */
-
-/* ---------- Lista de mapas ---------- */
-
-/* Cartão de mapa como uma ficha: borda fina, faixa na cor do nível em cima e sombra sólida */
-.App .mapa-card {
-    background-color: #FFFFFF;
-    border: 2px solid var(--tinta);
-    border-top: 6px solid var(--cor-nivel, var(--azul));
-    border-radius: 4px;
-    box-shadow: 5px 5px 0 var(--linha);
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
-}
-
-.App .mapa-card:hover {
-    border-color: var(--tinta);
-    border-top-color: var(--cor-nivel, var(--azul));
-    transform: translate(-2px, -2px);
-    box-shadow: 7px 7px 0 var(--azul-escuro);
-}
-
-/* Cada seção passa a cor do seu nível pros cartões dela */
-.App .mapas-secao:has(.nivel-basico) { --cor-nivel: var(--verde); }
-.App .mapas-secao:has(.nivel-intermediario) { --cor-nivel: var(--laranja); }
-.App .mapas-secao:has(.nivel-avancado) { --cor-nivel: var(--vermelho); }
-.App .mapas-secao:has(.nivel-treino) { --cor-nivel: var(--azul-claro); }
-
 /* Filtros: de pílula pra etiqueta retangular */
 .App .mapas-filtro {
     border: 2px solid var(--tinta);
@@ -215,10 +186,9 @@
     box-shadow: 3px 3px 0 var(--tinta);
 }
 
-.App .mapas-secao-titulo {
-    border: 2px solid var(--tinta);
-    border-radius: 3px;
-}
+/* =====================================================================
+   Parte 2: detalhes de cada página (fichas, cartões e janelas)
+   ===================================================================== */
 
 /* ---------- Mapa conceitual ---------- */
 
@@ -709,34 +679,6 @@
 }
 
 /* ---------- Sequência de mapas: trancado e concluído ---------- */
-
-/* Na lista: mapa trancado fica apagado, com faixa cinza e o aviso do que falta */
-.App .mapa-card-trancado {
-    color: #6B7480;
-    background-color: #F1F1EE;
-    border-style: dashed;
-    border-top-style: solid;
-    border-top-color: #B0B5BC;
-    box-shadow: none;
-    cursor: not-allowed;
-}
-
-.App .mapa-card-trancado:hover {
-    transform: none;
-    box-shadow: none;
-    border-top-color: #B0B5BC;
-}
-
-.App .mapa-card-status {
-    display: block;
-    margin-top: 8px;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.App .mapa-card-concluido .mapa-card-status {
-    color: #2F6B1D;
-}
 
 /* No mapa: aviso de concluído + link do próximo, dentro do quadrinho de progresso */
 .App .mapaProgressoConcluido {

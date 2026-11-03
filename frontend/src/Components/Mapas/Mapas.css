@@ -9,31 +9,6 @@
     margin-bottom: 24px;
 }
 
-.mapas-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 16px;
-}
-
-.mapa-card {
-    display: block;
-    background-color: var(--bg);
-    border: 1px solid var(--stroke);
-    border-radius: 20px;
-    padding: 24px 16px;
-    text-decoration: none;
-    color: var(--text);
-    transition: border-color 0.2s ease;
-}
-
-.mapa-card:hover {
-    border-color: var(--accent);
-}
-
-.mapa-card h2 {
-    font-size: 18px;
-}
-
 /* ---------- Filtro e seções por dificuldade ---------- */
 
 .mapas-filtros {
@@ -65,22 +40,8 @@
     background-color: #2B4C7E;
 }
 
-.mapas-secao {
-    margin-bottom: 32px;
-}
-
-.mapas-secao-titulo {
-    display: inline-block;
-    margin-bottom: 14px;
-    padding: 6px 14px;
-    font-size: 17px;
-    color: #1F2D44;
-    border-radius: 10px;
-}
-
-.mapas-secao-titulo span {
-    font-size: 13px;
-    font-weight: 400;
+.mainMapas .marca {
+    margin-bottom: 20px;
 }
 
 .mapas-vazio {
@@ -88,16 +49,451 @@
     color: #567EBB;
 }
 
-/* Mesmas cores dos cards de nível da página inicial (Home.css) */
-.mapas-filtro.ativo.nivel-basico,
-.mapas-secao-titulo.nivel-basico { background-color: #9CCB7E; }
-.mapas-filtro.ativo.nivel-intermediario,
-.mapas-secao-titulo.nivel-intermediario { background-color: #E8A27C; }
-.mapas-filtro.ativo.nivel-avancado,
-.mapas-secao-titulo.nivel-avancado { background-color: #E08A8A; }
-.mapas-filtro.ativo.nivel-treino,
-.mapas-secao-titulo.nivel-treino { background-color: #8DB3EC; }
+/* =====================================================================
+   Assistente "Helpy": cartão no topo da trilha
+   ===================================================================== */
 
-.mainMapas .marca {
-    margin-bottom: 20px;
+.assistente {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+        "cabeca balao"
+        "numeros numeros";
+    gap: 16px 20px;
+    margin-bottom: 28px;
+    padding: 20px;
+    background-color: #FFFFFF;
+    border: 2px solid var(--tinta);
+    border-left: 10px solid var(--azul-escuro);
+    border-radius: 4px;
+    box-shadow: 6px 6px 0 var(--tinta);
+}
+
+.assistenteCabeca {
+    grid-area: cabeca;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+}
+
+/* O π da marca como "rosto" do assistente */
+.assistenteAvatar {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "KaTeX_Main", "Times New Roman", serif;
+    font-size: 38px;
+    font-style: italic;
+    color: #FFFFFF;
+    background-color: var(--azul-escuro);
+    border: 2px solid var(--tinta);
+    border-radius: 6px;
+    box-shadow: 4px 4px 0 var(--verde);
+}
+
+.assistenteNome {
+    display: block;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--azul-escuro);
+}
+
+.assistenteCargo {
+    display: block;
+    max-width: 90px;
+    font-size: 11px;
+    line-height: 1.3;
+    color: #4A5A73;
+}
+
+/* Balão de fala, com a pontinha virada pro avatar */
+.assistenteBalao {
+    grid-area: balao;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 16px 18px;
+    background-color: var(--papel);
+    border: 2px solid var(--tinta);
+    border-radius: 4px;
+}
+
+.assistenteBalao::before {
+    content: "";
+    position: absolute;
+    top: 22px;
+    left: -11px;
+    width: 18px;
+    height: 18px;
+    background-color: var(--papel);
+    border-left: 2px solid var(--tinta);
+    border-bottom: 2px solid var(--tinta);
+    transform: rotate(45deg);
+}
+
+.assistenteBalao p {
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--tinta);
+}
+
+.assistenteBalao strong {
+    font-weight: 800;
+    color: var(--azul-escuro);
+}
+
+.assistenteSaudacao {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.assistenteAcao {
+    padding: 10px 18px;
+    font-weight: 700;
+    color: #FFFFFF;
+    text-decoration: none;
+    background-color: var(--azul-escuro);
+    border: 2px solid var(--azul-escuro);
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 var(--tinta);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.assistenteAcao:hover {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 var(--tinta);
+}
+
+.assistenteRevisao {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    font-size: 13px;
+    color: #4A5A73;
+}
+
+.assistenteRevisao a {
+    padding: 3px 8px;
+    color: var(--tinta);
+    text-decoration: none;
+    background-color: #FFFFFF;
+    border: 1px dashed var(--laranja);
+    border-left: 4px solid var(--laranja);
+    border-radius: 2px;
+}
+
+.assistenteRevisao a:hover {
+    background-color: #FCEEE6;
+}
+
+/* Números da evolução do aluno */
+.assistenteNumeros {
+    grid-area: numeros;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 0;
+    list-style: none;
+}
+
+.assistenteNumeros li {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 14px;
+    background-color: var(--papel);
+    border: 2px solid var(--linha);
+    border-top: 5px solid var(--verde);
+    border-radius: 3px;
+}
+
+.assistenteNumeros li:nth-child(2) { border-top-color: var(--laranja); }
+.assistenteNumeros li:nth-child(3) { border-top-color: var(--azul-claro); }
+
+.assistenteNumeros strong {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--azul-escuro);
+}
+
+.assistenteNumeros span {
+    font-size: 13px;
+    color: #4A5A73;
+}
+
+/* =====================================================================
+   Trilha: cada nível é uma "unidade" e os mapas formam um caminho
+   ===================================================================== */
+
+.trilha { --cor-nivel: var(--verde); margin-bottom: 44px; }
+.trilha.trilha-intermediario { --cor-nivel: var(--laranja); }
+.trilha.trilha-avancado { --cor-nivel: var(--vermelho); }
+.trilha.trilha-treino { --cor-nivel: var(--azul-claro); }
+
+/* Faixa do nível, na cor dele */
+.trilhaUnidade {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 20px;
+    padding: 18px 20px;
+    color: var(--tinta);
+    background-color: var(--cor-nivel);
+    border: 2px solid var(--tinta);
+    border-radius: 4px;
+    box-shadow: 5px 5px 0 var(--tinta);
+}
+
+.trilhaNumero {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.trilhaUnidade h2 {
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.trilhaUnidade p {
+    font-size: 14px;
+}
+
+.trilhaResumo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 130px;
+    padding: 10px 12px;
+    background-color: #FFFFFF;
+    border: 2px solid var(--tinta);
+    border-radius: 3px;
+}
+
+.trilhaResumo strong {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.trilhaResumo span {
+    font-size: 12px;
+}
+
+.trilhaResumoBarra {
+    height: 8px;
+    background-color: var(--linha);
+    border: 1px solid var(--tinta);
+}
+
+.trilhaResumoBarra div {
+    height: 100%;
+    background-color: var(--cor-nivel);
+}
+
+.trilhaVazia {
+    margin-top: 16px;
+    font-size: 14px;
+    color: #567EBB;
+}
+
+/* O caminho em si: os mapas são posicionados (left/top) pelo Trilha.jsx */
+.trilhaCaminho {
+    position: relative;
+    max-width: 100%;
+    margin: 28px auto 0;
+}
+
+/* Linha tracejada "de giz" ligando os mapas */
+.trilhaLinha {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: visible;
+}
+
+.trilhaLinha polyline {
+    fill: none;
+    stroke: #B7C3D6;
+    stroke-width: 5;
+    stroke-dasharray: 2 12;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.trilhaMapa {
+    position: absolute;
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    /* o ponto (left/top) é o centro da ficha */
+    transform: translate(-50%, -38px);
+}
+
+/* Anel de progresso (só aparece no mapa da vez, via --progresso) */
+.trilhaAnel {
+    padding: 6px;
+    border-radius: 9px;
+}
+
+.trilhaMapa.atual .trilhaAnel {
+    background: conic-gradient(var(--cor-nivel) var(--progresso, 0deg), var(--linha) 0);
+}
+
+/* A ficha: quase quadrada, número em fonte de fórmula e "relevo" de sombra embaixo */
+.trilhaFicha {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "KaTeX_Main", "Times New Roman", serif;
+    font-size: 30px;
+    font-style: italic;
+    font-weight: 700;
+    color: var(--azul-escuro);
+    background-color: #FFFFFF;
+    border: 2px solid var(--tinta);
+    border-radius: 6px;
+    box-shadow: 0 6px 0 var(--tinta);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.trilhaMapa.concluido .trilhaFicha {
+    font-family: inherit;
+    font-style: normal;
+    font-size: 28px;
+    color: var(--tinta);
+    background-color: var(--cor-nivel);
+}
+
+.trilhaMapa.atual .trilhaFicha {
+    color: #FFFFFF;
+    background-color: var(--azul-escuro);
+}
+
+.trilhaMapa.trancado .trilhaFicha {
+    color: #9AA1AB;
+    background-color: #E9EBEE;
+    border-color: #B0B5BC;
+    box-shadow: 0 6px 0 #B0B5BC;
+}
+
+.trilhaMapa.trancado {
+    cursor: not-allowed;
+}
+
+/* Clicar "afunda" a ficha */
+a.trilhaMapa:hover .trilhaFicha {
+    transform: translateY(2px);
+    box-shadow: 0 4px 0 var(--tinta);
+}
+
+a.trilhaMapa:active .trilhaFicha {
+    transform: translateY(6px);
+    box-shadow: none;
+}
+
+.trilhaNome {
+    margin-top: 12px;
+    padding: 2px 6px;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--tinta);
+    text-align: center;
+    background-color: var(--papel);
+}
+
+.trilhaMapa.trancado .trilhaNome {
+    color: #8A919B;
+}
+
+.trilhaPorcento {
+    font-size: 12px;
+    font-weight: 700;
+    color: #4A5A73;
+}
+
+/* Balão "COMEÇAR"/"CONTINUAR" em cima do mapa da vez */
+.trilhaBalao {
+    position: absolute;
+    top: -38px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--azul-escuro);
+    white-space: nowrap;
+    background-color: #FFFFFF;
+    border: 2px solid var(--tinta);
+    border-radius: 3px;
+    box-shadow: 3px 3px 0 var(--cor-nivel);
+    animation: trilhaPula 1.6s ease-in-out infinite;
+}
+
+.trilhaBalao::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -7px;
+    width: 10px;
+    height: 10px;
+    background-color: #FFFFFF;
+    border-right: 2px solid var(--tinta);
+    border-bottom: 2px solid var(--tinta);
+    transform: translateX(-50%) rotate(45deg);
+}
+
+@keyframes trilhaPula {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .trilhaBalao { animation: none; }
+}
+
+/* No celular o assistente vira uma coluna só */
+@media (max-width: 600px) {
+    .assistente {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "cabeca"
+            "balao"
+            "numeros";
+        padding: 16px;
+    }
+
+    .assistenteCabeca {
+        flex-direction: row;
+        text-align: left;
+    }
+
+    .assistenteCargo {
+        max-width: none;
+    }
+
+    /* A pontinha do balão vira pra cima, apontando pro avatar */
+    .assistenteBalao::before {
+        top: -11px;
+        left: 26px;
+        border-left: 2px solid var(--tinta);
+        border-bottom: none;
+        border-top: 2px solid var(--tinta);
+    }
+
+    .assistenteNumeros strong {
+        font-size: 18px;
+    }
 }

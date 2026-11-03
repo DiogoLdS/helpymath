@@ -52,16 +52,8 @@ export async function resultadoQuestoes(mapaId, usuarioId) {
     };
 }
 
-// Mapa concluído = todos os conteúdos interativos concluídos + 60% de acerto nas questões
-export async function mapaConcluido(mapaId, usuarioId) {
-    const { pendentes } = await progressoNoMapa(mapaId, usuarioId);
-    if (pendentes.length > 0) return false;
-
-    const { aprovado } = await resultadoQuestoes(mapaId, usuarioId);
-    return aprovado;
-}
-
-// Situação de todos os mapas pro usuário. Dentro de cada nível os mapas seguem a ordem de criação:
+// Situação de todos os mapas pro usuário.
+// Mapa concluído = todos os conteúdos interativos concluídos + 60% de acerto nas questões. Dentro de cada nível os mapas seguem a ordem de criação:
 // o primeiro fica liberado e cada um dos outros libera quando o anterior (do mesmo nível) é concluído.
 // Admin vê tudo liberado (precisa acessar qualquer mapa pra editar e conferir).
 export async function situacaoDosMapas(usuarioId, admin) {
@@ -76,13 +68,31 @@ export async function situacaoDosMapas(usuarioId, admin) {
     for (const mapa of mapas) {
         const anterior = anteriorPorNivel[mapa.nivel] ?? null;
         const liberado = admin || anterior === null || anterior.concluido;
+
         // Mapa trancado não conta como concluído, mesmo que esteja vazio (sem conteúdos nem questões)
-        const concluido = liberado && await mapaConcluido(mapa.mapaId, usuarioId);
+        let concluido = false;
+        // Números do aluno no mapa, usados na trilha e no assistente da página de mapas (null se trancado)
+        let progresso = null;
+
+        if (liberado) {
+            const conteudos = await progressoNoMapa(mapa.mapaId, usuarioId);
+            const questoes = await resultadoQuestoes(mapa.mapaId, usuarioId);
+
+            concluido = conteudos.pendentes.length === 0 && questoes.aprovado;
+            progresso = {
+                conteudosFeitos: conteudos.concluidos.length,
+                conteudosTotal: conteudos.total,
+                questoesRespondidas: questoes.respondidas,
+                questoesAcertos: questoes.acertos,
+                questoesTotal: questoes.total
+            };
+        }
 
         situacao.push({
             ...mapa,
             concluido,
             liberado,
+            progresso,
             // Pra mensagem "conclua o mapa X primeiro"
             anterior: anterior ? { mapaId: anterior.mapaId, nome: anterior.nome } : null
         });
