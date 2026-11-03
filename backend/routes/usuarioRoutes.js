@@ -25,4 +25,7 @@ routes.patch('/perfil/senha', authUser, usuarioController.trocarSenha);
 routes.patch('/usuario/:id/promover',authUser,authAdmin,usuarioController.promoverAdmin);
 routes.patch('/usuario/:id/despromover',authUser,authAdmin,usuarioController.despromoverAdmin);
 
+// Painel da página inicial do administrador
+routes.get('/admin/painel', authUser, authAdmin, usuarioController.painelAdmin);
+
 export default routes;

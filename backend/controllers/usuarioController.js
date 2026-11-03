@@ -1,6 +1,7 @@
 import prisma from '../services/adapter.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { dadosDoPainelAdmin } from '../services/painelAdmin.js';
 import { CAMPOS_PERFIL, SENHA_MINIMA, dadosDoPerfil, validarCadastro, validarEdicaoPerfil } from '../services/perfil.js';
 
 // Token de login (o mesmo do login e de quando o aluno muda o nome no perfil)
@@ -258,9 +259,23 @@ function controller() {
                 res.status(500).json("Internal server error!");
             }
         },
+        // Página inicial do admin: números, mapas, questões com problema e usuários
+        async painelAdmin(req, res) {
+            try {
+                res.status(200).json(await dadosDoPainelAdmin());
+            } catch (error) {
+                console.log(error.message);
+                res.status(500).json("Internal server error!");
+            }
+        },
         async despromoverAdmin(req, res) {
             try {
                 const { id } = req.params;
+
+                // O admin não pode tirar o próprio acesso (senão o site pode ficar sem nenhum admin)
+                if (parseInt(id) === req.usuario.usuarioId) {
+                    return res.status(400).json({ error: "Você não pode remover o seu próprio acesso de administrador" });
+                }
 
                 const usuarioAtualizado = await prisma.usuario.update({
                     where: {

@@ -1,0 +1,335 @@
+/* Painel do administrador (InicioAdmin.jsx): mesma identidade do site,
+   fichas com borda fina, sombra sólida de recorte e as cores dos níveis */
+
+.adminInicio {
+    align-items: stretch;
+    gap: 20px;
+    text-align: left;
+    color: #1F2D44;
+}
+
+.adminErro {
+    font-weight: 600;
+    color: #8F2D22;
+}
+
+/* ---------- Cabeçalho ---------- */
+
+.adminCabecalho {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 22px;
+    background-color: #FFFFFF;
+    border: 2px solid #1F2D44;
+    border-left: 10px solid #2B4C7E;
+    border-radius: 4px;
+    box-shadow: 6px 6px 0 #1F2D44;
+}
+
+.adminEtiqueta {
+    display: inline-block;
+    margin-bottom: 6px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #FFFFFF;
+    background-color: #2B4C7E;
+    border-radius: 3px;
+}
+
+.adminCabecalho h1 {
+    font-size: 28px;
+    color: #2B4C7E;
+}
+
+.adminCabecalho p {
+    font-size: 15px;
+    color: #4A5A73;
+}
+
+.adminAcoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.adminBotao {
+    padding: 10px 16px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    color: #FFFFFF;
+    text-decoration: none;
+    background-color: #2B4C7E;
+    border: 2px solid #2B4C7E;
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 #1F2D44;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.adminBotao:hover {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 #1F2D44;
+}
+
+.adminBotaoContorno {
+    color: #2B4C7E;
+    background-color: #FFFFFF;
+}
+
+/* ---------- Números ---------- */
+
+.adminNumeros {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    padding: 0;
+    list-style: none;
+}
+
+.adminNumeros li {
+    display: flex;
+    flex-direction: column;
+    padding: 14px;
+    background-color: #FFFFFF;
+    border: 2px solid #1F2D44;
+    border-top: 6px solid #9CCB7E;
+    border-radius: 4px;
+    box-shadow: 4px 4px 0 #DCE3EE;
+}
+
+.adminNumeros li:nth-child(2) { border-top-color: #E8A27C; }
+.adminNumeros li:nth-child(3) { border-top-color: #E08A8A; }
+.adminNumeros li:nth-child(4) { border-top-color: #8DB3EC; }
+.adminNumeros li:nth-child(5) { border-top-color: #2B4C7E; }
+
+.adminNumeros strong {
+    font-size: 26px;
+    font-weight: 800;
+    color: #2B4C7E;
+}
+
+.adminNumeros span {
+    font-size: 13px;
+    color: #4A5A73;
+}
+
+/* ---------- Blocos ---------- */
+
+.adminBloco {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+    padding: 18px 20px;
+    background-color: #FFFFFF;
+    border: 2px solid #1F2D44;
+    border-radius: 4px;
+    box-shadow: 5px 5px 0 #DCE3EE;
+}
+
+.adminBloco h2 {
+    font-size: 19px;
+    font-weight: 800;
+    color: #2B4C7E;
+}
+
+.adminVazio,
+.adminDica {
+    font-size: 13px;
+    color: #4A5A73;
+}
+
+.adminTudoCerto {
+    padding: 10px 12px;
+    font-weight: 600;
+    color: #2F6B1D;
+    background-color: #E3F2D9;
+    border-left: 5px solid #4F8A31;
+}
+
+/* Avisos: vermelho trava o aluno, laranja é bom revisar */
+.adminAvisos {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0;
+    list-style: none;
+}
+
+.adminAvisos li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 12px;
+    padding: 10px 12px;
+    font-size: 14px;
+    background-color: #FCEEE6;
+    border-left: 6px solid #E8A27C;
+}
+
+.adminAvisos li.grave {
+    background-color: #F8E0E0;
+    border-left-color: #B03A2E;
+}
+
+.adminAvisos a {
+    font-weight: 700;
+    color: #2B4C7E;
+    white-space: nowrap;
+}
+
+/* ---------- Tabelas ---------- */
+
+.adminTabelaRolagem {
+    max-height: 340px;
+    overflow: auto;
+    border: 2px solid #1F2D44;
+    border-radius: 3px;
+}
+
+.adminTabela {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.adminTabela th {
+    position: sticky;
+    top: 0;
+    padding: 8px 10px;
+    font-size: 12px;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: #FFFFFF;
+    background-color: #2B4C7E;
+}
+
+.adminTabela td {
+    padding: 8px 10px;
+    border-top: 1px solid #DCE3EE;
+}
+
+.adminTabela tbody tr:nth-child(even) {
+    background-color: #FBF9F4;
+}
+
+.adminTabelaAcoes {
+    white-space: nowrap;
+}
+
+.adminTabelaAcoes a {
+    margin-right: 10px;
+    font-weight: 700;
+    color: #2B4C7E;
+}
+
+.adminNivel {
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    border: 1px solid #1F2D44;
+    border-radius: 3px;
+}
+
+/* Cores dos níveis (nomes próprios pra não pegar o .nivel-basico do Home.css, que pinta o fundo de tudo) */
+.nivel-tag-basico { background-color: #9CCB7E; }
+.nivel-tag-intermediario { background-color: #E8A27C; }
+.nivel-tag-avancado { background-color: #E08A8A; }
+.nivel-tag-treino { background-color: #8DB3EC; }
+
+.adminPapel {
+    margin-right: 10px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid #1F2D44;
+    border-radius: 3px;
+}
+
+.adminPapel.admin {
+    color: #FFFFFF;
+    background-color: #2B4C7E;
+}
+
+.adminVoce {
+    font-size: 12px;
+    color: #4A5A73;
+}
+
+.adminLinkBotao {
+    padding: 0;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    color: #2B4C7E;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.adminLinkBotao:disabled {
+    cursor: wait;
+    opacity: 0.6;
+}
+
+/* ---------- Onde os alunos mais erram ---------- */
+
+.adminErros {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0;
+    list-style: none;
+}
+
+.adminErrosTopo {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.adminBarra {
+    height: 12px;
+    background-color: #DCE3EE;
+    border: 2px solid #1F2D44;
+}
+
+.adminBarra div {
+    height: 100%;
+    background-color: #9CCB7E;
+}
+
+.adminBarra.fraca div {
+    background-color: #E08A8A;
+}
+
+/* ---------- Telas menores ---------- */
+
+@media (max-width: 900px) {
+    .adminNumeros {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 560px) {
+    .adminNumeros {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .adminCabecalho h1 {
+        font-size: 22px;
+    }
+}

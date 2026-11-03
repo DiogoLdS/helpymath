@@ -178,3 +178,11 @@ export function iniciais(nome) {
     if (partes.length === 0) return "?";
     return ((partes[0][0] ?? "") + (partes.length > 1 ? partes[partes.length - 1][0] : "")).toUpperCase();
 }
+
+// Pontos do aluno (mostrados na página inicial): 10 por conteúdo concluído e 5 por questão certa
+export const PONTOS_POR_CONTEUDO = 10;
+export const PONTOS_POR_ACERTO = 5;
+
+export function pontos(stats) {
+    return stats.conteudosConcluidos * PONTOS_POR_CONTEUDO + stats.acertos * PONTOS_POR_ACERTO;
+}
