@@ -6,6 +6,7 @@ import mensagem from "../../Assets/Images/mensagem.svg";
 import sino from "../../Assets/Images/sino.svg";
 import pessoa from "../../Assets/Images/pessoa.svg";
 import mais from "../../Assets/Images/mais.svg";
+import { usuarioEhAdmin } from "../../utils/auth.js";
 
 const Sidebar = () => {
     return (
@@ -27,9 +28,12 @@ const Sidebar = () => {
             <div className="iconspace" id="iconspace4">
                 <Link to="/perfil" className="btnSB" title="Meu perfil"><img src={pessoa} alt="Meu perfil" id="pess" /></Link>
             </div>
-            <div className="iconspace" id="iconspace5">
-                <img src={mais} alt="Ícone de Mais" id="mais" />
-            </div>
+            {/* "+" = criar mapa: só aparece pra administrador (o backend também só deixa admin criar) */}
+            {usuarioEhAdmin() && (
+                <div className="iconspace" id="iconspace5">
+                    <Link to="/admin/mapas/criar" className="btnSB" title="Criar mapa"><img src={mais} alt="Criar mapa" id="mais" /></Link>
+                </div>
+            )}
         </section>
     );
 };
