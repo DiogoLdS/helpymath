@@ -1,0 +1,784 @@
+/* Página de perfil: mesmo modelo do painel do aluno (barra lateral + painel) e a identidade do site
+   (fichas com borda fina, sombra sólida de recorte e as cores dos níveis). As variáveis vêm do identidade.css. */
+
+.mainPerfil {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.perfilPainel {
+    width: 90%;
+    height: 90vh;
+    max-width: 1500px;
+    padding: 32px 40px;
+    overflow-y: auto;
+    background-color: #DCE0E6;
+    border: 5px solid #567EBB;
+    border-radius: 0px 20px 20px 0px;
+    color: var(--tinta);
+}
+
+.perfilConteudo {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.perfilCarregando {
+    padding: 24px;
+    font-weight: 600;
+    color: var(--azul-escuro);
+}
+
+.perfilDica {
+    font-size: 13px;
+    color: #4A5A73;
+}
+
+.perfilVazio {
+    font-size: 14px;
+    color: #4A5A73;
+}
+
+.perfilVazio a {
+    color: var(--azul-escuro);
+    font-weight: 700;
+}
+
+.perfilMensagem {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--azul-escuro);
+}
+
+/* Esconde o texto do rótulo mas mantém pra leitor de tela */
+.perfilRotuloOculto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.perfilBotao {
+    padding: 9px 16px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    color: #FFFFFF;
+    background-color: var(--azul-escuro);
+    border: 2px solid var(--azul-escuro);
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 var(--tinta);
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.perfilBotao:hover:not(:disabled) {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 var(--tinta);
+}
+
+.perfilBotao:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.perfilBotaoContorno {
+    color: var(--azul-escuro);
+    background-color: #FFFFFF;
+}
+
+/* ---------- Cabeçalho ---------- */
+
+.perfilCabecalho {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 18px 22px;
+    padding: 22px;
+    background-color: #FFFFFF;
+    border: 2px solid var(--tinta);
+    border-left: 10px solid var(--azul-escuro);
+    border-radius: 4px;
+    box-shadow: 6px 6px 0 var(--tinta);
+}
+
+/* Avatar com as iniciais, no quadradinho da marca */
+.perfilAvatar {
+    width: 84px;
+    height: 84px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 32px;
+    font-weight: 800;
+    color: #FFFFFF;
+    background-color: var(--azul-escuro);
+    border: 2px solid var(--tinta);
+    border-radius: 6px;
+    box-shadow: 5px 5px 0 var(--verde);
+}
+
+.perfilIdentidade {
+    flex: 1;
+    min-width: 200px;
+}
+
+.perfilIdentidade h1 {
+    display: inline;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--azul-escuro);
+    background-image: linear-gradient(transparent 62%, var(--azul-claro) 62%);
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    overflow-wrap: anywhere;
+}
+
+.perfilIdentidade p {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #4A5A73;
+    overflow-wrap: anywhere;
+}
+
+.perfilEtiquetas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.perfilEtiquetas span {
+    padding: 3px 9px;
+    font-size: 12px;
+    font-weight: 600;
+    background-color: var(--papel);
+    border: 1px solid var(--tinta);
+    border-radius: 3px;
+}
+
+.perfilEtiquetas .perfilEtiquetaAdmin {
+    color: #FFFFFF;
+    background-color: var(--azul-escuro);
+}
+
+.perfilCabecalhoAcoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* ---------- Edição da conta ---------- */
+
+.editarConta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    padding: 20px;
+    background-color: #FFFFFF;
+    border: 2px solid var(--tinta);
+    border-top: 6px solid var(--laranja);
+    border-radius: 4px;
+    box-shadow: 5px 5px 0 var(--linha);
+}
+
+.editarContaBloco {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.editarContaBloco h3 {
+    margin-bottom: 4px;
+    font-size: 17px;
+    color: var(--azul-escuro);
+}
+
+.editarContaBloco label {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.editarContaBloco input,
+.editarContaBloco select {
+    width: 100%;
+    padding: 9px 11px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--tinta);
+    background-color: var(--papel);
+    border: 2px solid var(--tinta);
+    border-radius: 3px;
+}
+
+.editarContaBloco .perfilBotao {
+    margin-top: 8px;
+}
+
+.editarContaFechar {
+    grid-column: 1 / -1;
+    justify-self: start;
+}
+
+/* ---------- Números ---------- */
+
+.perfilNumeros {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    padding: 0;
+    list-style: none;
+}
+
+.perfilNumeros li {
+    display: flex;
+    flex-direction: column;
+    padding: 14px 16px;
+    background-color: #FFFFFF;
+    border: 2px solid var(--tinta);
+    border-top: 6px solid var(--verde);
+    border-radius: 4px;
+    box-shadow: 4px 4px 0 var(--linha);
+}
+
+.perfilNumeros li:nth-child(2) { border-top-color: var(--laranja); }
+.perfilNumeros li:nth-child(3) { border-top-color: var(--vermelho); }
+.perfilNumeros li:nth-child(4) { border-top-color: var(--azul-claro); }
+.perfilNumeros li:nth-child(5) { border-top-color: var(--azul-escuro); }
+
+.perfilNumeros strong {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--azul-escuro);
+}
+
+.perfilNumeros span {
+    font-size: 13px;
+    color: #4A5A73;
+}
+
+/* ---------- Blocos ---------- */
+
+.perfilBloco {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+    padding: 20px;
+    background-color: #FFFFFF;
+    border: 2px solid var(--tinta);
+    border-radius: 4px;
+    box-shadow: 5px 5px 0 var(--linha);
+}
+
+.perfilBlocoTitulo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.perfilBlocoTitulo h2 {
+    flex: 1;
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--azul-escuro);
+}
+
+/* Símbolo matemático no quadradinho, como os títulos da introdução */
+.perfilSimbolo {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: "KaTeX_Main", "Times New Roman", serif;
+    font-size: 18px;
+    font-style: italic;
+    color: #FFFFFF;
+    background-color: var(--azul-escuro);
+    border-radius: 4px;
+}
+
+.perfilDuasColunas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+}
+
+/* Barra de progresso (meta da semana e desempenho) */
+.perfilBarra {
+    position: relative;
+    height: 14px;
+    background-color: var(--linha);
+    border: 2px solid var(--tinta);
+    border-radius: 2px;
+}
+
+.perfilBarra > div {
+    height: 100%;
+    background-color: var(--verde);
+    transition: width 0.3s ease;
+}
+
+.perfilBarra.fraca > div {
+    background-color: var(--vermelho);
+}
+
+/* Tracinho da meta de 60% nas barras de desempenho */
+.perfilBarraMeta {
+    position: absolute;
+    top: -5px;
+    bottom: -5px;
+    left: 60%;
+    width: 2px;
+    background-color: var(--tinta);
+}
+
+/* ---------- Meta da semana ---------- */
+
+.perfilMeta p strong {
+    font-weight: 800;
+    color: var(--azul-escuro);
+}
+
+.perfilMetaEscolha {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.perfilMetaEscolha select {
+    padding: 6px 8px;
+    font-family: inherit;
+    font-size: 14px;
+    background-color: var(--papel);
+    border: 2px solid var(--tinta);
+    border-radius: 3px;
+}
+
+/* ---------- Cronograma (carrossel) ---------- */
+
+.cronogramaTopo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.cronogramaSetas {
+    display: flex;
+    gap: 6px;
+}
+
+.cronogramaSetas button {
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--azul-escuro);
+    background-color: #FFFFFF;
+    border: 2px solid var(--tinta);
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.cronogramaSetas button:hover {
+    background-color: var(--papel);
+}
+
+/* O "carrossel": uma fileira que rola pro lado e para em cada cartão */
+.cronogramaTrilho,
+.recomendacoes {
+    display: flex;
+    gap: 12px;
+    padding: 6px 4px 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+}
+
+.cronogramaDia {
+    position: relative;
+    flex: 0 0 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    background-color: var(--papel);
+    border: 2px solid var(--tinta);
+    border-top: 6px solid var(--linha);
+    border-radius: 4px;
+    scroll-snap-align: start;
+}
+
+.cronogramaDia.hoje {
+    border-top-color: var(--verde);
+    box-shadow: 4px 4px 0 var(--tinta);
+}
+
+.cronogramaDiaTopo {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.cronogramaDiaTopo span {
+    font-size: 12px;
+    color: #4A5A73;
+}
+
+.cronogramaHoje {
+    position: absolute;
+    top: -14px;
+    right: 10px;
+    padding: 1px 8px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    background-color: var(--verde);
+    border: 2px solid var(--tinta);
+    border-radius: 3px;
+}
+
+.cronogramaDia input {
+    width: 100%;
+    padding: 7px 9px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--tinta);
+    background-color: #FFFFFF;
+    border: 2px solid var(--linha);
+    border-radius: 3px;
+}
+
+.cronogramaDia input:focus {
+    outline: none;
+    border-color: var(--azul-escuro);
+}
+
+.cronogramaAtividade {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #2F6B1D;
+}
+
+.cronogramaPonto {
+    width: 10px;
+    height: 10px;
+    background-color: var(--verde);
+    border: 2px solid var(--tinta);
+    border-radius: 50%;
+}
+
+.cronogramaSem {
+    color: #8A919B;
+    font-weight: 500;
+}
+
+/* ---------- Recomendações (carrossel) ---------- */
+
+.recomendacao {
+    flex: 0 0 240px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px;
+    color: var(--tinta);
+    text-decoration: none;
+    background-color: var(--papel);
+    border: 2px solid var(--tinta);
+    border-top: 6px solid var(--azul-claro);
+    border-radius: 4px;
+    scroll-snap-align: start;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.recomendacao.revisar { border-top-color: var(--vermelho); }
+.recomendacao.continuar { border-top-color: var(--laranja); }
+
+.recomendacao:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--tinta);
+}
+
+.recomendacaoTipo {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #4A5A73;
+}
+
+.recomendacao strong {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--azul-escuro);
+}
+
+.recomendacao span {
+    font-size: 13px;
+}
+
+.recomendacaoAcao {
+    margin-top: auto;
+    font-weight: 700;
+    color: var(--azul-escuro);
+}
+
+/* ---------- Tabelas de conteúdos ---------- */
+
+.perfilTabelaRolagem {
+    max-height: 280px;
+    overflow: auto;
+    border: 2px solid var(--tinta);
+    border-radius: 3px;
+}
+
+.perfilTabela {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.perfilTabela th {
+    position: sticky;
+    top: 0;
+    padding: 8px 10px;
+    font-size: 12px;
+    text-align: left;
+    text-transform: uppercase;
+    color: #FFFFFF;
+    background-color: var(--azul-escuro);
+}
+
+.perfilTabela td {
+    padding: 8px 10px;
+    border-top: 1px solid var(--linha);
+}
+
+.perfilTabela tbody tr:nth-child(even) {
+    background-color: var(--papel);
+}
+
+.perfilTabela a {
+    font-weight: 700;
+    color: var(--azul-escuro);
+}
+
+/* ---------- Desempenho ---------- */
+
+.desempenho {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 0;
+    list-style: none;
+}
+
+.desempenhoTopo {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.desempenhoTopo strong {
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+/* ---------- Histórico (linha do tempo) ---------- */
+
+.historico {
+    display: flex;
+    flex-direction: column;
+    padding: 0 0 0 14px;
+    list-style: none;
+    border-left: 3px dashed var(--linha);
+}
+
+.historico li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 6px 0 10px 12px;
+    font-size: 14px;
+}
+
+/* Bolinha na linha do tempo, com a cor do tipo de atividade */
+.historico li::before {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: -24px;
+    width: 12px;
+    height: 12px;
+    background-color: var(--azul-claro);
+    border: 2px solid var(--tinta);
+    border-radius: 50%;
+}
+
+.historico li.certa::before { background-color: var(--verde); }
+.historico li.errada::before { background-color: var(--vermelho); }
+
+.historicoQuando {
+    font-size: 12px;
+    color: #4A5A73;
+}
+
+.historicoTexto strong {
+    font-weight: 700;
+}
+
+/* ---------- Conquistas ---------- */
+
+.conquistas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+    padding: 0;
+    list-style: none;
+}
+
+.conquista {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 10px;
+    text-align: center;
+    color: #8A919B;
+    background-color: #F1F1EE;
+    border: 2px dashed #B0B5BC;
+    border-radius: 4px;
+}
+
+.conquista strong {
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.conquista span {
+    font-size: 12px;
+}
+
+/* Selo: quadradinho com símbolo; colorido quando ganho */
+.conquistaSelo {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+    font-family: "KaTeX_Main", "Times New Roman", serif;
+    font-size: 22px;
+    font-weight: 700;
+    font-style: italic;
+    color: #9AA1AB;
+    background-color: #E4E6EA;
+    border: 2px solid #B0B5BC;
+    border-radius: 6px;
+}
+
+.conquista.ganha {
+    color: var(--tinta);
+    background-color: #FFFFFF;
+    border: 2px solid var(--tinta);
+    box-shadow: 4px 4px 0 var(--verde);
+}
+
+.conquista.ganha .conquistaSelo {
+    color: var(--tinta);
+    background-color: var(--verde);
+    border-color: var(--tinta);
+    box-shadow: 0 4px 0 var(--tinta);
+}
+
+.conquistaProgresso {
+    font-weight: 700;
+}
+
+/* ---------- Anotações ---------- */
+
+.anotacoes textarea {
+    width: 100%;
+    padding: 12px 14px;
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--tinta);
+    resize: vertical;
+    /* papel pautado */
+    background-color: #FFFFFF;
+    background-image: linear-gradient(transparent 23px, var(--linha) 24px);
+    background-size: 100% 24px;
+    background-attachment: local;
+    border: 2px solid var(--tinta);
+    border-left: 6px solid var(--vermelho);
+    border-radius: 3px;
+}
+
+.anotacoesRodape {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* ---------- Telas menores ---------- */
+
+@media (max-width: 900px) {
+    .perfilNumeros {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .perfilDuasColunas,
+    .editarConta {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 560px) {
+    .perfilNumeros {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .perfilCabecalho {
+        padding: 16px;
+    }
+
+    .perfilAvatar {
+        width: 64px;
+        height: 64px;
+        font-size: 24px;
+    }
+
+    .perfilIdentidade h1 {
+        font-size: 22px;
+    }
+
+    .perfilBloco {
+        padding: 14px;
+    }
+}

@@ -150,7 +150,7 @@ const Home = () => {
 
                 <aside className='homeLateral'>
                     <div className='homeUsuario'>
-                        <img src={pessoa} alt='Ícone de usuário' />
+                        <Link to='/perfil' title='Meu perfil'><img src={pessoa} alt='Meu perfil' /></Link>
                         <button type='button' className='homeSair' onClick={sair}>Sair</button>
                     </div>
 

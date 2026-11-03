@@ -57,10 +57,13 @@ function controller() {
                 const usuarioId = req.usuario.usuarioId;
                 const concluido = req.body.concluido !== false;
 
+                // Guarda quando foi concluído (histórico do perfil); desmarcar apaga a data
+                const concluidoEm = concluido ? new Date() : null;
+
                 const registro = await prisma.usuarioconteudo.upsert({
                     where: { usuarioId_conteudoId: { usuarioId, conteudoId } },
-                    update: { concluido },
-                    create: { usuarioId, conteudoId, concluido }
+                    update: { concluido, concluidoEm },
+                    create: { usuarioId, conteudoId, concluido, concluidoEm }
                 });
 
                 res.status(200).json(registro);

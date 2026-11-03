@@ -11,6 +11,7 @@ import MapaConceitual from './Components/MapaConceitual/MapaConceitual';
 import AdminCriarMapa from './Components/AdminCriarMapa/AdminCriarMapa';
 import AdminEditarMapa from './Components/AdminEditarMapa/AdminEditarMapa';
 import Introducao from './Components/Introducao/Introducao';
+import Perfil from './Components/Perfil/Perfil';
 
 function App() {
   return (
@@ -29,6 +30,9 @@ function App() {
 
           {/* Painel do aluno logado (antes ficava no "/") */}
           <Route path="/inicio" element={<Home/>}/>
+
+          {/* Perfil do aluno logado (ícone de pessoa da barra lateral) */}
+          <Route path="/perfil" element={<Perfil/>}/>
 
           <Route path="/mapas" element={<Mapas/>}/>
 

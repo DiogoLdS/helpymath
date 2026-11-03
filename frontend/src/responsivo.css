@@ -57,6 +57,7 @@
     .App .mainHome,
     .App .mainAdmin,
     .App .mainMapas,
+    .App .mainPerfil,
     .App .mapaConceitualPage {
         align-items: stretch;
         /* espaço embaixo pra barra de navegação não cobrir o conteúdo */
@@ -68,6 +69,7 @@
     .App .home,
     .App .adminPainel,
     .App .mapasPainel,
+    .App .perfilPainel,
     .App .mapaGrid {
         width: 100%;
         height: auto;

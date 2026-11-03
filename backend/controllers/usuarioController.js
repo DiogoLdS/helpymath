@@ -1,6 +1,18 @@
 import prisma from '../services/adapter.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { CAMPOS_PERFIL, dadosDoPerfil, validarEdicaoPerfil } from '../services/perfil.js';
+
+// Token de login (o mesmo do login e de quando o aluno muda o nome no perfil)
+function gerarToken(usuario) {
+    const payload = {
+        usuarioId: usuario.usuarioId,
+        nome: usuario.nome,
+        admin: usuario.admin,
+    };
+
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "7d" });
+}
 
 function controller() {
     return {
@@ -63,21 +75,8 @@ function controller() {
                     return res.status(404).json("User not found...");
                 }
 
-                // Criando o payload de jwt
-                const payload = {
-                    usuarioId: logUsuario.usuarioId,
-                    nome: logUsuario.nome,
-                    admin: logUsuario.admin,
-                }
-
                 //  Definindo o token jwt
-                const token = jwt.sign(
-                    payload,
-                    process.env.JWT_SECRET,
-                    {
-                        expiresIn: "7d"
-                    }
-                );
+                const token = gerarToken(logUsuario);
 
                 // Comparando senha enviada na requisição com senha do banco
                 const matchingPassword = await bcrypt.compare(senha, logUsuario.senha);
@@ -96,6 +95,76 @@ function controller() {
             }
         },
 
+        // Página de perfil: dados do aluno, mapas, conteúdos concluídos/pendentes e respostas
+        async perfil(req, res) {
+            try {
+                const dados = await dadosDoPerfil(req.usuario.usuarioId, req.usuario.admin);
+
+                if (!dados) {
+                    return res.status(404).json("Usuário não encontrado");
+                }
+
+                res.status(200).json(dados);
+            } catch (error) {
+                console.log(error.message);
+                res.status(500).json("Internal server error!");
+            }
+        },
+        // Aluno edita o próprio perfil (nome, objetivo, meta semanal, anotações, cronograma)
+        async editarPerfil(req, res) {
+            try {
+                const { dados, erro } = validarEdicaoPerfil(req.body);
+
+                if (erro) {
+                    return res.status(400).json({ error: erro });
+                }
+
+                const usuario = await prisma.usuario.update({
+                    where: { usuarioId: req.usuario.usuarioId },
+                    data: dados,
+                    select: CAMPOS_PERFIL
+                });
+
+                // Se o nome mudou, manda um token novo (o nome vai dentro do token)
+                res.status(200).json({
+                    usuario,
+                    token: dados.nome !== undefined ? gerarToken(usuario) : undefined
+                });
+            } catch (error) {
+                console.log(error.message);
+                res.status(500).json("Internal server error!");
+            }
+        },
+        // Trocar a senha: precisa da senha atual
+        async trocarSenha(req, res) {
+            try {
+                const { senhaAtual, novaSenha } = req.body;
+
+                if (!senhaAtual || !novaSenha) {
+                    return res.status(400).json({ error: "Informe a senha atual e a nova senha" });
+                }
+                if (String(novaSenha).length < 6) {
+                    return res.status(400).json({ error: "A nova senha precisa ter pelo menos 6 caracteres" });
+                }
+
+                const usuario = await prisma.usuario.findUnique({ where: { usuarioId: req.usuario.usuarioId } });
+                const confere = usuario && await bcrypt.compare(String(senhaAtual), usuario.senha);
+
+                if (!confere) {
+                    return res.status(400).json({ error: "A senha atual está incorreta" });
+                }
+
+                await prisma.usuario.update({
+                    where: { usuarioId: usuario.usuarioId },
+                    data: { senha: await bcrypt.hash(String(novaSenha), 10) }
+                });
+
+                res.status(200).json("Senha alterada com sucesso");
+            } catch (error) {
+                console.log(error.message);
+                res.status(500).json("Internal server error!");
+            }
+        },
         async getUsuario(req, res) {
             try {
                 const { usuarioId } = req.usuario;

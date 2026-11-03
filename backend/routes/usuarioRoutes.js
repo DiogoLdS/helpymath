@@ -17,6 +17,11 @@ routes.get('/auth',authUser, (req,res) => {
 })
 
 routes.get('/me',authUser, usuarioController.getUsuario);
+
+// Perfil do próprio usuário logado
+routes.get('/perfil', authUser, usuarioController.perfil);
+routes.patch('/perfil', authUser, usuarioController.editarPerfil);
+routes.patch('/perfil/senha', authUser, usuarioController.trocarSenha);
 routes.patch('/usuario/:id/promover',authUser,authAdmin,usuarioController.promoverAdmin);
 routes.patch('/usuario/:id/despromover',authUser,authAdmin,usuarioController.despromoverAdmin);
 

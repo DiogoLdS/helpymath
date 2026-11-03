@@ -25,7 +25,7 @@ const Sidebar = () => {
                 <img src={sino} alt="Ícone de Sino" id="sino" />
             </div>
             <div className="iconspace" id="iconspace4">
-                <img src={pessoa} alt="Ícone de Pessoa" id="pess" />
+                <Link to="/perfil" className="btnSB" title="Meu perfil"><img src={pessoa} alt="Meu perfil" id="pess" /></Link>
             </div>
             <div className="iconspace" id="iconspace5">
                 <img src={mais} alt="Ícone de Mais" id="mais" />
