@@ -9,6 +9,7 @@ import { linkDestinoValido } from "../../utils/linkDestino.js";
 import QuestoesForm from "./QuestoesForm.jsx";
 import { validarQuestoes } from "./questoesUtils.js";
 import "./AdminCriarMapa.css";
+import Carregando from "../Carregando/Carregando.jsx";
 
 // Tipos de elemento de conteúdo, conforme seção 3.7 do TCC:
 // 1 - Botão ampliado a uma explicação (expande em janela detalhada)
@@ -332,11 +333,12 @@ const MapaForm = ({
             )}
 
             {mensagemErro &&<p className="mensagemErro">{mensagemErro}</p>}
-            {enviando && etapaAtual && <p className="mensagemEtapa">{etapaAtual}</p>}
+            {/* A etapa já vem com "..." no fim (ex: "Salvando questão 1 de 3..."); o spinner põe os dele */}
+            {enviando && etapaAtual && <p className="mensagemEtapa"><Carregando texto={etapaAtual.replace(/\.+$/, "")} /></p>}
 
             <div className="acoesForm">
                 <button type="submit" className="botaoPrimario" disabled={enviando}>
-                    {enviando ? "Salvando..." : rotuloBotao}
+                    {enviando ? <Carregando texto="Salvando" /> : rotuloBotao}
                 </button>
 
                 {linkCancelar && (

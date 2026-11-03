@@ -19,6 +19,7 @@ import {
     resumoDaSemana,
 } from "./perfilUtils.js";
 import "./Perfil.css";
+import Carregando from "../Carregando/Carregando.jsx";
 
 // Página de perfil do aluno (Figura 4.3.2 do TCC, CU07 e CU08, RF009, RF010, RF016 e RF017):
 // dados da conta, números, meta da semana, cronograma em carrossel, recomendações em carrossel,
@@ -30,6 +31,7 @@ const Perfil = () => {
     const [perfil, setPerfil] = useState(null);
     const [erro, setErro] = useState("");
     const [editando, setEditando] = useState(false);
+    const [salvandoMeta, setSalvandoMeta] = useState(false);
     const carrosselRecomendacoes = useRef(null);
 
     const headers = () => ({ Authorization: `Bearer ${localStorage.getItem("token")}` });
@@ -93,7 +95,9 @@ const Perfil = () => {
             <main className="mainPerfil">
                 <Sidebar />
                 <section className="perfilPainel">
-                    <p className="perfilCarregando">{erro || "Carregando seu perfil..."}</p>
+                    {erro
+                        ? <p className="perfilCarregando">{erro}</p>
+                        : <Carregando pagina texto="Carregando seu perfil" />}
                 </section>
             </main>
         );
@@ -173,12 +177,18 @@ const Perfil = () => {
                             Minha meta:
                             <select
                                 value={usuario.metaSemanal}
-                                onChange={(e) => salvarPerfil({ metaSemanal: Number(e.target.value) })}
+                                onChange={async (e) => {
+                                    setSalvandoMeta(true);
+                                    await salvarPerfil({ metaSemanal: Number(e.target.value) });
+                                    setSalvandoMeta(false);
+                                }}
+                                disabled={salvandoMeta}
                             >
                                 {[1, 2, 3, 5, 7, 10, 15, 20, 30].map((n) => (
                                     <option key={n} value={n}>{n} {n === 1 ? "conteúdo" : "conteúdos"} por semana</option>
                                 ))}
                             </select>
+                            {salvandoMeta && <Carregando texto="Salvando" />}
                         </label>
                     </section>
 

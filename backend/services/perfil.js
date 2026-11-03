@@ -1,6 +1,25 @@
 import prisma from './adapter.js';
 import { situacaoDosMapas, TIPO_INTERATIVO } from './progresso.js';
 
+// Mínimo de caracteres da senha (cadastro e troca de senha; o frontend usa o mesmo número)
+export const SENHA_MINIMA = 6;
+const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Confere os dados do cadastro. Devolve { dados } prontos pra gravar, ou { erro } com a mensagem.
+export function validarCadastro(corpo) {
+    const nome = String(corpo.nome ?? '').trim();
+    // E-mail sempre em minúsculas, pra "Ana@x.com" e "ana@x.com" serem a mesma conta
+    const email = String(corpo.email ?? '').trim().toLowerCase();
+    const senha = String(corpo.senha ?? '');
+
+    if (nome.length < 2 || nome.length > 80) return { erro: "O nome precisa ter entre 2 e 80 caracteres" };
+    if (!EMAIL_VALIDO.test(email) || email.length > 191) return { erro: "Digite um e-mail válido" };
+    if (senha.length < SENHA_MINIMA) return { erro: `A senha precisa ter pelo menos ${SENHA_MINIMA} caracteres` };
+    if (corpo.aceitouTermos !== true) return { erro: "É preciso aceitar os Termos e Condições" };
+
+    return { dados: { nome, email, senha } };
+}
+
 // Valores aceitos na edição do perfil
 export const OBJETIVOS = ['escola', 'enem', 'concursos'];
 export const DIAS_DA_SEMANA = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom'];

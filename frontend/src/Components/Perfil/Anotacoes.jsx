@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Carregando from "../Carregando/Carregando.jsx";
 
 const LIMITE = 5000; // mesmo limite do backend
 
@@ -6,12 +7,15 @@ const LIMITE = 5000; // mesmo limite do backend
 const Anotacoes = ({ texto, onSalvar }) => {
     const [rascunho, setRascunho] = useState(texto ?? "");
     const [estado, setEstado] = useState("");
+    const [salvando, setSalvando] = useState(false);
 
     const mudou = rascunho !== (texto ?? "");
 
     const salvar = async () => {
-        setEstado("Salvando...");
+        setEstado("");
+        setSalvando(true);
         const certo = await onSalvar({ anotacoes: rascunho });
+        setSalvando(false);
         setEstado(certo
             ? `Salvo às ${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`
             : "Não foi possível salvar. Tente de novo.");
@@ -30,8 +34,8 @@ const Anotacoes = ({ texto, onSalvar }) => {
             />
             <div className="anotacoesRodape">
                 <span className="perfilDica">{estado || `${rascunho.length}/${LIMITE} caracteres`}</span>
-                <button type="button" className="perfilBotao" onClick={salvar} disabled={!mudou}>
-                    Salvar anotações
+                <button type="button" className="perfilBotao" onClick={salvar} disabled={!mudou || salvando}>
+                    {salvando ? <Carregando texto="Salvando" /> : "Salvar anotações"}
                 </button>
             </div>
         </div>

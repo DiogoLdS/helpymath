@@ -8,6 +8,7 @@ import { TextoComMidia } from "../Midia/Midia.jsx";
 import { linkExterno, linkInterno } from "../../utils/linkDestino.js";
 import "./MapaConceitual.css";
 import useTituloPagina from "../../utils/useTituloPagina.js";
+import Carregando from "../Carregando/Carregando.jsx";
 
 // Nome de cada tipo de conteúdo na versão impressa (mesmos tipos do MapaForm)
 const ROTULOS_TIPO = {
@@ -117,7 +118,7 @@ const MapaConceitual = () => {
     }, [id]);
 
     if (carregando) {
-        return <p className="mapaMensagem">Carregando...</p>;
+        return <Carregando pagina texto="Carregando o mapa" />;
     }
 
     if (erro || !mapa) {
@@ -226,13 +227,13 @@ const MapaConceitual = () => {
         <>
             <div className="mapaAcoesTopo">
                 <button type="button" className="mapaImprimir" onClick={imprimirMapa} disabled={preparandoImpressao}>
-                    {preparandoImpressao ? "Preparando..." : "Imprimir / PDF"}
+                    {preparandoImpressao ? <Carregando texto="Preparando" /> : "Imprimir / PDF"}
                 </button>
                 {usuarioEhAdmin() && (
                     <>
                         <Link to={`/admin/mapas/${id}/editar`} className="mapaEditar">Editar mapa</Link>
                         <button type="button" className="mapaExcluir" onClick={excluirMapa} disabled={excluindo}>
-                            {excluindo ? "Excluindo..." : "Excluir mapa"}
+                            {excluindo ? <Carregando texto="Excluindo" /> : "Excluir mapa"}
                         </button>
                     </>
                 )}
@@ -467,7 +468,7 @@ const MapaConceitual = () => {
                                         onClick={() => marcarConclusao(itemAberto.conteudoId, true)}
                                         disabled={salvandoConclusao}
                                     >
-                                        {salvandoConclusao ? "Salvando..." : "Marcar como concluído"}
+                                        {salvandoConclusao ? <Carregando texto="Salvando" /> : "Marcar como concluído"}
                                     </button>
                                 )
                             )}

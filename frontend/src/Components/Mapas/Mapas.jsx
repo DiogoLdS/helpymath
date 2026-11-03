@@ -9,6 +9,7 @@ import Sidebar from "../Sidebar/SidebarChapeu";
 import Assistente from "./Assistente.jsx";
 import Trilha from "./Trilha.jsx";
 import { recomendacao } from "./trilhaUtils.js";
+import Carregando from "../Carregando/Carregando.jsx";
 
 // Página da trilha de estudos: o assistente "Helpy" no topo e, embaixo, cada nível como um caminho de mapas
 const Mapas = () => {
@@ -100,7 +101,7 @@ const Mapas = () => {
                         ))}
                     </div>
 
-                    {carregando && <p className='mapas-vazio'>Carregando sua trilha...</p>}
+                    {carregando && <Carregando pagina texto='Carregando sua trilha' />}
 
                     {!carregando && niveisMostrados.map((n) => (
                         <Trilha

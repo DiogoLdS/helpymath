@@ -1,7 +1,7 @@
 import prisma from '../services/adapter.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { CAMPOS_PERFIL, dadosDoPerfil, validarEdicaoPerfil } from '../services/perfil.js';
+import { CAMPOS_PERFIL, SENHA_MINIMA, dadosDoPerfil, validarCadastro, validarEdicaoPerfil } from '../services/perfil.js';
 
 // Token de login (o mesmo do login e de quando o aluno muda o nome no perfil)
 function gerarToken(usuario) {
@@ -21,22 +21,35 @@ function controller() {
         },
         async registrarUsuario(req, res) {
             try {
-                const {
-                    nome,
-                    email,
-                    senha,
-                } = req.body;
+                // Nome, e-mail, senha mínima e aceite dos termos (services/perfil.js)
+                const { dados, erro } = validarCadastro(req.body);
+
+                if (erro) {
+                    return res.status(400).json({ error: erro });
+                }
+
+                // E-mail já usado (sem diferenciar maiúsculas de minúsculas)
+                const existente = await prisma.usuario.findFirst({
+                    where: { email: { equals: dados.email, mode: 'insensitive' } },
+                    select: { usuarioId: true }
+                });
+
+                if (existente) {
+                    return res.status(409).json({ error: "Já existe uma conta com esse e-mail" });
+                }
 
                 // Criptogrando senha enviada na requisição
-                const hashPassword = await bcrypt.hash(senha, 10);
+                const hashPassword = await bcrypt.hash(dados.senha, 10);
 
                 // Fazendo o insert de dados no banco
                 const novoUsuario = await prisma.usuario.create({
                     data: {
-                        nome: nome,
-                        email: email,
+                        nome: dados.nome,
+                        email: dados.email,
                         senha: hashPassword
-                    }
+                    },
+                    // Nunca devolve a senha (nem criptografada)
+                    select: { usuarioId: true, nome: true, email: true }
                 })
 
                 // Resposta da requisição: JSON do novo usuário
@@ -44,9 +57,12 @@ function controller() {
             } catch (error) {
                 console.error(error);
 
-                res.status(500).json({
-                    error: error.message
-                });
+                // Dois cadastros com o mesmo e-mail ao mesmo tempo: o banco barra o segundo
+                if (error.code === 'P2002') {
+                    return res.status(409).json({ error: "Já existe uma conta com esse e-mail" });
+                }
+
+                res.status(500).json({ error: "Não foi possível criar a conta agora" });
             }
         },
         async logUsuario(req, res) {
@@ -59,20 +75,20 @@ function controller() {
                 //  Verificando usuario e senha
                 if (!email || !senha) {
                     //  Caso não tenha, há tratamento do erro.
-                    return res.status(400).json("Incorrect senha or email");
+                    return res.status(400).json({ error: "Informe o e-mail e a senha" });
                 }
 
-                // Procurando usuário
-                const logUsuario = await prisma.usuario.findUnique({
+                // Procurando usuário (sem diferenciar maiúsculas de minúsculas no e-mail)
+                const logUsuario = await prisma.usuario.findFirst({
                     where: {
-                        email: email,
+                        email: { equals: String(email).trim(), mode: 'insensitive' },
                     }
                 })
 
-                // Verificando se o usuário existe
+                // Usuário inexistente e senha errada dão a mesma resposta,
+                // pra ninguém descobrir quais e-mails têm conta
                 if (!logUsuario) {
-                    // Tratamento do erro
-                    return res.status(404).json("User not found...");
+                    return res.status(401).json({ error: "E-mail ou senha incorretos" });
                 }
 
                 //  Definindo o token jwt
@@ -87,7 +103,7 @@ function controller() {
                 }
 
                 // Caso a senha seja incorreta, o login não é realizado
-                res.status(401).json("Login failed...");
+                res.status(401).json({ error: "E-mail ou senha incorretos" });
             } catch (error) {
                 console.log(error.message)
                 // Erro no servidor
@@ -143,8 +159,8 @@ function controller() {
                 if (!senhaAtual || !novaSenha) {
                     return res.status(400).json({ error: "Informe a senha atual e a nova senha" });
                 }
-                if (String(novaSenha).length < 6) {
-                    return res.status(400).json({ error: "A nova senha precisa ter pelo menos 6 caracteres" });
+                if (String(novaSenha).length < SENHA_MINIMA) {
+                    return res.status(400).json({ error: `A nova senha precisa ter pelo menos ${SENHA_MINIMA} caracteres` });
                 }
 
                 const usuario = await prisma.usuario.findUnique({ where: { usuarioId: req.usuario.usuarioId } });

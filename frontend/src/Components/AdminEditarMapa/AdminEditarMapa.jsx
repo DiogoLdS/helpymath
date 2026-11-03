@@ -11,6 +11,7 @@ import {
 } from "../AdminCriarMapa/questoesUtils.js";
 import "../AdminCriarMapa/AdminCriarMapa.css";
 import useTituloPagina from "../../utils/useTituloPagina.js";
+import Carregando from "../Carregando/Carregando.jsx";
 
 const AdminEditarMapa = () => {
     useTituloPagina("Editar mapa");
@@ -269,7 +270,7 @@ const AdminEditarMapa = () => {
                         Altere o nome do mapa e adicione, edite ou remova os conteúdos e as questões dele.
                     </p>
 
-                    {carregando && <p className="mensagemAdmin">Carregando...</p>}
+                    {carregando && <Carregando pagina texto="Carregando o mapa" />}
 
                     {!carregando && erroCarga && <p className="mensagemErro">{erroCarga}</p>}
 

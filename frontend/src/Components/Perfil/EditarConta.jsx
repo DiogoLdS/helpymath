@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { OBJETIVOS } from "./perfilUtils.js";
+import Carregando from "../Carregando/Carregando.jsx";
 
 // Editar nome e objetivo de estudo, e trocar a senha
 const EditarConta = ({ usuario, onSalvar, onTrocarSenha, onFechar }) => {
     const [nome, setNome] = useState(usuario.nome);
     const [objetivo, setObjetivo] = useState(usuario.objetivo ?? "");
     const [mensagemDados, setMensagemDados] = useState("");
+    const [salvandoDados, setSalvandoDados] = useState(false);
+    const [salvandoSenha, setSalvandoSenha] = useState(false);
 
     const [senhaAtual, setSenhaAtual] = useState("");
     const [novaSenha, setNovaSenha] = useState("");
@@ -18,7 +21,9 @@ const EditarConta = ({ usuario, onSalvar, onTrocarSenha, onFechar }) => {
             setMensagemDados("O nome precisa ter pelo menos 2 letras.");
             return;
         }
+        setSalvandoDados(true);
         const certo = await onSalvar({ nome: nome.trim(), objetivo: objetivo || null });
+        setSalvandoDados(false);
         setMensagemDados(certo ? "Dados salvos!" : "Não foi possível salvar. Tente de novo.");
     };
 
@@ -32,7 +37,9 @@ const EditarConta = ({ usuario, onSalvar, onTrocarSenha, onFechar }) => {
             setMensagemSenha("A confirmação não é igual à nova senha.");
             return;
         }
+        setSalvandoSenha(true);
         const erro = await onTrocarSenha(senhaAtual, novaSenha);
+        setSalvandoSenha(false);
         setMensagemSenha(erro || "Senha alterada!");
         if (!erro) {
             setSenhaAtual("");
@@ -56,7 +63,9 @@ const EditarConta = ({ usuario, onSalvar, onTrocarSenha, onFechar }) => {
 
                 <p className="perfilDica">E-mail: {usuario.email} (não pode ser alterado)</p>
                 {mensagemDados && <p className="perfilMensagem">{mensagemDados}</p>}
-                <button type="submit" className="perfilBotao">Salvar dados</button>
+                <button type="submit" className="perfilBotao" disabled={salvandoDados}>
+                    {salvandoDados ? <Carregando texto="Salvando" /> : "Salvar dados"}
+                </button>
             </form>
 
             <form onSubmit={salvarSenha} className="editarContaBloco">
@@ -71,7 +80,9 @@ const EditarConta = ({ usuario, onSalvar, onTrocarSenha, onFechar }) => {
                 <input id="confirmacaoSenha" type="password" autoComplete="new-password" value={confirmacao} onChange={(e) => setConfirmacao(e.target.value)} />
 
                 {mensagemSenha && <p className="perfilMensagem">{mensagemSenha}</p>}
-                <button type="submit" className="perfilBotao" disabled={!senhaAtual || !novaSenha}>Trocar senha</button>
+                <button type="submit" className="perfilBotao" disabled={!senhaAtual || !novaSenha || salvandoSenha}>
+                    {salvandoSenha ? <Carregando texto="Trocando" /> : "Trocar senha"}
+                </button>
             </form>
 
             <button type="button" className="perfilBotao perfilBotaoContorno editarContaFechar" onClick={onFechar}>

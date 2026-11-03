@@ -5,34 +5,51 @@ import api from '../../../services/api.js';
 import Sidebar from "../Sidebar/SidebarChapeu";
 import useTituloPagina from "../../utils/useTituloPagina.js";
 import Marca from "../Marca/Marca.jsx";
+import Carregando from "../Carregando/Carregando.jsx";
+import { iniciarSessao } from "../../utils/sessao.js";
 
 const Login = () => {
     useTituloPagina("Entrar");
 
   const [email, setEmail] = useState('');
   const [senha, setPassword] = useState('');
+  const [lembrar, setLembrar] = useState(true);
+  const [enviando, setEnviando] = useState(false);
+  const [erro, setErro] = useState('');
+  const [mostrarAjudaSenha, setMostrarAjudaSenha] = useState(false);
 
   const navigate = useNavigate();
 
   async function logUser(e) {
     e.preventDefault();
+    setErro('');
+
+    if (!email.trim() || !senha) {
+      setErro('Preencha o e-mail e a senha.');
+      return;
+    }
+
+    setEnviando(true);
 
     try {
-      const login = await api.post('/logUsuario', { email, senha });
+      const login = await api.post('/logUsuario', { email: email.trim(), senha });
 
       if (login.status == 200) {
-        localStorage.setItem('token', login.data);
+        iniciarSessao(login.data, lembrar);
         navigate('/inicio');
       }
     } catch (error) {
+      // 400/401/404: e-mail ou senha errados (não dizemos qual, por segurança)
+      setErro(
+        error.response && error.response.status < 500
+          ? 'E-mail ou senha incorretos.'
+          : 'Não foi possível entrar agora. Tente novamente em instantes.'
+      );
       console.log(error.message);
+    } finally {
+      setEnviando(false);
     }
   }
-
-  // {
-  //   "email": "aerfdfcqer",
-  //   "senha": "sla2"
-  // }
 
 
   return (
@@ -46,21 +63,35 @@ const Login = () => {
             <h1>Faça seu login</h1>
 
             <div className="input-field">
-              <input type="text" id="user" name="user" value={email} onChange={(e) => { setEmail(e.target.value) }} placeholder="E-mail" />
+              <input type="email" id="user" name="user" autoComplete="email" value={email} onChange={(e) => { setEmail(e.target.value) }} placeholder="E-mail" disabled={enviando} />
             </div>
 
             <div className="input-field">
-              <input type="password" id="password" name="password" value={senha} onChange={(e) => { setPassword(e.target.value) }} placeholder="Senha" />
+              <input type="password" id="password" name="password" autoComplete="current-password" value={senha} onChange={(e) => { setPassword(e.target.value) }} placeholder="Senha" disabled={enviando} />
             </div>
 
             <div className="remember-me">
-              <label><input type="checkbox" id="remember-me" name="remember-me" />Lembrar de mim</label>
+              <label><input type="checkbox" id="remember-me" name="remember-me" checked={lembrar} onChange={(e) => setLembrar(e.target.checked)} />Lembrar de mim</label>
 
-              <a href="#">Esqueceu a senha?</a>
+              <button type="button" className="linkSenha" onClick={() => setMostrarAjudaSenha((v) => !v)} aria-expanded={mostrarAjudaSenha}>
+                Esqueceu a senha?
+              </button>
             </div>
 
+            {/* O site ainda não envia e-mail, então a recuperação é feita por um administrador */}
+            {mostrarAjudaSenha && (
+              <p className="avisoFormulario">
+                A recuperação de senha pelo site ainda não está disponível. Fale com um administrador do HelpyMath
+                para redefinir sua senha. Se você lembra a senha atual, pode trocá-la no seu perfil.
+              </p>
+            )}
+
+            {erro && <p className="erroFormulario" role="alert">{erro}</p>}
+
             <div className="enter">
-              <button type="submit">Entrar</button>
+              <button type="submit" disabled={enviando}>
+                {enviando ? <Carregando texto="Entrando" /> : 'Entrar'}
+              </button>
             </div>
 
 

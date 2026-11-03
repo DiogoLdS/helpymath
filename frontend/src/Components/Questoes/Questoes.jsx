@@ -4,6 +4,7 @@ import api from "../../../services/api.js";
 import "./Questoes.css";
 import useTituloPagina from "../../utils/useTituloPagina.js";
 import Marca from "../Marca/Marca.jsx";
+import Carregando from "../Carregando/Carregando.jsx";
 
 // Precisa bater com NOTA_MINIMA do backend (services/progresso.js)
 const NOTA_MINIMA = 0.6;
@@ -19,6 +20,11 @@ const Questoes = () => {
     // Correção de cada questão já respondida: { questaoId: { correto, letraCorreta } }
     const [resultados, setResultados] = useState({});
     const [bloqueado, setBloqueado] = useState(false);
+    // Enquanto as questões não chegam, mostra o spinner (e não "Nenhuma questão cadastrada")
+    const [carregando, setCarregando] = useState(true);
+    // Questão sendo corrigida agora (spinner no botão) e erro de envio, se houver
+    const [respondendo, setRespondendo] = useState(null);
+    const [erroEnvio, setErroEnvio] = useState({});
     // Placar do mapa: { acertos, total, mapaConcluido, proximo }
     const [placar, setPlacar] = useState(null);
 
@@ -72,7 +78,7 @@ const Questoes = () => {
             }
         };
 
-        buscarQuestoes();
+        buscarQuestoes().finally(() => setCarregando(false));
     }, [mapaId]);
 
     const selecionarAlternativa = (questaoId, alternativaId) => {
@@ -87,6 +93,8 @@ const Questoes = () => {
         if (!alternativaId) return;
 
         const storedToken = localStorage.getItem('token');
+        setRespondendo(questaoId);
+        setErroEnvio((anteriores) => ({ ...anteriores, [questaoId]: '' }));
 
         try {
             const resposta = await api.post(`/questoes/${questaoId}/responder`, { alternativaId }, {
@@ -103,7 +111,10 @@ const Questoes = () => {
                 setPlacar({ acertos: resultado.acertos, total: resultado.total, mapaConcluido, proximo });
             }
         } catch (error) {
+            setErroEnvio((anteriores) => ({ ...anteriores, [questaoId]: 'Não foi possível enviar sua resposta. Tente de novo.' }));
             console.log(error.message);
+        } finally {
+            setRespondendo(null);
         }
     };
 
@@ -135,7 +146,9 @@ const Questoes = () => {
                 </div>
             )}
 
-            {!bloqueado && questoes.length === 0 && <p>Nenhuma questão cadastrada para este mapa.</p>}
+            {carregando && <Carregando pagina texto="Carregando as questões" />}
+
+            {!carregando && !bloqueado && questoes.length === 0 && <p>Nenhuma questão cadastrada para este mapa.</p>}
 
             {/* Placar: quantas acertou e a meta de 60% pra concluir o mapa */}
             {placar && placar.total > 0 && (
@@ -202,14 +215,19 @@ const Questoes = () => {
                         </div>
 
                         {!resultado ? (
-                            <button
-                                type='button'
-                                className='botao-responder'
-                                disabled={!respostas[questao.questaoId]}
-                                onClick={() => responder(questao.questaoId)}
-                            >
-                                Responder
-                            </button>
+                            <>
+                                <button
+                                    type='button'
+                                    className='botao-responder'
+                                    disabled={!respostas[questao.questaoId] || respondendo !== null}
+                                    onClick={() => responder(questao.questaoId)}
+                                >
+                                    {respondendo === questao.questaoId ? <Carregando texto="Corrigindo" /> : 'Responder'}
+                                </button>
+                                {erroEnvio[questao.questaoId] && (
+                                    <p className='feedback incorreto'>{erroEnvio[questao.questaoId]}</p>
+                                )}
+                            </>
                         ) : resultado.correto ? (
                             <p className='feedback correto'>Resposta correta!</p>
                         ) : (

@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { DIAS, chaveDoDia } from "./perfilUtils.js";
+import Carregando from "../Carregando/Carregando.jsx";
 
 // Cronograma da semana em carrossel (Figura 4.3.2 do TCC): um cartão por dia, com o que o aluno
 // planejou estudar e quantas atividades ele fez naquele dia. O plano é salvo ao sair do campo.
@@ -26,7 +27,7 @@ const Cronograma = ({ cronograma, porDia, inicioSemana, onSalvar }) => {
     return (
         <div className="cronograma">
             <div className="cronogramaTopo">
-                <span className="perfilDica">{salvando ? "Salvando..." : "Escreva o que pretende estudar em cada dia."}</span>
+                <span className="perfilDica">{salvando ? <Carregando texto="Salvando o cronograma" /> : "Escreva o que pretende estudar em cada dia."}</span>
                 <div className="cronogramaSetas">
                     <button type="button" onClick={() => rolar(-1)} aria-label="Dias anteriores">‹</button>
                     <button type="button" onClick={() => rolar(1)} aria-label="Próximos dias">›</button>

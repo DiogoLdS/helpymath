@@ -7,6 +7,12 @@ import api from '../../../services/api.js';
 import { useState } from "react";
 import useTituloPagina from "../../utils/useTituloPagina.js";
 import Marca from "../Marca/Marca.jsx";
+import Carregando from "../Carregando/Carregando.jsx";
+import Termos from "./Termos.jsx";
+
+// Mesmo mínimo do backend (usuarioController.js) e da troca de senha no perfil
+const SENHA_MINIMA = 6;
+const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const Register = () => {
     useTituloPagina("Criar conta");
@@ -15,58 +21,112 @@ const Register = () => {
   const [nome, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setPassword] = useState('');
+  const [confirmacao, setConfirmacao] = useState('');
+
+  // Os termos precisam ser abertos e lidos até o fim antes de poder marcar a caixinha
+  const [termosAbertos, setTermosAbertos] = useState(false);
+  const [termosLidos, setTermosLidos] = useState(false);
+  const [aceitouTermos, setAceitouTermos] = useState(false);
+
+  const [enviando, setEnviando] = useState(false);
+  const [erro, setErro] = useState('');
 
   const navigate = useNavigate();
+
+  // Devolve a primeira coisa errada no formulário, ou "" se estiver tudo certo
+  function validar() {
+    if (nome.trim().length < 2) return 'Digite seu nome (pelo menos 2 letras).';
+    if (!EMAIL_VALIDO.test(email.trim())) return 'Digite um e-mail válido.';
+    if (senha.length < SENHA_MINIMA) return `A senha precisa ter pelo menos ${SENHA_MINIMA} caracteres.`;
+    if (senha !== confirmacao) return 'As senhas não são iguais.';
+    if (!aceitouTermos) return 'Leia e aceite os Termos e Condições para criar a conta.';
+    return '';
+  }
 
   async function registerUser(e) {
     e.preventDefault();
 
-    try {
-      console.log("Dados:", {
-        nome,
-        email,
-        senha
-      });
-      const response = await api.post('/registrarUsuario', { nome, email, senha });
+    const problema = validar();
+    setErro(problema);
+    if (problema) return;
 
-      console.log("Usuário registrado com sucesso!" + "\n" + response.data);
-      
+    setEnviando(true);
+
+    try {
+      await api.post('/registrarUsuario', { nome: nome.trim(), email: email.trim(), senha, aceitouTermos });
       navigate('/login');
     } catch (error) {
+      // O backend devolve { error: "mensagem" } quando algum dado está errado (ex: e-mail já usado)
+      setErro(error.response?.data?.error ?? 'Não foi possível criar a conta agora. Tente novamente em instantes.');
       console.log(error.message);
+    } finally {
+      setEnviando(false);
     }
   }
+
+  const aceitarTermos = () => {
+    setTermosLidos(true);
+    setAceitouTermos(true);
+    setTermosAbertos(false);
+  };
+
   return (
     <>
       <main className='mainRegister'>
         <Sidebar />
 
         <section className="register">
-          <form onSubmit={registerUser}>
+          <form onSubmit={registerUser} noValidate>
             <Marca grande />
             <h1>Crie uma conta</h1>
 
             <div className="input-field">
-              <input type="text" id="user" name="user" placeholder="Seu nome de usuário *" value={nome} required onChange={(e) => { setUsername(e.target.value) }} />
+              <input type="text" id="user" name="user" autoComplete="name" placeholder="Seu nome *" value={nome} maxLength={80} onChange={(e) => { setUsername(e.target.value) }} disabled={enviando} />
             </div>
 
             <div className="input-field">
-              <input type="email" id="email" name="email" placeholder="Seu e-mail *" value={email} required onChange={(e) => { setEmail(e.target.value) }} />
-  
+              <input type="email" id="email" name="email" autoComplete="email" placeholder="Seu e-mail *" value={email} onChange={(e) => { setEmail(e.target.value) }} disabled={enviando} />
             </div>
 
             <div className="input-field">
-              <input type="password" id="password" name="password" placeholder="Sua senha *" value={senha} required onChange={(e) => { setPassword(e.target.value) }} />
-        
+              <input type="password" id="password" name="password" autoComplete="new-password" placeholder={`Sua senha (mínimo ${SENHA_MINIMA} caracteres) *`} value={senha} onChange={(e) => { setPassword(e.target.value) }} disabled={enviando} />
             </div>
+            {/* Aviso enquanto a pessoa digita */}
+            {senha.length > 0 && senha.length < SENHA_MINIMA && (
+              <p className="avisoFormulario">Faltam {SENHA_MINIMA - senha.length} caractere(s) para a senha ficar válida.</p>
+            )}
 
+            <div className="input-field">
+              <input type="password" id="confirmacao" name="confirmacao" autoComplete="new-password" placeholder="Repita a senha *" value={confirmacao} onChange={(e) => { setConfirmacao(e.target.value) }} disabled={enviando} />
+            </div>
+            {confirmacao.length > 0 && confirmacao !== senha && (
+              <p className="avisoFormulario">As senhas ainda não são iguais.</p>
+            )}
 
             <div className="terms">
-              <label><input type="checkbox" id="terms" name="terms" /><p>Eu concordo com os <a href="#">Termos e Condições</a></p></label>
+              <label title={termosLidos ? '' : 'Abra e leia os termos para poder aceitar'}>
+                <input
+                  type="checkbox"
+                  id="terms"
+                  name="terms"
+                  checked={aceitouTermos}
+                  disabled={!termosLidos || enviando}
+                  onChange={(e) => setAceitouTermos(e.target.checked)}
+                />
+                <p>
+                  Li e concordo com os{' '}
+                  <button type="button" className="linkTermos" onClick={() => setTermosAbertos(true)}>Termos e Condições</button>
+                </p>
+              </label>
             </div>
+            {!termosLidos && <p className="avisoFormulario">Clique em "Termos e Condições" e leia até o fim para poder aceitar.</p>}
+
+            {erro && <p className="erroFormulario" role="alert">{erro}</p>}
 
             <div className="enter">
-              <button type="submit">Registre-se</button>
+              <button type="submit" disabled={enviando}>
+                {enviando ? <Carregando texto="Criando conta" /> : 'Registre-se'}
+              </button>
             </div>
 
             <div className="signup">
@@ -76,6 +136,8 @@ const Register = () => {
           </form>
         </section>
       </main>
+
+      {termosAbertos && <Termos onAceitar={aceitarTermos} onFechar={() => setTermosAbertos(false)} />}
     </>
   )
 
