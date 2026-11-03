@@ -5,7 +5,7 @@ import niveis from "../../data/niveis.js";
 import { decodificarToken } from "../../utils/auth.js";
 import "./Mapas.css";
 import useTituloPagina from "../../utils/useTituloPagina.js";
-import Marca from "../Marca/Marca.jsx";
+import Sidebar from "../Sidebar/SidebarChapeu";
 import Assistente from "./Assistente.jsx";
 import Trilha from "./Trilha.jsx";
 import { recomendacao } from "./trilhaUtils.js";
@@ -66,47 +66,53 @@ const Mapas = () => {
     const niveisMostrados = nivelEscolhido ? niveis.filter((n) => n.chave === nivelEscolhido) : niveis;
 
     return (
+        // Mesmo modelo do painel do aluno e do admin: barra lateral à esquerda e o painel ao lado
         <main className='mainMapas'>
-            <Marca comLink />
-            <h1>Sua trilha de estudos</h1>
+            <Sidebar />
 
-            {!carregando && (
-                <Assistente nome={nome} recomendacao={recomendacao(mapas, niveis, nivelEscolhido)} />
-            )}
+            <section className='mapasPainel'>
+                <div className='mapasConteudo'>
+                    <h1>Sua trilha de estudos</h1>
 
-            <div className='mapas-filtros' role='group' aria-label='Filtrar por dificuldade'>
-                <button
-                    type='button'
-                    className={!nivelEscolhido ? 'mapas-filtro ativo' : 'mapas-filtro'}
-                    aria-pressed={!nivelEscolhido}
-                    onClick={() => escolherNivel(null)}
-                >
-                    Todos
-                </button>
-                {niveis.map((n) => (
-                    <button
-                        type='button'
-                        key={n.chave}
-                        className={nivelEscolhido === n.chave ? `mapas-filtro ativo nivel-${n.chave}` : `mapas-filtro nivel-${n.chave}`}
-                        aria-pressed={nivelEscolhido === n.chave}
-                        onClick={() => escolherNivel(n.chave)}
-                    >
-                        {n.nome}
-                    </button>
-                ))}
-            </div>
+                    {!carregando && (
+                        <Assistente nome={nome} recomendacao={recomendacao(mapas, niveis, nivelEscolhido)} />
+                    )}
 
-            {carregando && <p className='mapas-vazio'>Carregando sua trilha...</p>}
+                    <div className='mapas-filtros' role='group' aria-label='Filtrar por dificuldade'>
+                        <button
+                            type='button'
+                            className={!nivelEscolhido ? 'mapas-filtro ativo' : 'mapas-filtro'}
+                            aria-pressed={!nivelEscolhido}
+                            onClick={() => escolherNivel(null)}
+                        >
+                            Todos
+                        </button>
+                        {niveis.map((n) => (
+                            <button
+                                type='button'
+                                key={n.chave}
+                                className={nivelEscolhido === n.chave ? `mapas-filtro ativo nivel-${n.chave}` : `mapas-filtro nivel-${n.chave}`}
+                                aria-pressed={nivelEscolhido === n.chave}
+                                onClick={() => escolherNivel(n.chave)}
+                            >
+                                {n.nome}
+                            </button>
+                        ))}
+                    </div>
 
-            {!carregando && niveisMostrados.map((n) => (
-                <Trilha
-                    key={n.chave}
-                    numero={niveis.indexOf(n) + 1}
-                    nivel={n}
-                    // Mapas antigos, sem nível salvo, entram como básico (mesmo padrão do banco)
-                    mapas={mapas.filter((mapa) => (mapa.nivel ?? 'basico') === n.chave)}
-                />
-            ))}
+                    {carregando && <p className='mapas-vazio'>Carregando sua trilha...</p>}
+
+                    {!carregando && niveisMostrados.map((n) => (
+                        <Trilha
+                            key={n.chave}
+                            numero={niveis.indexOf(n) + 1}
+                            nivel={n}
+                            // Mapas antigos, sem nível salvo, entram como básico (mesmo padrão do banco)
+                            mapas={mapas.filter((mapa) => (mapa.nivel ?? 'basico') === n.chave)}
+                        />
+                    ))}
+                </div>
+            </section>
         </main>
     );
 };

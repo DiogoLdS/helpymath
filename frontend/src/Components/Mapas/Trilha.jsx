@@ -1,9 +1,11 @@
 import { Link } from "react-router";
 import { mapaAtual, porcentagemDoMapa } from "./trilhaUtils.js";
 
-// Deslocamento horizontal (em px) de cada mapa no caminho, formando um zigue-zague que se repete
-const ZIGUEZAGUE = [0, 70, 100, 70, 0, -70, -100, -70];
-const LARGURA = 320;  // largura do caminho (cabe no celular)
+// Deslocamento horizontal de cada mapa no caminho, formando um zigue-zague que se repete.
+// As posições são calculadas numa largura de referência e viram porcentagem, então o caminho
+// encolhe junto com a tela no celular sem nada vazar pro lado.
+const ZIGUEZAGUE = [0, 60, 90, 60, 0, -60, -90, -60];
+const LARGURA = 320;  // largura de referência (e máxima) do caminho
 const ALTURA_PASSO = 170; // distância vertical entre um mapa e o próximo (com folga pro balão "COMEÇAR")
 const TOPO = 64;      // espaço em cima do primeiro mapa (pro balão "COMEÇAR")
 
@@ -41,9 +43,14 @@ const Trilha = ({ numero, nivel, mapas }) => {
             {mapas.length === 0 ? (
                 <p className="trilhaVazia">Nenhum mapa neste nível ainda.</p>
             ) : (
-                <div className="trilhaCaminho" style={{ width: LARGURA, height: TOPO + (mapas.length - 1) * ALTURA_PASSO + 110 }}>
+                <div className="trilhaCaminho" style={{ maxWidth: LARGURA, height: TOPO + (mapas.length - 1) * ALTURA_PASSO + 110 }}>
                     {/* Linha "de giz" ligando os mapas na ordem */}
-                    <svg className="trilhaLinha" width={LARGURA} height={TOPO + (mapas.length - 1) * ALTURA_PASSO + 40} aria-hidden="true">
+                    <svg
+                        className="trilhaLinha"
+                        viewBox={`0 0 ${LARGURA} ${TOPO + (mapas.length - 1) * ALTURA_PASSO + 40}`}
+                        preserveAspectRatio="none"
+                        aria-hidden="true"
+                    >
                         <polyline points={pontos.map((p) => `${p.x},${p.y}`).join(" ")} />
                     </svg>
 
@@ -51,7 +58,7 @@ const Trilha = ({ numero, nivel, mapas }) => {
                         const ehAtual = atual?.mapaId === mapa.mapaId;
                         const porcentagem = porcentagemDoMapa(mapa);
                         const estado = mapa.concluido ? "concluido" : ehAtual ? "atual" : mapa.liberado ? "livre" : "trancado";
-                        const estilo = { left: pontos[i].x, top: pontos[i].y };
+                        const estilo = { left: `${(pontos[i].x / LARGURA) * 100}%`, top: pontos[i].y };
 
                         const ficha = (
                             <>

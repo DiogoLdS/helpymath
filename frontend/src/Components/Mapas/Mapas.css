@@ -1,8 +1,27 @@
+/* Mesmo modelo do painel do aluno (Home.css) e do admin: barra lateral + painel ao lado */
 .mainMapas {
     width: 100%;
-    max-width: 1000px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mapasPainel {
+    width: 90%;
+    height: 90vh;
+    max-width: 1500px;
+    padding: 32px 40px;
+    overflow-y: auto;
+    background-color: #DCE0E6;
+    border: 5px solid #567EBB;
+    border-radius: 0px 20px 20px 0px;
+}
+
+/* O conteúdo fica numa coluna central, como a trilha do Duolingo */
+.mapasConteudo {
+    max-width: 860px;
     margin: 0 auto;
-    padding: 32px 16px;
 }
 
 .mainMapas h1 {
@@ -40,9 +59,6 @@
     background-color: #2B4C7E;
 }
 
-.mainMapas .marca {
-    margin-bottom: 20px;
-}
 
 .mapas-vazio {
     font-size: 14px;
@@ -307,7 +323,7 @@
 /* O caminho em si: os mapas são posicionados (left/top) pelo Trilha.jsx */
 .trilhaCaminho {
     position: relative;
-    max-width: 100%;
+    width: 100%;
     margin: 28px auto 0;
 }
 
@@ -316,21 +332,25 @@
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: calc(100% - 70px);
     overflow: visible;
 }
 
 .trilhaLinha polyline {
     fill: none;
-    stroke: #B7C3D6;
+    stroke: #93A6C4;
     stroke-width: 5;
     stroke-dasharray: 2 12;
     stroke-linecap: round;
     stroke-linejoin: round;
+    /* a linha esticada junto com a largura não pode engordar */
+    vector-effect: non-scaling-stroke;
 }
 
 .trilhaMapa {
     position: absolute;
-    width: 150px;
+    width: 120px;
     display: flex;
     flex-direction: column;
     align-items: center;

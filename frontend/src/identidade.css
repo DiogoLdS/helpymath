@@ -30,6 +30,7 @@
 .App .mainRegister,
 .App .mainHome,
 .App .mainAdmin,
+.App .mainMapas,
 .App .mapaConceitualPage {
     background-color: transparent;
 }
@@ -46,6 +47,7 @@
 .App .register,
 .App .home,
 .App .adminPainel,
+.App .mapasPainel,
 .App .mapaGrid {
     border-radius: 0 4px 4px 0;
     box-shadow: 8px 8px 0 var(--tinta);
