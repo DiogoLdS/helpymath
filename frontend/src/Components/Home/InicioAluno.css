@@ -1,0 +1,759 @@
+/* Painel de estudos do aluno (InicioAluno.jsx). Mesma identidade do site:
+   fichas brancas com borda de tinta, sombra sólida e as cores dos níveis. */
+
+.iaCentro {
+    align-items: stretch;
+    gap: 18px;
+    text-align: left;
+    color: #1F2D44;
+}
+
+.iaErro {
+    font-weight: 600;
+    color: #8F2D22;
+}
+
+/* ---------- Botões ---------- */
+
+.iaBotao {
+    align-self: flex-start;
+    display: inline-block;
+    padding: 9px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    color: #FFFFFF;
+    text-decoration: none;
+    background-color: #2B4C7E;
+    border: 2px solid #2B4C7E;
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 #1F2D44;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.iaBotao:hover {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 #1F2D44;
+}
+
+.iaBotaoGrande {
+    padding: 12px 22px;
+    font-size: 16px;
+    white-space: normal;
+}
+
+/* ---------- Helpy ---------- */
+
+.iaHelpy {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 20px 22px;
+    background-color: #FFFFFF;
+    border: 2px solid #1F2D44;
+    border-left: 10px solid #2B4C7E;
+    border-radius: 4px;
+    box-shadow: 6px 6px 0 #1F2D44;
+}
+
+.iaHelpyTopo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.iaHelpyAvatar {
+    flex-shrink: 0;
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #FFFFFF;
+    background-color: #2B4C7E;
+    border: 2px solid #1F2D44;
+    border-radius: 50%;
+    box-shadow: 3px 3px 0 #8DB3EC;
+}
+
+.iaHelpyTopo h1 {
+    font-size: clamp(22px, 2.4vw, 30px);
+    line-height: 1.15;
+    color: #2B4C7E;
+}
+
+.iaHelpyCargo {
+    font-size: 13px;
+    color: #4A5A73;
+}
+
+/* A engrenagem continua no canto, mas dentro do cartão */
+.iaConfig.homeConfig {
+    position: static;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.iaHelpyFala {
+    position: relative;
+    padding: 14px 16px;
+    font-size: 16px;
+    line-height: 1.5;
+    background-color: #E6EEFA;
+    border: 2px solid #1F2D44;
+    border-radius: 4px;
+}
+
+/* Pontinha do balão apontando pro avatar */
+.iaHelpyFala::before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: 22px;
+    width: 16px;
+    height: 16px;
+    background-color: #E6EEFA;
+    border-top: 2px solid #1F2D44;
+    border-left: 2px solid #1F2D44;
+    transform: rotate(45deg);
+}
+
+.iaHelpyFala strong {
+    color: #2B4C7E;
+}
+
+.iaPlano {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    padding-top: 12px;
+    border-top: 2px dashed #DCE3EE;
+}
+
+.iaPlano span {
+    display: flex;
+    flex-direction: column;
+    padding: 4px 10px;
+    font-size: 13px;
+    font-weight: 700;
+    background-color: #FBF9F4;
+    border: 2px solid #1F2D44;
+    border-radius: 4px;
+}
+
+.iaPlano small {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #4A5A73;
+}
+
+.iaPlano a {
+    margin-left: auto;
+    font-size: 13px;
+    font-weight: 700;
+    color: #2B4C7E;
+}
+
+/* ---------- Números ---------- */
+
+.iaNumeros {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding: 0;
+    list-style: none;
+}
+
+.iaNumeros li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    align-items: center;
+    column-gap: 10px;
+    padding: 12px 14px;
+    background-color: #FFFFFF;
+    border: 2px solid #1F2D44;
+    border-top: 6px solid #9CCB7E;
+    border-radius: 4px;
+    box-shadow: 4px 4px 0 #DCE3EE;
+}
+
+.iaNumeros li span {
+    grid-row: span 2;
+    font-size: 26px;
+}
+
+.iaNumeros strong {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #2B4C7E;
+}
+
+.iaNumeros small {
+    font-size: 12px;
+    color: #4A5A73;
+}
+
+.iaNumeros .iaNumeroFogo { border-top-color: #E8A27C; }
+.iaNumeros .iaNumeroPontos { border-top-color: #E0B84C; }
+.iaNumeros .iaNumeroMapas { border-top-color: #9CCB7E; }
+.iaNumeros .iaNumeroAcerto { border-top-color: #8DB3EC; }
+
+/* ---------- Blocos ---------- */
+
+.iaBloco {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 18px;
+    background-color: #FFFFFF;
+    border: 2px solid #1F2D44;
+    border-radius: 4px;
+    box-shadow: 5px 5px 0 #DCE3EE;
+}
+
+.iaBlocoTitulo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 6px 12px;
+}
+
+.iaBlocoTitulo h2 {
+    font-size: 18px;
+    font-weight: 800;
+    color: #2B4C7E;
+}
+
+.iaBlocoTitulo a {
+    font-size: 13px;
+    font-weight: 700;
+    color: #2B4C7E;
+}
+
+.iaVazio {
+    padding: 12px 14px;
+    font-size: 14px;
+    color: #4A5A73;
+    background-color: #FBF9F4;
+    border: 2px dashed #DCE3EE;
+}
+
+.iaDica {
+    padding: 10px 14px;
+    font-size: 14px;
+    line-height: 1.45;
+    background-color: #FCF3D9;
+    border-left: 6px solid #E0B84C;
+}
+
+/* Conteúdos que faltam */
+.iaPendentes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 0;
+    list-style: none;
+}
+
+.iaPendentes a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 100%;
+    padding: 10px 12px;
+    color: #1F2D44;
+    text-decoration: none;
+    background-color: #FBF9F4;
+    border: 2px solid #1F2D44;
+    border-radius: 4px;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.iaPendentes a:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 #1F2D44;
+}
+
+.iaPendentes strong {
+    display: block;
+    font-size: 14px;
+}
+
+.iaPendentes small {
+    font-size: 12px;
+    color: #4A5A73;
+}
+
+.iaPendenteIcone {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #FFFFFF;
+    background-color: #9CCB7E;
+    border: 2px solid #1F2D44;
+    border-radius: 50%;
+}
+
+/* Treino da semana */
+.iaTreino {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+    padding: 14px 18px;
+    font-size: 15px;
+    background-color: #FFFFFF;
+    border: 2px solid #1F2D44;
+    border-left: 8px solid #8DB3EC;
+    border-radius: 4px;
+    box-shadow: 5px 5px 0 #DCE3EE;
+}
+
+.iaTreino p {
+    flex: 1 1 260px;
+}
+
+.iaTreino .iaBotao {
+    align-self: center;
+}
+
+/* Para revisar */
+.iaRevisar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0;
+    list-style: none;
+}
+
+.iaRevisar li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 12px;
+    padding: 10px 12px;
+    font-size: 14px;
+    background-color: #FBF9F4;
+    border: 2px solid #1F2D44;
+    border-left: 6px solid #E08A8A;
+    border-radius: 4px;
+}
+
+.iaRevisar a {
+    font-weight: 700;
+    color: #2B4C7E;
+    white-space: nowrap;
+}
+
+/* O plano usa os cartões de nível do Home.css; aqui só o espaço das etiquetas */
+.iaBloco .homeNiveis {
+    margin-top: 10px;
+}
+
+/* Deixa os cartões encolherem em telas médias (sem rolagem para o lado) */
+.iaBloco .homeNivel {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+/* Atividade recente */
+.iaAtividades {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    list-style: none;
+}
+
+.iaAtividades li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 2px;
+    font-size: 14px;
+    border-top: 1px solid #DCE3EE;
+}
+
+.iaAtividades li:first-child {
+    border-top: none;
+}
+
+.iaAtividadeIcone {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    border: 2px solid #1F2D44;
+    border-radius: 4px;
+}
+
+.iaAtividades .conteudo .iaAtividadeIcone { background-color: #9CCB7E; }
+.iaAtividades .certa .iaAtividadeIcone { background-color: #8DB3EC; }
+.iaAtividades .errada .iaAtividadeIcone { background-color: #E08A8A; }
+
+.iaAtividadeTexto {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.iaAtividadeTexto small {
+    color: #4A5A73;
+}
+
+.iaAtividadeQuando {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: #4A5A73;
+}
+
+/* Curiosidade do dia */
+.iaCuriosidade {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background-color: #FFFFFF;
+    border: 2px dashed #2B4C7E;
+    border-radius: 4px;
+}
+
+.iaCuriosidade span {
+    flex-shrink: 0;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #FFFFFF;
+    background-color: #2B4C7E;
+    border-radius: 3px;
+}
+
+.iaCuriosidade p {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* ---------- Coluna da direita ---------- */
+
+.iaLateral {
+    gap: 14px;
+    overflow-y: auto;
+}
+
+.iaEu {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.iaEu > div {
+    flex: 1 1 90px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.iaEu strong {
+    overflow: hidden;
+    font-size: 15px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.iaEu a:not(.iaAvatar) {
+    font-size: 12px;
+    color: #DCE3EE;
+}
+
+.iaAvatar {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 800;
+    color: #1F2D44;
+    text-decoration: none;
+    background-color: #9CCB7E;
+    border: 2px solid #1F2D44;
+    border-radius: 50%;
+}
+
+.iaCartao {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px;
+    color: #1F2D44;
+    background-color: #FFFFFF;
+    border: 2px solid #1F2D44;
+    border-radius: 4px;
+}
+
+.iaCartao h2 {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    font-size: 15px;
+    font-weight: 800;
+    color: #2B4C7E;
+}
+
+.iaCartao h2 small {
+    font-size: 12px;
+    color: #4A5A73;
+}
+
+/* Meta: anel de progresso */
+.iaMeta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 12px;
+}
+
+.iaMeta p {
+    flex: 1 1 110px;
+    min-width: 0;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.iaAnel {
+    flex-shrink: 0;
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: conic-gradient(#2B4C7E var(--progresso), #DCE3EE 0);
+    border: 2px solid #1F2D44;
+    border-radius: 50%;
+}
+
+.iaAnel.batida {
+    background: conic-gradient(#4F8A31 var(--progresso), #DCE3EE 0);
+}
+
+.iaAnel span {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    background-color: #FFFFFF;
+    border: 2px solid #1F2D44;
+    border-radius: 50%;
+}
+
+.iaAnel strong {
+    font-size: 18px;
+}
+
+/* Semana: barrinhas por dia */
+.iaDias {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+
+.iaDia {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.iaDiaBarra {
+    width: 100%;
+    height: 44px;
+    display: flex;
+    align-items: flex-end;
+    background-color: #F1F4F9;
+    border: 2px solid #1F2D44;
+    border-radius: 3px;
+}
+
+.iaDiaBarra span {
+    width: 100%;
+    background-color: #8DB3EC;
+}
+
+.iaDia small {
+    font-size: 11px;
+    font-weight: 700;
+    color: #4A5A73;
+}
+
+.iaDia.hoje .iaDiaBarra {
+    border-color: #2B4C7E;
+    outline: 2px solid #2B4C7E;
+}
+
+.iaDia.hoje .iaDiaBarra span {
+    background-color: #2B4C7E;
+}
+
+.iaDia.hoje small {
+    color: #2B4C7E;
+}
+
+/* Cronograma de hoje */
+.iaHoje {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.iaHoje.vazio {
+    font-size: 13px;
+    font-weight: 400;
+    color: #4A5A73;
+}
+
+.iaLinkClaro {
+    font-size: 13px;
+    font-weight: 700;
+    color: #2B4C7E;
+}
+
+/* Próximas conquistas */
+.iaConquistas {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0;
+    list-style: none;
+}
+
+.iaConquistas li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.iaConquistas li > div {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.iaConquistas strong {
+    font-size: 13px;
+}
+
+.iaConquistas small {
+    font-size: 11px;
+    color: #4A5A73;
+}
+
+.iaConquistas em {
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    color: #4A5A73;
+}
+
+.iaMedalha {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    background-color: #FCF3D9;
+    border: 2px solid #1F2D44;
+    border-radius: 50%;
+}
+
+.iaMiniBarra {
+    height: 6px;
+    background-color: #DCE3EE;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.iaMiniBarra span {
+    display: block;
+    height: 100%;
+    background-color: #E0B84C;
+}
+
+.iaPontosDica {
+    font-size: 11px;
+    color: #4A5A73;
+}
+
+/* ---------- Telas menores ---------- */
+
+@media (max-width: 1100px) {
+    .iaNumeros {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .iaHelpy {
+        padding: 16px;
+        box-shadow: 4px 4px 0 #1F2D44;
+    }
+
+    .iaHelpyAvatar {
+        width: 44px;
+        height: 44px;
+        font-size: 26px;
+    }
+
+    .iaPendentes {
+        grid-template-columns: 1fr;
+    }
+
+    .iaNumeros li {
+        padding: 10px;
+    }
+
+    .iaNumeros li span {
+        font-size: 22px;
+    }
+
+    .iaNumeros strong {
+        font-size: 20px;
+    }
+
+    .iaBotaoGrande {
+        align-self: stretch;
+        text-align: center;
+    }
+
+    .iaCuriosidade {
+        flex-direction: column;
+    }
+}
