@@ -720,6 +720,33 @@
     }
 }
 
+/* Tablet (em pé ou deitado): a coluna azul ficaria estreita demais do lado.
+   Ela desce pra baixo do conteúdo e os cartões dela ficam lado a lado */
+@media (max-width: 1100px) {
+    .home:has(.iaLateral) {
+        grid-template-columns: 1fr;
+        height: auto;
+        min-height: 90vh;
+    }
+
+    .home:has(.iaLateral) .homeCentro {
+        overflow-y: visible;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1100px) {
+    .iaLateral {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        align-items: start;
+        overflow-y: visible;
+    }
+
+    .iaEu {
+        grid-column: 1 / -1;
+    }
+}
+
 @media (max-width: 640px) {
     .iaHelpy {
         padding: 16px;
