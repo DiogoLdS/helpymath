@@ -230,7 +230,9 @@ const Introducao = () => {
                             <Link to={logado ? "/inicio" : "/register"} className="introBotao introBotaoGrande">
                                 {logado ? "Continuar estudando" : "Começar agora, é grátis"}
                             </Link>
-                            <a href="#mapas" className="introBotao introBotaoGrande introBotaoContorno">Ver um exemplo</a>
+                            {logado
+                                ? <a href="#mapas" className="introBotao introBotaoGrande introBotaoContorno">Ver um exemplo</a>
+                                : <Link to="/mapas" className="introBotao introBotaoGrande introBotaoContorno">Entrar como visitante</Link>}
                         </div>
                     </div>
 
@@ -527,6 +529,7 @@ const Introducao = () => {
                             <>
                                 <Link to="/register" className="introBotao introBotaoGrande introBotaoClaro">Criar minha conta</Link>
                                 <Link to="/login" className="introBotao introBotaoGrande introBotaoContornoClaro">Já tenho conta</Link>
+                                <Link to="/mapas" className="introBotao introBotaoGrande introBotaoContornoClaro">Explorar sem conta</Link>
                             </>
                         )}
                     </div>

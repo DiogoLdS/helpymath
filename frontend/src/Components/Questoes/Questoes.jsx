@@ -5,6 +5,8 @@ import "./Questoes.css";
 import useTituloPagina from "../../utils/useTituloPagina.js";
 import Marca from "../Marca/Marca.jsx";
 import Carregando from "../Carregando/Carregando.jsx";
+import AvisoVisitante from "../Visitante/AvisoVisitante.jsx";
+import { cabecalhoAuth, ehVisitante } from "../../utils/auth.js";
 
 // Precisa bater com NOTA_MINIMA do backend (services/progresso.js)
 const NOTA_MINIMA = 0.6;
@@ -27,17 +29,12 @@ const Questoes = () => {
     const [erroEnvio, setErroEnvio] = useState({});
     // Placar do mapa: { acertos, total, mapaConcluido, proximo }
     const [placar, setPlacar] = useState(null);
+    // Visitante (sem conta): as respostas são corrigidas, mas não ficam salvas
+    const visitante = ehVisitante();
 
     useEffect(() => {
         const buscarQuestoes = async () => {
-            const storedToken = localStorage.getItem('token');
-
-            if (!storedToken) {
-                navigate('/login');
-                return;
-            }
-
-            const headers = { Authorization: `Bearer ${storedToken}` };
+            const headers = cabecalhoAuth();
 
             try {
                 const resposta = await api.get(`/mapas/${mapaId}/questoes`, { headers });
@@ -53,6 +50,9 @@ const Questoes = () => {
                 console.log(error.message);
                 return;
             }
+
+            // Visitante não tem respostas salvas: o placar é contado aqui mesmo, a cada resposta
+            if (!localStorage.getItem('token')) return;
 
             // Respostas que o aluno já deu antes (pra continuar de onde parou)
             try {
@@ -92,15 +92,12 @@ const Questoes = () => {
 
         if (!alternativaId) return;
 
-        const storedToken = localStorage.getItem('token');
         setRespondendo(questaoId);
         setErroEnvio((anteriores) => ({ ...anteriores, [questaoId]: '' }));
 
         try {
             const resposta = await api.post(`/questoes/${questaoId}/responder`, { alternativaId }, {
-                headers: {
-                    Authorization: `Bearer ${storedToken}`
-                }
+                headers: cabecalhoAuth()
             });
 
             const { correto, letraCorreta, resultado, mapaConcluido, proximo } = resposta.data;
@@ -131,12 +128,33 @@ const Questoes = () => {
     };
 
     const respondidas = Object.keys(resultados).length;
+
+    // Visitante: placar só desta visita (sem meta de conclusão, porque nada é salvo)
+    const placarVisitante = visitante && questoes.length > 0 && respondidas > 0
+        ? { acertos: Object.values(resultados).filter((r) => r.correto).length, total: questoes.length }
+        : null;
     const porcentagem = placar && placar.total > 0 ? Math.round((placar.acertos / placar.total) * 100) : 0;
 
     return (
         <main className='mainQuestoes'>
             <Marca comLink />
             <h1>Questões</h1>
+
+            {visitante && (
+                <AvisoVisitante compacto texto="Suas respostas são corrigidas, mas não ficam salvas. Crie uma conta para guardar o progresso e liberar o próximo mapa." />
+            )}
+
+            {placarVisitante && (
+                <section className='questoes-placar' aria-live='polite'>
+                    <div className='questoes-placar-texto'>
+                        <strong>{placarVisitante.acertos} de {placarVisitante.total} certas nesta visita</strong>
+                        <span>{respondidas} de {placarVisitante.total} respondidas</span>
+                    </div>
+                    <div className='questoes-placar-barra'>
+                        <div className='questoes-placar-preenchido' style={{ width: `${(placarVisitante.acertos / placarVisitante.total) * 100}%` }} />
+                    </div>
+                </section>
+            )}
 
             {bloqueado && (
                 <div className='questoes-bloqueadas'>

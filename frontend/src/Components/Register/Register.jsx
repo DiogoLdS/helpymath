@@ -9,6 +9,7 @@ import useTituloPagina from "../../utils/useTituloPagina.js";
 import Marca from "../Marca/Marca.jsx";
 import Carregando from "../Carregando/Carregando.jsx";
 import Termos from "./Termos.jsx";
+import { iniciarSessao } from "../../utils/sessao.js";
 
 // Mesmo mínimo do backend (usuarioController.js) e da troca de senha no perfil
 const SENHA_MINIMA = 6;
@@ -53,8 +54,14 @@ const Register = () => {
     setEnviando(true);
 
     try {
-      await api.post('/registrarUsuario', { nome: nome.trim(), email: email.trim(), senha, aceitouTermos });
-      navigate('/login');
+      const resposta = await api.post('/registrarUsuario', { nome: nome.trim(), email: email.trim(), senha, aceitouTermos });
+      // Já entra na conta e vai direto pras perguntas de boas-vindas (se não vier token, cai no login como antes)
+      if (resposta.data?.token) {
+        iniciarSessao(resposta.data.token, true);
+        navigate('/boas-vindas');
+      } else {
+        navigate('/login');
+      }
     } catch (error) {
       // O backend devolve { error: "mensagem" } quando algum dado está errado (ex: e-mail já usado)
       setErro(error.response?.data?.error ?? 'Não foi possível criar a conta agora. Tente novamente em instantes.');

@@ -1,11 +1,36 @@
 // Contas da página de perfil, feitas no navegador (no fuso horário do aluno) a partir do GET /perfil.
 // (Fora dos .jsx porque arquivo de componente só deve exportar componentes.)
 
+// Objetivo de estudo (perguntado nas boas-vindas). Cada um muda o plano do aluno:
+// a meta sugerida da semana, se o Treino (simulados) entra no plano e a dica da página inicial.
 export const OBJETIVOS = [
-    { chave: "escola", nome: "Escola regular" },
-    { chave: "enem", nome: "ENEM" },
-    { chave: "concursos", nome: "Concursos públicos" },
+    {
+        chave: "escola",
+        nome: "Escola regular",
+        descricao: "Acompanhar e reforçar a matéria das aulas.",
+        metaSugerida: 3,
+        treino: false,
+        dica: "Estude um pouco depois das aulas: siga os mapas do seu nível na ordem, sem pressa.",
+    },
+    {
+        chave: "enem",
+        nome: "ENEM",
+        descricao: "Revisar o ensino médio e treinar questões no estilo da prova.",
+        metaSugerida: 5,
+        treino: true,
+        dica: "Durante a semana, avance nos mapas do seu nível; no fim de semana, faça o Treino com simulados.",
+    },
+    {
+        chave: "concursos",
+        nome: "Concursos públicos",
+        descricao: "Matemática e raciocínio cobrados em provas de concurso.",
+        metaSugerida: 7,
+        treino: true,
+        dica: "Concurso cobra muito o básico bem feito: revise os fundamentos e faça o Treino toda semana.",
+    },
 ];
+
+export const objetivoDe = (chave) => OBJETIVOS.find((o) => o.chave === chave) ?? null;
 
 // Mesma ordem e chaves do backend (services/perfil.js): a semana começa na segunda
 export const DIAS = [

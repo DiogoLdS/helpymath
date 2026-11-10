@@ -4,27 +4,15 @@ import api from "../../../services/api.js";
 import niveis from "../../data/niveis.js";
 import pessoa from "../../Assets/Images/pessoa.svg";
 import Carregando from "../Carregando/Carregando.jsx";
-import { OBJETIVOS, atividades, estatisticas, pontos, resumoDaSemana } from "../Perfil/perfilUtils.js";
+import { atividades, estatisticas, objetivoDe, pontos, recomendacoes, resumoDaSemana } from "../Perfil/perfilUtils.js";
 import { mapaAtual, recomendacao } from "../Mapas/trilhaUtils.js";
 
-const recompensas = [
-    'Ganhe pontos ao completar exercícios;',
-    'Desbloqueie níveis;',
-    'Suba no ranking.',
-];
-
-const beneficios = [
-    'Compreenda mais rapidamente',
-    'Foco no que importa de verdade',
-    'Não esqueça facilmente',
-];
-
-// Página inicial de quem é ALUNO: escolher por onde estudar, com o progresso real dele.
-// Os dados vêm do GET /perfil (o mesmo da página de perfil).
+// Página inicial de quem é ALUNO: tudo o que ele precisa pra continuar estudando.
+// O objetivo, o nível e a meta são respondidos uma vez nas boas-vindas (/boas-vindas), logo depois do cadastro;
+// aqui aparece o plano montado a partir dessas respostas. Os dados vêm do GET /perfil (o mesmo da página de perfil).
 const InicioAluno = ({ sair }) => {
     const navigate = useNavigate();
     const [perfil, setPerfil] = useState(null);
-    const [salvandoObjetivo, setSalvandoObjetivo] = useState(null);
 
     useEffect(() => {
         const buscar = async () => {
@@ -32,6 +20,11 @@ const InicioAluno = ({ sair }) => {
                 const resposta = await api.get('/perfil', {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                 });
+                // Quem ainda não respondeu as perguntas de boas-vindas vai pra lá primeiro
+                if (!resposta.data.usuario?.boasVindasEm) {
+                    navigate('/boas-vindas', { replace: true });
+                    return;
+                }
                 setPerfil(resposta.data);
             } catch (error) {
                 //  Se o token é inválido, voltar para o login
@@ -47,21 +40,6 @@ const InicioAluno = ({ sair }) => {
         buscar();
     }, [navigate]);
 
-    // Salva o objetivo no perfil (antes a escolha se perdia ao sair da página)
-    const escolherObjetivo = async (chave) => {
-        setSalvandoObjetivo(chave);
-        try {
-            const resposta = await api.patch('/perfil', { objetivo: chave }, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-            });
-            setPerfil((atual) => ({ ...atual, usuario: resposta.data.usuario }));
-        } catch (error) {
-            console.log(error.message);
-        } finally {
-            setSalvandoObjetivo(null);
-        }
-    };
-
     if (!perfil) {
         return <Carregando pagina texto="Carregando seu início" />;
     }
@@ -72,11 +50,28 @@ const InicioAluno = ({ sair }) => {
     const semana = temDados ? resumoDaSemana(lista) : null;
     const primeiroNome = temDados ? perfil.usuario.nome.trim().split(/\s+/)[0] : '';
     const jaComecou = temDados && lista.length > 0;
-    const proximoPasso = temDados ? recomendacao(perfil.mapas, niveis, null) : null;
 
-    // Nível em que o aluno está: o primeiro que ainda tem mapa pra fazer
+    // Respostas das boas-vindas
+    const objetivo = temDados ? objetivoDe(perfil.usuario.objetivo) : null;
+    const meuNivel = temDados ? perfil.usuario.nivel : null;
+    const indiceMeuNivel = niveis.findIndex((n) => n.chave === meuNivel);
+    const meta = perfil.usuario?.metaSemanal ?? 5;
+
+    // O próximo passo (o mesmo que o Helpy sugere na trilha), a partir do nível do aluno
+    const proximoPasso = temDados ? recomendacao(perfil.mapas, niveis, null, meuNivel) : null;
     const doNivel = (chave) => (temDados ? perfil.mapas.filter((m) => m.nivel === chave) : []);
-    const nivelAtual = niveis.find((n) => mapaAtual(doNivel(n.chave)))?.chave;
+    const paraRevisar = temDados ? recomendacoes(perfil.mapas).filter((r) => r.tipo === 'revisar').slice(0, 3) : [];
+    const treino = doNivel('treino');
+    const treinoAtual = mapaAtual(treino);
+
+    // Etiqueta de cada nível no plano
+    const etiqueta = (nivel, i) => {
+        if (nivel.chave === meuNivel) return 'Seu nível';
+        if (nivel.chave === 'treino') return objetivo?.treino ? 'Recomendado' : 'Simulados';
+        if (indiceMeuNivel >= 0 && i < indiceMeuNivel) return 'Revisão';
+        if (indiceMeuNivel >= 0 && i > indiceMeuNivel) return 'Depois';
+        return null;
+    };
 
     return (
         <>
@@ -85,7 +80,7 @@ const InicioAluno = ({ sair }) => {
                     <h1>
                         {primeiroNome ? `${jaComecou ? 'Bem-vindo(a) de volta' : 'Bem-vindo(a)'}, ${primeiroNome}!` : <>Bem-vindo(a) ao Helpy<span className='homeMath'>Math</span>!</>}
                     </h1>
-                    <p>{jaComecou ? 'Continue de onde parou ou escolha outro nível.' : 'Vamos encontrar seu nível ideal!'}</p>
+                    <p>{jaComecou ? 'Continue de onde parou.' : 'Seu plano está pronto. Bora dar o primeiro passo?'}</p>
 
                     <Link to='/perfil' className='homeConfig' aria-label='Meu perfil e configurações' title='Meu perfil e configurações'>
                         <svg viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='currentColor' strokeWidth='1.8' strokeLinecap='round' strokeLinejoin='round' aria-hidden='true'>
@@ -95,8 +90,18 @@ const InicioAluno = ({ sair }) => {
                     </Link>
                 </header>
 
-                {/* Quem já começou ganha um atalho direto pro próximo passo (o mesmo que o Helpy sugere) */}
-                {jaComecou && proximoPasso?.acao && (
+                {/* Resumo das respostas das boas-vindas, com atalho pra mudar */}
+                {temDados && (
+                    <div className='homePlano'>
+                        <span><small>Objetivo</small>{objetivo?.nome ?? 'Não definido'}</span>
+                        <span><small>Nível</small>{niveis.find((n) => n.chave === meuNivel)?.nome ?? 'Não definido'}</span>
+                        <span><small>Meta</small>{semana.conteudosNaSemana}/{meta} na semana</span>
+                        <Link to='/boas-vindas'>Mudar respostas</Link>
+                    </div>
+                )}
+
+                {/* O próximo passo, sempre em destaque */}
+                {proximoPasso?.acao && (
                     <section className='homeContinuar'>
                         <p>
                             {proximoPasso.mensagem.map((pedaco, i) => (pedaco.destaque ? <strong key={i}>{pedaco.texto}</strong> : <span key={i}>{pedaco.texto}</span>))}
@@ -105,17 +110,50 @@ const InicioAluno = ({ sair }) => {
                     </section>
                 )}
 
+                {/* ENEM e concursos: o Treino (simulados) entra no plano toda semana */}
+                {objetivo?.treino && treino.length > 0 && (
+                    <section className='homeContinuar homeTreino'>
+                        <p>
+                            <strong>Treino da semana:</strong>{' '}
+                            {treinoAtual
+                                ? <>faça o simulado <strong>{treinoAtual.nome}</strong>, no estilo {objetivo.chave === 'enem' ? 'do ENEM' : 'das provas de concurso'}.</>
+                                : 'você já fez todos os simulados. Refaça os que errou!'}
+                        </p>
+                        <Link to={treinoAtual ? `/mapas/${treinoAtual.mapaId}` : '/mapas?nivel=treino'} className='homeContinuarBotao'>
+                            {treinoAtual ? 'Ir para o Treino' : 'Ver o Treino'} →
+                        </Link>
+                    </section>
+                )}
+
+                {objetivo && <p className='homeDicaObjetivo'><strong>Dica para {objetivo.nome}:</strong> {objetivo.dica}</p>}
+
+                {paraRevisar.length > 0 && (
+                    <section className='homeSecao'>
+                        <h2>Para revisar</h2>
+                        <ul className='homeRevisar'>
+                            {paraRevisar.map((r) => (
+                                <li key={r.mapa.mapaId}>
+                                    <span><strong>{r.mapa.nome}</strong> · {r.motivo}</span>
+                                    <Link to={r.para}>{r.acao}</Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                )}
+
                 <section className='homeSecao'>
-                    <h2>{jaComecou ? 'Seus níveis' : 'Por onde quer começar sua jornada?'}</h2>
+                    <h2>Seu plano de estudos</h2>
 
                     <div className='homeNiveis'>
-                        {niveis.map((nivel) => {
+                        {niveis.map((nivel, i) => {
                             const mapas = doNivel(nivel.chave);
                             const concluidos = mapas.filter((m) => m.concluido).length;
+                            const tag = etiqueta(nivel, i);
+                            const meu = nivel.chave === meuNivel;
 
                             return (
-                                <Link to={`/mapas?nivel=${nivel.chave}`} key={nivel.chave} className={`homeNivel nivel-${nivel.chave}`}>
-                                    {nivel.chave === nivelAtual && jaComecou && <span className='homeNivelAqui'>Você está aqui</span>}
+                                <Link to={`/mapas?nivel=${nivel.chave}`} key={nivel.chave} className={meu ? `homeNivel nivel-${nivel.chave} homeNivelMeu` : `homeNivel nivel-${nivel.chave}`}>
+                                    {tag && <span className={meu ? 'homeNivelAqui' : 'homeNivelAqui homeNivelTag'}>{tag}</span>}
                                     <strong>{nivel.titulo}</strong>
                                     <span>{nivel.descricao}</span>
                                     {temDados && (
@@ -131,54 +169,6 @@ const InicioAluno = ({ sair }) => {
                                 </Link>
                             );
                         })}
-                    </div>
-
-                    <small className='homeDica'>Você pode mudar isso depois!</small>
-                </section>
-
-                <section className='homeSecao'>
-                    <h2>Por que você quer aprender?</h2>
-
-                    <div className='homeObjetivos'>
-                        {OBJETIVOS.map((item) => {
-                            const ativo = perfil.usuario?.objetivo === item.chave;
-                            return (
-                                <button
-                                    type='button'
-                                    key={item.chave}
-                                    className={ativo ? 'homeObjetivo ativo' : 'homeObjetivo'}
-                                    aria-pressed={ativo}
-                                    onClick={() => escolherObjetivo(ativo ? null : item.chave)}
-                                    disabled={!temDados || salvandoObjetivo !== null}
-                                >
-                                    {salvandoObjetivo === item.chave ? <Carregando texto="Salvando" /> : item.nome}
-                                </button>
-                            );
-                        })}
-                    </div>
-                    {perfil.usuario?.objetivo && <small className='homeDica'>Objetivo salvo no seu perfil. Clique de novo para desmarcar.</small>}
-                </section>
-
-                <section className='homeSecao'>
-                    <h2>Já possui conhecimento prévio? Faça um teste diagnóstico!</h2>
-
-                    {/* Ainda não existe: fica marcado como "em breve" em vez de um botão que não faz nada */}
-                    <button type='button' className='homeDiagnostico' disabled title='Em breve'>Teste Diagnóstico · em breve</button>
-                </section>
-
-                <section className='homeBlocos'>
-                    <div>
-                        <h3>Recompensas:</h3>
-                        <ul>
-                            {recompensas.map((texto) => <li key={texto}>{texto}</li>)}
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h3>Benefícios na prática:</h3>
-                        <ul>
-                            {beneficios.map((texto) => <li key={texto}>{texto}</li>)}
-                        </ul>
                     </div>
                 </section>
 
@@ -196,12 +186,11 @@ const InicioAluno = ({ sair }) => {
 
                 <h2>Pontuação:</h2>
 
-                {/* Agora com os números de verdade (antes eram fixos em zero) */}
                 <ul className='homePontuacao'>
                     <li><span aria-hidden='true'>🔥</span> Sequência: {stats ? stats.sequencia : 0} {stats?.sequencia === 1 ? 'dia' : 'dias'}</li>
                     <li><span aria-hidden='true'>⭐</span> Pontos: {stats ? pontos(stats) : 0}</li>
                     <li>
-                        <span aria-hidden='true'>🎯</span> Meta: {semana ? semana.conteudosNaSemana : 0}/{perfil.usuario?.metaSemanal ?? 5} conteúdos na semana
+                        <span aria-hidden='true'>🎯</span> Meta: {semana ? semana.conteudosNaSemana : 0}/{meta} conteúdos na semana
                     </li>
                 </ul>
                 <small className='homePontosDica'>10 pontos por conteúdo concluído e 5 por questão certa.</small>

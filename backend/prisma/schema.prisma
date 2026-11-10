@@ -69,6 +69,10 @@ model usuario {
   anotacoes       String?           @db.Text
   // { "seg": "Frações", "ter": "", ... }: o que o aluno planejou estudar em cada dia da semana
   cronograma      Json?
+  // Perguntas de boas-vindas (logo depois do cadastro): nível escolhido ou sugerido pelo teste diagnóstico,
+  // e quando o aluno terminou as perguntas (null = ainda não respondeu, a página inicial manda pra lá)
+  nivel           String?           @db.VarChar(20)
+  boasVindasEm    DateTime?
   usuarioconteudo usuarioconteudo[]
   usuarioquestao  usuarioquestao[]
 }

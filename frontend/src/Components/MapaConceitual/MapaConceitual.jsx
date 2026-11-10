@@ -48,12 +48,9 @@ const MapaConceitual = () => {
 
     useEffect(() => {
         const buscarMapa = async () => {
+            // Sem conta (visitante) também abre: o backend responde sem progresso
             const storedToken = localStorage.getItem("token");
-
-            if (!storedToken) {
-                navigate("/login");
-                return;
-            }
+            const headers = storedToken ? { Authorization: `Bearer ${storedToken}` } : {};
 
             setCarregando(true);
             setErro("");
@@ -65,19 +62,13 @@ const MapaConceitual = () => {
             setMapaAnterior(null);
 
             try {
-                const resposta = await api.get(`/mapas/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${storedToken}`
-                    }
-                });
+                const resposta = await api.get(`/mapas/${id}`, { headers });
 
                 const dados = resposta.data;
 
                 // Progresso do usuário nesse mapa (se falhar, o mapa abre normalmente, sem bloqueios)
                 try {
-                    const respostaProgresso = await api.get(`/mapas/${id}/progresso`, {
-                        headers: { Authorization: `Bearer ${storedToken}` }
-                    });
+                    const respostaProgresso = await api.get(`/mapas/${id}/progresso`, { headers });
                     setConcluidos(respostaProgresso.data.concluidos);
                     setMapaConcluido(Boolean(respostaProgresso.data.concluido));
                     setProximoMapa(respostaProgresso.data.proximo ?? null);

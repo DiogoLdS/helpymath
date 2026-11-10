@@ -409,3 +409,100 @@
 .home.homeAdmin {
     grid-template-columns: 1fr;
 }
+
+/* ---------- Plano do aluno (respostas das boas-vindas) ---------- */
+
+.homePlano {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    text-align: left;
+}
+
+.homePlano span {
+    display: flex;
+    flex-direction: column;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1F2D44;
+    background-color: #FFFFFF;
+    border: 2px solid #1F2D44;
+    border-radius: 4px;
+}
+
+.homePlano small {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #4A5A73;
+}
+
+.homePlano a {
+    margin-left: auto;
+    font-size: 14px;
+    font-weight: 700;
+    color: #2B4C7E;
+}
+
+/* Treino da semana (ENEM e concursos): mesmo cartão do "Continuar", na cor do Treino */
+.homeContinuar.homeTreino {
+    border-left-color: #8DB3EC;
+    box-shadow: 4px 4px 0 #DCE3EE;
+}
+
+.homeDicaObjetivo {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 14px;
+    line-height: 1.45;
+    text-align: left;
+    color: #1F2D44;
+    background-color: #FCF3D9;
+    border-left: 6px solid #E0B84C;
+}
+
+.homeRevisar {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0;
+    list-style: none;
+    text-align: left;
+}
+
+.homeRevisar li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 12px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: #1F2D44;
+    background-color: #FFFFFF;
+    border: 2px solid #1F2D44;
+    border-left: 6px solid #E08A8A;
+    border-radius: 4px;
+}
+
+.homeRevisar a {
+    font-weight: 700;
+    color: #2B4C7E;
+    white-space: nowrap;
+}
+
+/* Nível do aluno em destaque no plano; os outros com etiqueta mais discreta */
+.homeNivel.homeNivelMeu {
+    outline: 3px solid #2B4C7E;
+    outline-offset: 3px;
+}
+
+.homeNivelAqui.homeNivelTag {
+    color: #1F2D44;
+    background-color: #FFFFFF;
+}

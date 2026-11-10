@@ -50,11 +50,11 @@ function controller() {
                         senha: hashPassword
                     },
                     // Nunca devolve a senha (nem criptografada)
-                    select: { usuarioId: true, nome: true, email: true }
+                    select: { usuarioId: true, nome: true, email: true, admin: true }
                 })
 
-                // Resposta da requisição: JSON do novo usuário
-                res.status(201).json(novoUsuario);
+                // Resposta: o novo usuário e o token, pra já entrar direto nas perguntas de boas-vindas
+                res.status(201).json({ ...novoUsuario, token: gerarToken(novoUsuario) });
             } catch (error) {
                 console.error(error);
 
@@ -192,9 +192,14 @@ function controller() {
                     }
                 })
 
+                // Também as respostas das boas-vindas (a trilha usa o nível; as boas-vindas vêm preenchidas)
                 const usuarioInfo = {
                     usuarioId: findUsuario.usuarioId,
                     nome: findUsuario.nome,
+                    objetivo: findUsuario.objetivo,
+                    nivel: findUsuario.nivel,
+                    metaSemanal: findUsuario.metaSemanal,
+                    boasVindasEm: findUsuario.boasVindasEm,
                 }
                 res.status(200).json(usuarioInfo);
             } catch (error) {

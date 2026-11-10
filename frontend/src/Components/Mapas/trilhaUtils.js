@@ -48,7 +48,9 @@ const destaque = (texto) => ({ texto, destaque: true });
 // O que o assistente recomenda agora. Analisa o nível em foco (o filtro da página, ou o primeiro nível
 // que ainda tem mapa pra fazer) e devolve { mensagem, acao, revisoes, estatisticas }.
 // acao = { rotulo, para } é o botão principal; revisoes são mapas concluídos com questões erradas (RF010 do TCC).
-export function recomendacao(mapas, niveis, nivelFoco) {
+// nivelPreferido = o nível do aluno (perguntas de boas-vindas): sem filtro, o foco começa nele
+// e, se ele já acabou, segue pros níveis seguintes antes de voltar pros anteriores.
+export function recomendacao(mapas, niveis, nivelFoco, nivelPreferido = null) {
     const estatisticas = {
         mapasConcluidos: mapas.filter((m) => m.concluido).length,
         mapasTotal: mapas.length,
@@ -78,8 +80,10 @@ export function recomendacao(mapas, niveis, nivelFoco) {
     const nomeDoNivel = (chave) => niveis.find((n) => n.chave === chave)?.nome ?? chave;
 
     // Nível em foco: o escolhido no filtro, ou o primeiro (na ordem dos níveis) que ainda tem mapa pra fazer
+    const inicio = Math.max(niveis.findIndex((n) => n.chave === nivelPreferido), 0);
+    const ordem = [...niveis.slice(inicio), ...niveis.slice(0, inicio)];
     const focoChave = nivelFoco
-        ?? niveis.find((n) => mapaAtual(doNivel(n.chave)))?.chave
+        ?? ordem.find((n) => mapaAtual(doNivel(n.chave)))?.chave
         ?? null;
 
     if (!focoChave) {
@@ -95,7 +99,7 @@ export function recomendacao(mapas, niveis, nivelFoco) {
 
     // Nível em foco terminado: sugere o próximo nível que ainda tem mapa
     if (!atual) {
-        const proximoNivel = niveis.find((n) => n.chave !== focoChave && mapaAtual(doNivel(n.chave)));
+        const proximoNivel = ordem.find((n) => n.chave !== focoChave && mapaAtual(doNivel(n.chave)));
         return {
             mensagem: doNivel(focoChave).length === 0
                 ? frase("O nível ", destaque(nomeDoNivel(focoChave)), " ainda não tem mapas.",

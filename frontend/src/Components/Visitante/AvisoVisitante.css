@@ -1,0 +1,87 @@
+/* Faixa do modo visitante (AvisoVisitante.jsx), na identidade do site */
+
+.avisoVisitante {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 18px;
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 14px 18px;
+    text-align: left;
+    color: #1F2D44;
+    background-color: #FFFFFF;
+    border: 2px solid #1F2D44;
+    border-left: 8px solid #E8A27C;
+    border-radius: 4px;
+    box-shadow: 4px 4px 0 #1F2D44;
+}
+
+.avisoVisitante > div:first-child {
+    flex: 1 1 320px;
+}
+
+.avisoVisitante p {
+    margin-top: 6px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #4A5A73;
+}
+
+.avisoVisitanteEtiqueta {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #1F2D44;
+    background-color: #E8A27C;
+    border: 2px solid #1F2D44;
+    border-radius: 3px;
+}
+
+.avisoVisitanteAcoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.avisoVisitanteBotao {
+    padding: 9px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    color: #FFFFFF;
+    text-decoration: none;
+    background-color: #2B4C7E;
+    border: 2px solid #2B4C7E;
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 #1F2D44;
+}
+
+.avisoVisitanteBotao.contorno {
+    color: #2B4C7E;
+    background-color: #FFFFFF;
+}
+
+.avisoVisitanteBotao:hover {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 #1F2D44;
+}
+
+.avisoVisitante.compacto {
+    padding: 10px 14px;
+}
+
+.avisoVisitante.compacto > div:first-child {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+}
+
+.avisoVisitante.compacto p {
+    margin-top: 0;
+}

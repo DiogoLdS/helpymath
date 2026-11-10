@@ -97,7 +97,7 @@ const Login = () => {
 
             <div className="signup">
               <p>Ainda não tem uma conta? <Link to="/register">Crie uma!</Link></p>
-              <p><Link to="/">Conheça o HelpyMath</Link></p>
+              <p><Link to="/mapas">Entrar como visitante</Link> · <Link to="/">Conheça o HelpyMath</Link></p>
             </div>
           </form>
         </section>

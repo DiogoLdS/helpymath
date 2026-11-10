@@ -75,7 +75,8 @@ function controller() {
 
                 // O aluno só vê as questões depois de concluir todos os conteúdos interativos do mapa.
                 // Admin passa direto (precisa conferir as questões que cadastrou).
-                if (!req.usuario.admin) {
+                // Visitante (sem conta) vê as questões direto: não há conteúdos concluídos pra conferir
+                if (req.usuario && !req.usuario.admin) {
                     const situacao = await situacaoDoMapa(parseInt(mapaId), req.usuario.usuarioId, false);
                     if (!situacao || !situacao.liberado) {
                         return res.status(403).json({ error: "Este mapa ainda está bloqueado", bloqueado: true });
@@ -181,6 +182,22 @@ function controller() {
                 }
 
                 const questaoId = parseInt(id);
+
+                // Visitante: só corrige, sem salvar nada (não há conta pra guardar a resposta)
+                if (!req.usuario) {
+                    const correta = alternativaEscolhida.correta
+                        ? await prisma.alternativa.findFirst({ where: { questaoId, correta: true } })
+                        : null;
+                    return res.status(200).json({
+                        correto: alternativaEscolhida.correta,
+                        letraCorreta: correta ? correta.letra : null,
+                        resultado: null,
+                        mapaConcluido: false,
+                        proximo: null,
+                        visitante: true
+                    });
+                }
+
                 const { usuarioId, admin } = req.usuario;
                 const questao = await prisma.questao.findUnique({
                     where: { questaoId },

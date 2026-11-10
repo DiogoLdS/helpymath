@@ -12,6 +12,7 @@ import AdminCriarMapa from './Components/AdminCriarMapa/AdminCriarMapa';
 import AdminEditarMapa from './Components/AdminEditarMapa/AdminEditarMapa';
 import Introducao from './Components/Introducao/Introducao';
 import Perfil from './Components/Perfil/Perfil';
+import BoasVindas from './Components/BoasVindas/BoasVindas';
 
 function App() {
   return (
@@ -33,6 +34,9 @@ function App() {
 
           {/* Perfil do aluno logado (ícone de pessoa da barra lateral) */}
           <Route path="/perfil" element={<Perfil/>}/>
+
+          {/* Perguntas logo depois do cadastro: objetivo, nível (ou teste diagnóstico) e meta da semana */}
+          <Route path="/boas-vindas" element={<BoasVindas/>}/>
 
           <Route path="/mapas" element={<Mapas/>}/>
 

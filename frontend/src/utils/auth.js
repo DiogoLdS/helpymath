@@ -21,3 +21,14 @@ export function usuarioEhAdmin() {
 
     return Boolean(decodificarToken(token)?.admin);
 }
+// Modo visitante: quem não entrou na conta pode ver os mapas e fazer as questões,
+// mas sem perfil, sem assistente e sem salvar progresso.
+export function ehVisitante() {
+    return !localStorage.getItem("token");
+}
+
+// Cabeçalho de login pras chamadas à API: vazio pro visitante (o backend trata como visitante)
+export function cabecalhoAuth() {
+    const token = localStorage.getItem("token");
+    return token ? { Authorization: `Bearer ${token}` } : {};
+}

@@ -56,7 +56,9 @@ export async function resultadoQuestoes(mapaId, usuarioId) {
 // Mapa concluído = todos os conteúdos interativos concluídos + 60% de acerto nas questões. Dentro de cada nível os mapas seguem a ordem de criação:
 // o primeiro fica liberado e cada um dos outros libera quando o anterior (do mesmo nível) é concluído.
 // Admin vê tudo liberado (precisa acessar qualquer mapa pra editar e conferir).
+// Visitante (usuarioId null, sem conta): tudo liberado e nada concluído, porque não há progresso salvo.
 export async function situacaoDosMapas(usuarioId, admin) {
+    const visitante = usuarioId === null || usuarioId === undefined;
     const mapas = await prisma.mapaconceitual.findMany({
         select: { mapaId: true, nome: true, nivel: true },
         orderBy: { mapaId: 'asc' }
@@ -67,14 +69,14 @@ export async function situacaoDosMapas(usuarioId, admin) {
 
     for (const mapa of mapas) {
         const anterior = anteriorPorNivel[mapa.nivel] ?? null;
-        const liberado = admin || anterior === null || anterior.concluido;
+        const liberado = visitante || admin || anterior === null || anterior.concluido;
 
         // Mapa trancado não conta como concluído, mesmo que esteja vazio (sem conteúdos nem questões)
         let concluido = false;
         // Números do aluno no mapa, usados na trilha e no assistente da página de mapas (null se trancado)
         let progresso = null;
 
-        if (liberado) {
+        if (liberado && !visitante) {
             const conteudos = await progressoNoMapa(mapa.mapaId, usuarioId);
             const questoes = await resultadoQuestoes(mapa.mapaId, usuarioId);
 

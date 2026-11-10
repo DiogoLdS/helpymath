@@ -23,6 +23,8 @@ export function validarCadastro(corpo) {
 // Valores aceitos na edição do perfil
 export const OBJETIVOS = ['escola', 'enem', 'concursos'];
 export const DIAS_DA_SEMANA = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom'];
+// Níveis que o aluno pode escolher como ponto de partida (mesmas chaves dos mapas)
+export const NIVEIS_ALUNO = ['basico', 'intermediario', 'avancado', 'treino'];
 
 // Campos do usuário que o perfil mostra (nunca a senha)
 export const CAMPOS_PERFIL = {
@@ -34,7 +36,9 @@ export const CAMPOS_PERFIL = {
     objetivo: true,
     metaSemanal: true,
     anotacoes: true,
-    cronograma: true
+    cronograma: true,
+    nivel: true,
+    boasVindasEm: true
 };
 
 // Tudo o que a página de perfil precisa, numa consulta só (Figura 4.3.2, CU07 e CU08 do TCC).
@@ -131,6 +135,16 @@ export function validarEdicaoPerfil(corpo) {
         const meta = Number(corpo.metaSemanal);
         if (!Number.isInteger(meta) || meta < 1 || meta > 50) return { erro: "A meta precisa ser entre 1 e 50 conteúdos por semana" };
         dados.metaSemanal = meta;
+    }
+
+    if (corpo.nivel !== undefined) {
+        if (corpo.nivel !== null && !NIVEIS_ALUNO.includes(corpo.nivel)) return { erro: "Nível inválido" };
+        dados.nivel = corpo.nivel;
+    }
+
+    // Fim das perguntas de boas-vindas: grava quando o aluno terminou (a página inicial para de mandar pra lá)
+    if (corpo.boasVindas === true) {
+        dados.boasVindasEm = new Date();
     }
 
     if (corpo.anotacoes !== undefined) {

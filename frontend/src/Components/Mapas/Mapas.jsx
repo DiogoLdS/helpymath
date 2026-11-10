@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import api from "../../../services/api.js";
 import niveis from "../../data/niveis.js";
-import { decodificarToken } from "../../utils/auth.js";
+import { decodificarToken, ehVisitante } from "../../utils/auth.js";
+import AvisoVisitante from "../Visitante/AvisoVisitante.jsx";
 import "./Mapas.css";
 import useTituloPagina from "../../utils/useTituloPagina.js";
 import Sidebar from "../Sidebar/SidebarChapeu";
@@ -13,11 +14,15 @@ import Carregando from "../Carregando/Carregando.jsx";
 
 // Página da trilha de estudos: o assistente "Helpy" no topo e, embaixo, cada nível como um caminho de mapas
 const Mapas = () => {
-    useTituloPagina("Sua trilha");
+    // Visitante (sem conta): vê todos os mapas liberados, sem o Helpy e sem progresso
+    const visitante = ehVisitante();
+    useTituloPagina(visitante ? "Mapas" : "Sua trilha");
 
     // Cada mapa vem com { liberado, concluido, progresso } do usuário logado, na ordem da sequência
     const [mapas, setMapas] = useState([]);
     const [carregando, setCarregando] = useState(true);
+    // Nível do aluno (respondido nas boas-vindas): o Helpy começa a recomendar por ele
+    const [nivelPreferido, setNivelPreferido] = useState(null);
     const navigate = useNavigate();
 
     // A dificuldade escolhida fica na URL (/mapas?nivel=basico): os cards da página inicial já abrem filtrados
@@ -33,19 +38,18 @@ const Mapas = () => {
         const buscarMapas = async () => {
             const storedToken = localStorage.getItem('token');
 
-            if (!storedToken) {
-                navigate('/login');
-                return;
-            }
-
             try {
+                // Sem token vai sem cabeçalho: o backend responde como visitante
                 const resposta = await api.get('/mapas', {
-                    headers: {
-                        Authorization: `Bearer ${storedToken}`
-                    }
+                    headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {}
                 });
 
-                setMapas(resposta.data);
+                setMapas(Array.isArray(resposta.data) ? resposta.data : []);
+
+                // Se falhar, a trilha funciona igual (só recomenda a partir do Básico)
+                if (storedToken) api.get('/me', { headers: { Authorization: `Bearer ${storedToken}` } })
+                    .then((r) => setNivelPreferido(r.data?.nivel ?? null))
+                    .catch(() => {});
             } catch (error) {
                 if (error.response?.status === 401) {
                     navigate('/login');
@@ -73,10 +77,12 @@ const Mapas = () => {
 
             <section className='mapasPainel'>
                 <div className='mapasConteudo'>
-                    <h1>Sua trilha de estudos</h1>
+                    <h1>{visitante ? 'Explore os mapas' : 'Sua trilha de estudos'}</h1>
 
-                    {!carregando && (
-                        <Assistente nome={nome} recomendacao={recomendacao(mapas, niveis, nivelEscolhido)} />
+                    {visitante && <AvisoVisitante />}
+
+                    {!carregando && !visitante && (
+                        <Assistente nome={nome} recomendacao={recomendacao(mapas, niveis, nivelEscolhido, nivelPreferido)} />
                     )}
 
                     <div className='mapas-filtros' role='group' aria-label='Filtrar por dificuldade'>

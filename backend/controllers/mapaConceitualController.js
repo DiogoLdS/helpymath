@@ -33,7 +33,8 @@ function controller() {
         async listarMapas(req, res) {
             try {
                 // Cada mapa vem com "liberado" e "concluido" pro usuário logado, na ordem da sequência
-                const mapas = await situacaoDosMapas(req.usuario.usuarioId, req.usuario.admin);
+                // Visitante (req.usuario null): todos liberados, sem progresso
+                const mapas = await situacaoDosMapas(req.usuario?.usuarioId ?? null, req.usuario?.admin ?? false);
 
                 res.status(200).json(mapas);
             } catch (error) {
@@ -62,7 +63,7 @@ function controller() {
                 }
 
                 // Mapa da sequência que o aluno ainda não liberou (precisa concluir o anterior do nível)
-                const situacao = await situacaoDoMapa(mapa.mapaId, req.usuario.usuarioId, req.usuario.admin);
+                const situacao = await situacaoDoMapa(mapa.mapaId, req.usuario?.usuarioId ?? null, req.usuario?.admin ?? false);
                 if (!situacao.liberado) {
                     return res.status(403).json({
                         error: "Conclua o mapa anterior para liberar este",
@@ -88,6 +89,24 @@ function controller() {
         async progressoMapa(req, res) {
             try {
                 const mapaId = parseInt(req.params.id);
+
+                // Visitante: não tem progresso. concluidos = null faz a página do mapa esconder
+                // a barra de progresso e o "Marcar como concluído", e deixar as questões abertas.
+                if (!req.usuario) {
+                    const situacao = await situacaoDoMapa(mapaId, null, false);
+                    const totalQuestoes = await prisma.questao.count({ where: { mapaId } });
+                    return res.status(200).json({
+                        concluidos: null,
+                        pendentes: [],
+                        total: 0,
+                        questoes: { total: totalQuestoes, respondidas: 0, acertos: 0, respostas: [], aprovado: false },
+                        concluido: false,
+                        proximo: situacao?.proximo ?? null,
+                        anterior: situacao?.anterior ?? null,
+                        visitante: true
+                    });
+                }
+
                 const { usuarioId, admin } = req.usuario;
 
                 const progresso = await progressoNoMapa(mapaId, usuarioId);
