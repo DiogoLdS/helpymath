@@ -18,4 +18,9 @@ export default defineConfig([
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
+  // Os testes (npm test) rodam no Node, não no navegador
+  {
+    files: ['tests/**/*.js'],
+    languageOptions: { globals: globals.node },
+  },
 ])
