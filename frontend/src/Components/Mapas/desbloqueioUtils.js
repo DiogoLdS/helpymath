@@ -1,6 +1,6 @@
 import { decodificarToken } from "../../utils/auth.js";
 
-// Lembra (no navegador) quais mapas o aluno já viu liberados, pra comemorar só os desbloqueios novos.
+// Lembra (no navegador) quais mapas o aluno já viu liberados, pra animar o cadeado só nos desbloqueios novos.
 // Fica por usuário: duas contas no mesmo computador não se misturam.
 const chave = () => {
     const usuario = decodificarToken(localStorage.getItem("token") ?? "");
@@ -20,19 +20,12 @@ function salvarVistos(ids) {
     try {
         if (chave()) localStorage.setItem(chave(), JSON.stringify([...ids]));
     } catch {
-        // Sem localStorage (aba anônima bloqueada etc.): só não comemora
+        // Sem localStorage (aba anônima bloqueada etc.): só não anima
     }
 }
 
-// Marca mapas como já vistos (ex: a página de questões já comemorou o próximo mapa)
-export function marcarComoVistos(mapaIds) {
-    const vistos = lerVistos() ?? new Set();
-    mapaIds.forEach((id) => vistos.add(id));
-    salvarVistos(vistos);
-}
-
 // Mapas liberados que o aluno ainda não tinha visto liberados.
-// Na primeira visita só guarda a lista (senão comemoraria tudo o que já estava aberto).
+// Na primeira visita só guarda a lista (senão abriria o cadeado de tudo o que já estava aberto).
 // Mapa que abre sem precisar de outro antes (primeiro do nível) não conta como desbloqueio.
 export function desbloqueiosNovos(mapas) {
     const liberados = mapas.filter((m) => m.liberado).map((m) => m.mapaId);

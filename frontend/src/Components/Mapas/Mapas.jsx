@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import api from "../../../services/api.js";
 import niveis from "../../data/niveis.js";
@@ -11,8 +11,7 @@ import Assistente from "./Assistente.jsx";
 import Trilha from "./Trilha.jsx";
 import { recomendacao } from "./trilhaUtils.js";
 import { buscarMapas } from "./buscaUtils.js";
-import Comemoracao from "../Comemoracao/Comemoracao.jsx";
-import { desbloqueiosNovos } from "../Comemoracao/comemoracaoUtils.js";
+import { desbloqueiosNovos } from "./desbloqueioUtils.js";
 import Carregando from "../Carregando/Carregando.jsx";
 
 // Página da trilha de estudos: o assistente "Helpy" no topo e, embaixo, cada nível como um caminho de mapas
@@ -26,9 +25,8 @@ const Mapas = () => {
     const [carregando, setCarregando] = useState(true);
     // Nível do aluno (respondido nas boas-vindas): o Helpy começa a recomendar por ele
     const [nivelPreferido, setNivelPreferido] = useState(null);
-    // Mapa desbloqueado desde a última visita (abre a tela de comemoração)
-    const [desbloqueado, setDesbloqueado] = useState(null);
-    const fecharComemoracao = useCallback(() => setDesbloqueado(null), []);
+    // Mapas desbloqueados desde a última visita: o cadeado deles abre na trilha (uma vez só)
+    const [abrindo, setAbrindo] = useState([]);
     const navigate = useNavigate();
 
     // A dificuldade escolhida fica na URL (/mapas?nivel=basico): os cards da página inicial já abrem filtrados
@@ -53,10 +51,11 @@ const Mapas = () => {
                 const lista = Array.isArray(resposta.data) ? resposta.data : [];
                 setMapas(lista);
 
-                // Mapa desbloqueado desde a última visita: comemora (admin vê tudo liberado, não conta)
+                // Mapa desbloqueado desde a última visita: anima o cadeado abrindo (admin vê tudo liberado, não conta)
+                // (só troca se veio algo: uma 2ª busca já veria tudo como visto e apagaria a animação)
                 if (storedToken && !decodificarToken(storedToken)?.admin) {
-                    const novos = desbloqueiosNovos(lista);
-                    if (novos.length > 0) setDesbloqueado(novos[0]);
+                    const novos = desbloqueiosNovos(lista).map((m) => m.mapaId);
+                    if (novos.length > 0) setAbrindo(novos);
                 }
 
                 // Se falhar, a trilha funciona igual (só recomenda a partir do Básico)
@@ -75,6 +74,13 @@ const Mapas = () => {
 
         buscarMapas();
     }, []);
+
+    // Leva a tela até o cadeado que vai abrir (se estiver lá embaixo, o aluno nem veria)
+    useEffect(() => {
+        if (carregando || abrindo.length === 0) return;
+        const suave = !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+        document.querySelector('.trilhaMapa.abrindo')?.scrollIntoView({ block: 'center', behavior: suave ? 'smooth' : 'auto' });
+    }, [carregando, abrindo]);
 
     const escolherNivel = (chave) => {
         setSearchParams(chave ? { nivel: chave } : {});
@@ -100,15 +106,6 @@ const Mapas = () => {
                     <h1>{visitante ? 'Explore os mapas' : 'Sua trilha de estudos'}</h1>
 
                     {visitante && <AvisoVisitante />}
-
-                    {desbloqueado && (
-                        <Comemoracao
-                            titulo="Mapa novo desbloqueado!"
-                            texto={`Você concluiu "${desbloqueado.anterior.nome}" e liberou "${desbloqueado.nome}". Bora continuar?`}
-                            mapa={desbloqueado}
-                            fechar={fecharComemoracao}
-                        />
-                    )}
 
                     {!carregando && !visitante && (
                         <Assistente nome={nome} recomendacao={recomendacao(mapas, niveis, nivelEscolhido, nivelPreferido)} />
@@ -197,6 +194,7 @@ const Mapas = () => {
                             nivel={n}
                             // Mapas antigos, sem nível salvo, entram como básico (mesmo padrão do banco)
                             mapas={mapas.filter((mapa) => (mapa.nivel ?? 'basico') === n.chave)}
+                            abrindo={abrindo}
                         />
                     ))}
                 </div>

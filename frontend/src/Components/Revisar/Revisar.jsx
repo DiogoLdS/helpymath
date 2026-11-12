@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import api from "../../../services/api.js";
 import useTituloPagina from "../../utils/useTituloPagina.js";
@@ -6,8 +6,7 @@ import { cabecalhoAuth, ehVisitante } from "../../utils/auth.js";
 import Marca from "../Marca/Marca.jsx";
 import Carregando from "../Carregando/Carregando.jsx";
 import AvisoVisitante from "../Visitante/AvisoVisitante.jsx";
-import Comemoracao from "../Comemoracao/Comemoracao.jsx";
-import { marcarComoVistos } from "../Comemoracao/comemoracaoUtils.js";
+import Carimbo from "../Carimbo/Carimbo.jsx";
 import { TextoComFormulas } from "../Formulas/Formula.jsx";
 import { formulasNaLinha } from "../Formulas/formulaUtils.js";
 import niveis from "../../data/niveis.js";
@@ -29,8 +28,6 @@ const Revisar = () => {
     const [resultados, setResultados] = useState({});   // { questaoId: { correto } }
     const [respondendo, setRespondendo] = useState(null);
     const [mapasConcluidos, setMapasConcluidos] = useState([]); // mapas concluídos nesta revisão
-    const [comemoracao, setComemoracao] = useState(null);       // { nome, proximo }
-    const fecharComemoracao = useCallback(() => setComemoracao(null), []);
 
     useEffect(() => {
         if (visitante) return;
@@ -57,9 +54,7 @@ const Revisar = () => {
             setResultados((atual) => ({ ...atual, [questaoId]: { correto } }));
 
             if (mapaConcluido && !mapasConcluidos.some((m) => m.mapaId === mapa.mapaId)) {
-                setMapasConcluidos((atual) => [...atual, { mapaId: mapa.mapaId, nome: mapa.nome, proximo }]);
-                setComemoracao({ nome: mapa.nome, proximo });
-                if (proximo) marcarComoVistos([proximo.mapaId]);
+                setMapasConcluidos((atual) => [...atual, { mapaId: mapa.mapaId, nome: mapa.nome, proximo, em: new Date() }]);
             }
         } catch (error) {
             window.alert(error.response?.data?.error ?? "Não foi possível enviar sua resposta. Tente de novo.");
@@ -86,16 +81,7 @@ const Revisar = () => {
             <Marca comLink />
             <h1>Revisar erros</h1>
 
-            {comemoracao && (
-                <Comemoracao
-                    titulo={`Mapa "${comemoracao.nome}" concluído!`}
-                    texto={comemoracao.proximo
-                        ? `A revisão valeu a pena: você desbloqueou o mapa "${comemoracao.proximo.nome}".`
-                        : "A revisão valeu a pena: você concluiu todos os mapas deste nível!"}
-                    mapa={comemoracao.proximo}
-                    fechar={fecharComemoracao}
-                />
-            )}
+
             <p className="rvIntro">
                 Aqui ficam as questões que você errou, de todos os mapas. Acertar aqui vale igual: conta pontos
                 e pode até concluir o mapa.
@@ -129,7 +115,8 @@ const Revisar = () => {
 
             {mapasConcluidos.map((m) => (
                 <div className="questoes-concluido rvConcluido" key={m.mapaId} role="status">
-                    <p>🎉 <strong>Mapa "{m.nome}" concluído!</strong></p>
+                    <Carimbo data={m.em} animar />
+                    <p><strong>Mapa "{m.nome}" concluído!</strong> A revisão valeu a pena.</p>
                     {m.proximo && (
                         <Link to={`/mapas/${m.proximo.mapaId}`} className="botao-responder">
                             Próximo mapa: {m.proximo.nome} →

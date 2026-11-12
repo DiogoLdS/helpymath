@@ -11,7 +11,8 @@ const TOPO = 64;      // espaço em cima do primeiro mapa (pro balão "COMEÇAR"
 
 // Um nível da trilha: faixa colorida no topo ("unidade") e os mapas do nível num caminho.
 // numero = posição do nível (1 = Básico...), nivel = item de data/niveis.js, mapas = mapas desse nível em ordem
-const Trilha = ({ numero, nivel, mapas }) => {
+// abrindo = ids dos mapas desbloqueados desde a última visita (o cadeado deles abre na tela, uma vez)
+const Trilha = ({ numero, nivel, mapas, abrindo = [] }) => {
     const atual = mapaAtual(mapas);
     const concluidos = mapas.filter((m) => m.concluido).length;
 
@@ -59,11 +60,21 @@ const Trilha = ({ numero, nivel, mapas }) => {
                         const porcentagem = porcentagemDoMapa(mapa);
                         const estado = mapa.concluido ? "concluido" : ehAtual ? "atual" : mapa.liberado ? "livre" : "trancado";
                         const estilo = { left: `${(pontos[i].x / LARGURA) * 100}%`, top: pontos[i].y };
+                        const abrindoAgora = abrindo.includes(mapa.mapaId);
+                        // Liberado por ter concluído o anterior e ainda nem aberto: ganha o bilhete "novo!"
+                        const novo = mapa.liberado && mapa.anterior && !mapa.concluido && porcentagem === 0;
+                        // Mapa do lado direito do zigue-zague: bilhete vai pra esquerda (senão sai da tela)
+                        const ladoDoBilhete = ZIGUEZAGUE[i % ZIGUEZAGUE.length] > 0 ? "esquerda" : "direita";
+                        let classe = `trilhaMapa ${estado}`;
+                        if (abrindoAgora) classe += " abrindo";
 
                         const ficha = (
                             <>
                                 {ehAtual && (
                                     <span className="trilhaBalao">{porcentagem > 0 ? "Continuar" : "Começar"}</span>
+                                )}
+                                {novo && (
+                                    <span className={`trilhaBilhete ${ladoDoBilhete}`} aria-hidden="true">novo!</span>
                                 )}
                                 {/* Anel de progresso em volta do mapa da vez */}
                                 <span
@@ -71,6 +82,14 @@ const Trilha = ({ numero, nivel, mapas }) => {
                                     style={ehAtual ? { "--progresso": `${porcentagem * 3.6}deg` } : undefined}
                                 >
                                     <span className="trilhaFicha">{mapa.concluido ? "✓" : i + 1}</span>
+                                    {abrindoAgora && (
+                                        // Cadeado em cima da ficha: a alça sobe, o cadeado cai e some
+                                        <svg className="trilhaCadeado" viewBox="0 0 24 30" aria-hidden="true">
+                                            <path className="trilhaCadeadoAlca" d="M6 14V9a6 6 0 0 1 12 0v5" />
+                                            <rect className="trilhaCadeadoCorpo" x="3" y="13" width="18" height="14" rx="2" />
+                                            <circle className="trilhaCadeadoFuro" cx="12" cy="20" r="1.8" />
+                                        </svg>
+                                    )}
                                 </span>
                                 <span className="trilhaNome">{mapa.nome}</span>
                                 {ehAtual && porcentagem > 0 && <span className="trilhaPorcento">{porcentagem}%</span>}
@@ -96,9 +115,9 @@ const Trilha = ({ numero, nivel, mapas }) => {
                             <Link
                                 key={mapa.mapaId}
                                 to={`/mapas/${mapa.mapaId}`}
-                                className={`trilhaMapa ${estado}`}
+                                className={classe}
                                 style={estilo}
-                                aria-label={`${mapa.nome}${mapa.concluido ? " (concluído)" : ehAtual ? ` (mapa atual, ${porcentagem}% feito)` : ""}`}
+                                aria-label={`${mapa.nome}${mapa.concluido ? " (concluído)" : ehAtual ? ` (mapa atual, ${porcentagem}% feito)` : ""}${novo ? " (novo)" : ""}`}
                             >
                                 {ficha}
                             </Link>

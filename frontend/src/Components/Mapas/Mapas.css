@@ -484,6 +484,118 @@ a.trilhaMapa:active .trilhaFicha {
     .trilhaBalao { animation: none; }
 }
 
+/* Bilhete "novo!" a caneta vermelha, como anotação de professor no caderno */
+.trilhaBilhete {
+    position: absolute;
+    top: 8px;
+    font-family: "KaTeX_Main", "Times New Roman", serif;
+    font-size: 21px;
+    font-style: italic;
+    font-weight: 700;
+    line-height: 1;
+    color: #B3261E;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.trilhaBilhete.direita {
+    left: calc(50% + 46px);
+    transform: rotate(-11deg);
+}
+
+.trilhaBilhete.esquerda {
+    right: calc(50% + 46px);
+    transform: rotate(9deg);
+}
+
+/* risquinho embaixo, feito à mão (meio torto de propósito) */
+.trilhaBilhete::after {
+    content: "";
+    display: block;
+    height: 6px;
+    margin-top: 1px;
+    border-bottom: 2px solid currentColor;
+    border-radius: 0 0 60% 40% / 0 0 100% 70%;
+}
+
+/* Cadeado abrindo (só no mapa desbloqueado desde a última visita) */
+.trilhaAnel {
+    position: relative;
+}
+
+.trilhaCadeado {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 37px;
+    margin: -21px 0 0 -15px;
+    overflow: visible;
+    pointer-events: none;
+    animation: trilhaCadeadoCai 0.5s ease-in 1.15s both;
+}
+
+.trilhaCadeadoAlca {
+    fill: none;
+    stroke: #6B7380;
+    stroke-width: 3;
+    stroke-linecap: round;
+    /* gira pela perna direita, como cadeado de verdade */
+    transform-origin: 18px 14px;
+    animation: trilhaAlcaSobe 0.45s ease-out 0.55s both;
+}
+
+.trilhaCadeadoCorpo {
+    fill: #8A919B;
+    stroke: #6B7380;
+    stroke-width: 1.5;
+}
+
+.trilhaCadeadoFuro {
+    fill: #E9EBEE;
+}
+
+@keyframes trilhaAlcaSobe {
+    0% { transform: translateY(0) rotate(0); }
+    55% { transform: translateY(-5px) rotate(0); }
+    100% { transform: translateY(-5px) rotate(28deg); }
+}
+
+@keyframes trilhaCadeadoCai {
+    from { transform: translateY(0) rotate(0); opacity: 1; }
+    to { transform: translateY(26px) rotate(-14deg); opacity: 0; }
+}
+
+/* A ficha fica cinza enquanto o cadeado está nela e depois ganha a cor normal */
+.trilhaMapa.abrindo .trilhaFicha {
+    animation: trilhaDestranca 1.9s ease both;
+}
+
+@keyframes trilhaDestranca {
+    0%, 65% {
+        color: transparent;
+        background-color: #E9EBEE;
+        border-color: #B0B5BC;
+        box-shadow: 0 6px 0 #B0B5BC;
+    }
+}
+
+/* O bilhete é "escrito" depois que o cadeado cai */
+.trilhaMapa.abrindo .trilhaBilhete {
+    animation: trilhaEscreve 0.6s steps(6) 1.6s both;
+}
+
+@keyframes trilhaEscreve {
+    from { clip-path: inset(0 100% 0 0); }
+    to { clip-path: inset(0 0 0 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .trilhaCadeado { display: none; }
+    .trilhaMapa.abrindo .trilhaFicha,
+    .trilhaMapa.abrindo .trilhaBilhete { animation: none; }
+}
+
 /* No celular o assistente vira uma coluna só */
 @media (max-width: 600px) {
     .assistente {

@@ -82,3 +82,27 @@
 .mainQuestoes .marca {
     margin-bottom: 20px;
 }
+
+/* Carimbo "CONCLUÍDO" no canto da caixa verde (questões e revisão) */
+.App .questoes-concluido {
+    position: relative;
+    padding-right: 170px;
+}
+
+.questoes-concluido .carimbo {
+    position: absolute;
+    top: 50%;
+    right: 22px;
+    margin-top: -26px;
+}
+
+@media (max-width: 560px) {
+    .App .questoes-concluido {
+        padding-right: 14px;
+    }
+
+    .questoes-concluido .carimbo {
+        position: static;
+        margin: 4px 0 6px 6px;
+    }
+}
