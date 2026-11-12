@@ -7,6 +7,8 @@ import useTituloPagina from "../../utils/useTituloPagina.js";
 import Marca from "../Marca/Marca.jsx";
 import Carregando from "../Carregando/Carregando.jsx";
 import { OBJETIVOS, objetivoDe } from "../Perfil/perfilUtils.js";
+import { TextoComFormulas } from "../Formulas/Formula.jsx";
+import { formulasNaLinha } from "../Formulas/formulaUtils.js";
 import "./BoasVindas.css";
 
 // Níveis que dá pra escolher como ponto de partida (o Treino é de simulados, entra no plano pelo objetivo)
@@ -227,11 +229,11 @@ const BoasVindas = () => {
                         <p className="bvContador">Questão {indice + 1} de {questoes.length} · {nomeDoNivel(questoes[indice].nivel)}</p>
                         <div className="bvBarra"><div style={{ width: `${(indice / questoes.length) * 100}%` }} /></div>
 
-                        <h2 className="bvEnunciado">{questoes[indice].enunciado}</h2>
+                        <div className="bvEnunciado" role="heading" aria-level={2}><TextoComFormulas texto={questoes[indice].enunciado} /></div>
                         <div className="bvAlternativas">
                             {questoes[indice].alternativas.map((a) => (
                                 <button type="button" key={a.id} className="bvAlternativa" onClick={() => responder(a.id)} disabled={ocupado}>
-                                    <strong>{a.letra})</strong> {a.texto}
+                                    <strong>{a.letra})</strong> <TextoComFormulas texto={formulasNaLinha(a.texto)} />
                                 </button>
                             ))}
                         </div>

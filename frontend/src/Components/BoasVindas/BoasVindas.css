@@ -70,7 +70,8 @@
     color: #2B4C7E;
 }
 
-.bvEtapa h2 {
+.bvEtapa h2,
+.bvEtapa .bvEnunciado {
     font-size: 21px;
     line-height: 1.3;
     color: #1F2D44;
@@ -228,6 +229,7 @@
 }
 
 .bvEnunciado {
+    font-weight: 700;
     white-space: pre-wrap;
 }
 
@@ -364,7 +366,8 @@
         font-size: 23px;
     }
 
-    .bvEtapa h2 {
+    .bvEtapa h2,
+    .bvEtapa .bvEnunciado {
         font-size: 18px;
     }
 

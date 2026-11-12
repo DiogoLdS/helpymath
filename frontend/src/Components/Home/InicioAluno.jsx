@@ -8,6 +8,8 @@ import {
     objetivoDe, pontos, recomendacoes, resumoDaSemana,
 } from "../Perfil/perfilUtils.js";
 import { mapaAtual, recomendacao, saudacao } from "../Mapas/trilhaUtils.js";
+import { TextoComFormulas } from "../Formulas/Formula.jsx";
+import { formulasNaLinha } from "../Formulas/formulaUtils.js";
 import "./InicioAluno.css";
 
 // Uma curiosidade por dia (muda à meia-noite), pra página ter algo novo toda vez que o aluno volta
@@ -299,7 +301,7 @@ const InicioAluno = ({ sair }) => {
                                     </span>
                                     <span className='iaAtividadeTexto'>
                                         <strong>{a.tipo === 'conteudo' ? 'Concluiu' : a.correta ? 'Acertou' : 'Errou'}</strong>{' '}
-                                        {a.titulo}
+                                        <TextoComFormulas texto={formulasNaLinha(a.titulo ?? '')} />
                                         {a.mapa && <small> · {a.mapa.nome}</small>}
                                     </span>
                                     <span className='iaAtividadeQuando'>{quando(a.data)}</span>

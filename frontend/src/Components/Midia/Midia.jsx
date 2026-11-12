@@ -1,5 +1,6 @@
 import { Fragment, useState } from "react";
 import { TextoComFormulas } from "../Formulas/Formula.jsx";
+import { textoSemFormulas } from "../Formulas/formulaUtils.js";
 import { idVideoYoutube, linkValido } from "./midiaUtils.js";
 import "./Midia.css";
 
@@ -7,7 +8,8 @@ import "./Midia.css";
 //   [[imagem:https://site.com/figura.png|Descrição da imagem]]
 //   [[video:https://www.youtube.com/watch?v=XXXXXXXXXXX]]
 // Assim não precisa de coluna nova no banco nem de servidor de arquivos.
-const PADRAO_MIDIA = /(\[\[(?:imagem|video):[^\]\n]+\]\])/g;
+// A descrição pode ter fórmulas ($...$), então um "]" sozinho é aceito (ex: \sqrt[3]{x}); só "]]" fecha.
+const PADRAO_MIDIA = /(\[\[(?:imagem|video):(?:[^\]\n]|\](?!\]))+\]\])/g;
 
 // Usada na impressão: desenha a imagem num <canvas> assim que ela carrega.
 // Assim um GIF animado sai sempre no primeiro quadro (o <img> imprimiria o quadro que estiver passando).
@@ -38,7 +40,7 @@ function ImagemPrimeiroQuadro({ url, descricao }) {
                 onError={() => setEstado("erro")}
                 data-carregando={estado === "carregando" ? "" : undefined}
             />
-            <canvas className="midiaImagemImpressa" role="img" aria-label={descricao} />
+            <canvas className="midiaImagemImpressa" role="img" aria-label={textoSemFormulas(descricao)} />
         </>
     );
 }
@@ -53,7 +55,7 @@ export function Midia({ tipo, url, descricao, impressao = false }) {
         return (
             <figure className="midiaBloco">
                 <ImagemPrimeiroQuadro url={url} descricao={descricao} />
-                {descricao && <figcaption>{descricao}</figcaption>}
+                {descricao && <figcaption><TextoComFormulas texto={descricao} /></figcaption>}
             </figure>
         );
     }
@@ -61,8 +63,9 @@ export function Midia({ tipo, url, descricao, impressao = false }) {
     if (tipo === "imagem") {
         return (
             <figure className="midiaBloco">
-                <img src={url} alt={descricao} loading="lazy" />
-                {descricao && <figcaption>{descricao}</figcaption>}
+                {/* O alt é lido por leitores de tela: vai sem os $ das fórmulas */}
+                <img src={url} alt={textoSemFormulas(descricao)} loading="lazy" />
+                {descricao && <figcaption><TextoComFormulas texto={descricao} /></figcaption>}
             </figure>
         );
     }

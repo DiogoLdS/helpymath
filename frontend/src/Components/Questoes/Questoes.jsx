@@ -6,6 +6,8 @@ import useTituloPagina from "../../utils/useTituloPagina.js";
 import Marca from "../Marca/Marca.jsx";
 import Carregando from "../Carregando/Carregando.jsx";
 import AvisoVisitante from "../Visitante/AvisoVisitante.jsx";
+import { TextoComFormulas } from "../Formulas/Formula.jsx";
+import { formulasNaLinha } from "../Formulas/formulaUtils.js";
 import { cabecalhoAuth, ehVisitante } from "../../utils/auth.js";
 
 // Precisa bater com NOTA_MINIMA do backend (services/progresso.js)
@@ -207,7 +209,7 @@ const Questoes = () => {
 
                 return (
                     <section className='questao-card' key={questao.questaoId}>
-                        <p className='enunciado'>{indice + 1}. {questao.enunciado}</p>
+                        <div className='enunciado'>{indice + 1}. <TextoComFormulas texto={questao.enunciado} /></div>
 
                         <div className='alternativas'>
                             {questao.alternativa.map((alternativa) => {
@@ -226,7 +228,7 @@ const Questoes = () => {
                                         disabled={!!resultado}
                                         onClick={() => selecionarAlternativa(questao.questaoId, alternativa.id)}
                                     >
-                                        <strong>{alternativa.letra})</strong> {alternativa.texto}
+                                        <strong>{alternativa.letra})</strong> <TextoComFormulas texto={formulasNaLinha(alternativa.texto)} />
                                     </button>
                                 );
                             })}

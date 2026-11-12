@@ -80,11 +80,15 @@ const ABAS = [
 ];
 
 // Mini editor de fórmulas: o admin monta a fórmula aqui (com botões e pré-visualização)
-// e clica em "Inserir na explicação" pra jogar o resultado, já com $...$ ou $$...$$, no texto.
-const FormulaEditor = ({ onInserir, disabled }) => {
+// e clica no botão de inserir pra jogar o resultado, já com $...$ ou $$...$$, no texto.
+// Usado na explicação dos conteúdos, na descrição da mídia e nas questões (enunciado e alternativas).
+// rotuloInserir: texto do botão (ex: "Inserir no enunciado")
+// permitirBloco = false: só fórmula na linha (campos de uma linha, como alternativa e descrição da imagem)
+const FormulaEditor = ({ onInserir, disabled, rotuloInserir = "Inserir na explicação", permitirBloco = true }) => {
     const [abaAtiva, setAbaAtiva] = useState(ABAS[0].chave);
     const [latex, setLatex] = useState("");
-    const [bloco, setBloco] = useState(true);
+    const [blocoEscolhido, setBloco] = useState(true);
+    const bloco = permitirBloco && blocoEscolhido;
     const campoRef = useRef(null);
     const idCampo = useId();
 
@@ -167,15 +171,19 @@ const FormulaEditor = ({ onInserir, disabled }) => {
             </div>
 
             <div className="formulaAcoes">
-                <label className="formulaModo">
-                    <input
-                        type="checkbox"
-                        checked={bloco}
-                        onChange={(e) => setBloco(e.target.checked)}
-                        disabled={disabled}
-                    />
-                    Em bloco (centralizada, em linha própria)
-                </label>
+                {permitirBloco ? (
+                    <label className="formulaModo">
+                        <input
+                            type="checkbox"
+                            checked={bloco}
+                            onChange={(e) => setBloco(e.target.checked)}
+                            disabled={disabled}
+                        />
+                        Em bloco (centralizada, em linha própria)
+                    </label>
+                ) : (
+                    <span className="formulaModo">A fórmula entra na mesma linha do texto.</span>
+                )}
 
                 <button
                     type="button"
@@ -183,7 +191,7 @@ const FormulaEditor = ({ onInserir, disabled }) => {
                     onClick={inserirNaExplicacao}
                     disabled={disabled || !latex.trim()}
                 >
-                    Inserir na explicação
+                    {rotuloInserir}
                 </button>
             </div>
         </div>

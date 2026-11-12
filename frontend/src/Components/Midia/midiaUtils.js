@@ -14,8 +14,9 @@ export function idVideoYoutube(url) {
 // Monta o trecho que vai pro texto da explicação
 export function montarMarcacaoMidia(tipo, url, descricao = "") {
     if (tipo === "imagem") {
-        // "|" e "]" quebrariam a marcação, então saem da descrição
-        const descricaoLimpa = descricao.replace(/[|\]\n]/g, " ").trim();
+        // Só "]]" (fim da marcação) e quebras de linha quebrariam a marcação. "|" e "]" sozinhos podem ficar,
+        // porque aparecem em fórmulas (ex: \left| x \right| e \sqrt[3]{x})
+        const descricaoLimpa = descricao.replace(/\n/g, " ").replace(/\]\]/g, "] ]").trim();
         return `\n[[imagem:${url.trim()}|${descricaoLimpa}]]\n`;
     }
     return `\n[[video:${url.trim()}]]\n`;

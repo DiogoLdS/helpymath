@@ -381,3 +381,17 @@
         padding: 20px 16px;
     }
 }
+/* Pré-visualização da questão com fórmulas */
+.previaAlternativas {
+    margin: 8px 0 0;
+    padding-left: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.previaAlternativas li.correta {
+    color: #1E7A4C;
+    font-weight: 600;
+}

@@ -143,3 +143,16 @@
     font-size: 14px;
     word-break: break-all;
 }
+
+/* Botão de fórmula da descrição e a prévia da descrição com as fórmulas desenhadas */
+.midiaBotaoFormula {
+    align-self: flex-start;
+    margin-top: 8px;
+}
+
+.midiaPreviaDescricao {
+    margin-top: 6px;
+    font-size: 14px;
+    font-style: italic;
+    text-align: center;
+}

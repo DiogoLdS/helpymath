@@ -1,5 +1,8 @@
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { Midia } from "./Midia.jsx";
+import FormulaEditor from "../Formulas/FormulaEditor.jsx";
+import { TextoComFormulas } from "../Formulas/Formula.jsx";
+import { temFormula, textoSemFormulas } from "../Formulas/formulaUtils.js";
 import { idVideoYoutube, linkValido, montarMarcacaoMidia } from "./midiaUtils.js";
 import "./Midia.css";
 
@@ -10,6 +13,9 @@ const MidiaEditor = ({ onInserir, disabled }) => {
     const [url, setUrl] = useState("");
     const [descricao, setDescricao] = useState("");
     const [imagemCarregou, setImagemCarregou] = useState(false);
+    // Editor de fórmulas da descrição (ex: "Gráfico de $y = x^2$")
+    const [formulaAberta, setFormulaAberta] = useState(false);
+    const campoDescricao = useRef(null);
     const idUrl = useId();
     const idDescricao = useId();
 
@@ -36,6 +42,21 @@ const MidiaEditor = ({ onInserir, disabled }) => {
     const trocarUrl = (novaUrl) => {
         setUrl(novaUrl);
         setImagemCarregou(false);
+    };
+
+    // Joga a fórmula na descrição, no lugar do cursor
+    const inserirFormulaNaDescricao = (trecho) => {
+        const campo = campoDescricao.current;
+        const inicio = campo ? campo.selectionStart : descricao.length;
+        const fim = campo ? campo.selectionEnd : descricao.length;
+        setDescricao(descricao.slice(0, inicio) + trecho + descricao.slice(fim));
+
+        requestAnimationFrame(() => {
+            if (!campoDescricao.current) return;
+            const posicao = inicio + trecho.length;
+            campoDescricao.current.focus();
+            campoDescricao.current.setSelectionRange(posicao, posicao);
+        });
     };
 
     const inserirNaExplicacao = () => {
@@ -91,12 +112,32 @@ const MidiaEditor = ({ onInserir, disabled }) => {
                     <label className="midiaRotulo" htmlFor={idDescricao}>Descrição da imagem</label>
                     <input
                         id={idDescricao}
+                        ref={campoDescricao}
                         type="text"
                         value={descricao}
                         onChange={(e) => setDescricao(e.target.value)}
-                        placeholder="Ex: Gráfico de uma parábola com concavidade para cima"
+                        placeholder="Ex: Gráfico de $y = x^2$, uma parábola com concavidade para cima"
                         disabled={disabled}
                     />
+
+                    <button
+                        type="button"
+                        className="botaoSecundario midiaBotaoFormula"
+                        onClick={() => setFormulaAberta(!formulaAberta)}
+                        aria-expanded={formulaAberta}
+                        disabled={disabled}
+                    >
+                        {formulaAberta ? "Fechar fórmulas" : "+ Fórmula na descrição"}
+                    </button>
+
+                    {formulaAberta && (
+                        <FormulaEditor
+                            onInserir={inserirFormulaNaDescricao}
+                            disabled={disabled}
+                            rotuloInserir="Inserir na descrição"
+                            permitirBloco={false}
+                        />
+                    )}
                 </>
             )}
 
@@ -106,7 +147,7 @@ const MidiaEditor = ({ onInserir, disabled }) => {
                         <img
                             key={urlLimpa}
                             src={urlLimpa}
-                            alt={descricao}
+                            alt={textoSemFormulas(descricao)}
                             onLoad={() => setImagemCarregou(true)}
                             onError={() => setImagemCarregou(false)}
                         />
@@ -117,6 +158,11 @@ const MidiaEditor = ({ onInserir, disabled }) => {
                     <span className="midiaPreviaVazia">A pré-visualização da mídia aparece aqui.</span>
                 )}
             </div>
+
+            {/* Como a descrição vai aparecer embaixo da imagem, com as fórmulas desenhadas */}
+            {tipo === "imagem" && temFormula(descricao) && (
+                <p className="midiaPreviaDescricao"><TextoComFormulas texto={descricao} /></p>
+            )}
 
             {tipo === "imagem" && mostrarPrevia && !imagemCarregou && (
                 <p className="midiaAviso">
