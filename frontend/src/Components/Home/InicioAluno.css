@@ -784,3 +784,50 @@
         flex-direction: column;
     }
 }
+
+/* ---------- Ranking da semana ---------- */
+
+.iaRanking {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.iaRanking li {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 4px;
+}
+
+.iaRanking li.voce {
+    background-color: #E8F0FB;
+}
+
+.iaRanking span {
+    font-size: 18px;
+    text-align: center;
+}
+
+.iaRanking strong {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.iaRanking em {
+    font-style: normal;
+    font-weight: 700;
+    color: #2B4C7E;
+    white-space: nowrap;
+}
+
+.iaRankingEu {
+    margin: 0;
+    font-size: 13px;
+    color: #4A5A73;
+}

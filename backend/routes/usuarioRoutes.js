@@ -27,6 +27,9 @@ routes.patch('/usuario/:id/despromover',authUser,authAdmin,usuarioController.des
 // Esqueci minha senha: o admin gera uma senha temporária pro usuário
 routes.patch('/usuario/:id/senha-temporaria',authUser,authAdmin,usuarioController.redefinirSenha);
 
+// Ranking de pontos (precisa estar logado: mostra nomes de outros alunos)
+routes.get('/ranking', authUser, usuarioController.ranking);
+
 // Painel da página inicial do administrador
 routes.get('/admin/painel', authUser, authAdmin, usuarioController.painelAdmin);
 

@@ -10,6 +10,7 @@ import {
 import { mapaAtual, recomendacao, saudacao } from "../Mapas/trilhaUtils.js";
 import { TextoComFormulas } from "../Formulas/Formula.jsx";
 import { formulasNaLinha } from "../Formulas/formulaUtils.js";
+import { MEDALHAS } from "../Ranking/rankingUtils.js";
 import "./InicioAluno.css";
 
 // Uma curiosidade por dia (muda à meia-noite), pra página ter algo novo toda vez que o aluno volta
@@ -76,6 +77,14 @@ const InicioAluno = ({ sair }) => {
         };
         buscar();
     }, [navigate]);
+
+    // Ranking da semana (cartão do lado). Se der erro, o cartão só não aparece.
+    const [ranking, setRanking] = useState(null);
+    useEffect(() => {
+        api.get('/ranking', { params: { periodo: 'semana' }, headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
+            .then((resposta) => setRanking(resposta.data))
+            .catch((error) => console.log(error.message));
+    }, []);
 
     if (!perfil) {
         return <Carregando pagina texto="Carregando seu início" />;
@@ -355,6 +364,32 @@ const InicioAluno = ({ sair }) => {
                         ))}
                     </div>
                 </section>
+
+                {/* Ranking da semana: os 3 primeiros e a sua posição */}
+                {ranking && (
+                    <section className='iaCartao'>
+                        <h2>Ranking da semana</h2>
+                        {ranking.top.length === 0 ? (
+                            <p className='iaHoje vazio'>Ninguém pontuou nesta semana ainda. Seja o primeiro!</p>
+                        ) : (
+                            <ol className='iaRanking'>
+                                {ranking.top.slice(0, 3).map((a, i) => (
+                                    <li key={i} className={a.voce ? 'voce' : undefined}>
+                                        <span aria-label={`${a.posicao}º lugar`}>{MEDALHAS[a.posicao] ?? `${a.posicao}º`}</span>
+                                        <strong>{a.voce ? 'Você' : a.nome}</strong>
+                                        <em>{a.pontos} pts</em>
+                                    </li>
+                                ))}
+                            </ol>
+                        )}
+                        <p className='iaRankingEu'>
+                            {ranking.eu
+                                ? `Você está em ${ranking.eu.posicao}º lugar, com ${ranking.eu.pontos} pontos nesta semana.`
+                                : 'Conclua um conteúdo ou acerte uma questão para entrar no ranking.'}
+                        </p>
+                        <Link to='/ranking' className='iaLinkClaro'>Ver o ranking completo →</Link>
+                    </section>
+                )}
 
                 <section className='iaCartao'>
                     <h2>Hoje no cronograma</h2>

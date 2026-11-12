@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { dadosDoPainelAdmin } from '../services/painelAdmin.js';
 import { gerarSenhaTemporaria } from '../services/senhaTemporaria.js';
+import { rankingDosAlunos } from '../services/ranking.js';
 import { CAMPOS_PERFIL, SENHA_MINIMA, dadosDoPerfil, validarCadastro, validarEdicaoPerfil } from '../services/perfil.js';
 
 // Token de login (o mesmo do login e de quando o aluno muda o nome no perfil)
@@ -266,6 +267,16 @@ function controller() {
             }
         },
         // Página inicial do admin: números, mapas, questões com problema e usuários
+        // Ranking de pontos dos alunos: ?periodo=geral (padrão) ou ?periodo=semana
+        async ranking(req, res) {
+            try {
+                const periodo = req.query.periodo === 'semana' ? 'semana' : 'geral';
+                res.status(200).json(await rankingDosAlunos(periodo, req.usuario.usuarioId));
+            } catch (error) {
+                console.log(error.message);
+                res.status(500).json("Internal server error!");
+            }
+        },
         async painelAdmin(req, res) {
             try {
                 res.status(200).json(await dadosDoPainelAdmin());
