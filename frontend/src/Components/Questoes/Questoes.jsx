@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import api from "../../../services/api.js";
 import "./Questoes.css";
@@ -6,6 +6,8 @@ import useTituloPagina from "../../utils/useTituloPagina.js";
 import Marca from "../Marca/Marca.jsx";
 import Carregando from "../Carregando/Carregando.jsx";
 import AvisoVisitante from "../Visitante/AvisoVisitante.jsx";
+import Comemoracao from "../Comemoracao/Comemoracao.jsx";
+import { marcarComoVistos } from "../Comemoracao/comemoracaoUtils.js";
 import { TextoComFormulas } from "../Formulas/Formula.jsx";
 import { formulasNaLinha } from "../Formulas/formulaUtils.js";
 import { cabecalhoAuth, ehVisitante } from "../../utils/auth.js";
@@ -83,6 +85,10 @@ const Questoes = () => {
         buscarQuestoes().finally(() => setCarregando(false));
     }, [mapaId]);
 
+    // Tela de comemoração quando o mapa é concluído: { proximo } (mapa desbloqueado ou null)
+    const [comemoracao, setComemoracao] = useState(null);
+    const fecharComemoracao = useCallback(() => setComemoracao(null), []);
+
     const selecionarAlternativa = (questaoId, alternativaId) => {
         if (resultados[questaoId]) return;
 
@@ -107,6 +113,11 @@ const Questoes = () => {
             setResultados((anteriores) => ({ ...anteriores, [questaoId]: { correto, letraCorreta } }));
 
             if (resultado) {
+                // Esta resposta concluiu o mapa agora: hora de comemorar (e de mostrar o mapa liberado)
+                if (mapaConcluido && !placar?.mapaConcluido) {
+                    setComemoracao({ proximo });
+                    if (proximo) marcarComoVistos([proximo.mapaId]);
+                }
                 setPlacar({ acertos: resultado.acertos, total: resultado.total, mapaConcluido, proximo });
             }
         } catch (error) {
@@ -141,6 +152,17 @@ const Questoes = () => {
         <main className='mainQuestoes'>
             <Marca comLink />
             <h1>Questões</h1>
+
+            {comemoracao && (
+                <Comemoracao
+                    titulo="Mapa concluído!"
+                    texto={comemoracao.proximo
+                        ? `Você bateu a meta e desbloqueou o mapa "${comemoracao.proximo.nome}".`
+                        : "Você bateu a meta e concluiu todos os mapas deste nível!"}
+                    mapa={comemoracao.proximo}
+                    fechar={fecharComemoracao}
+                />
+            )}
 
             {visitante && (
                 <AvisoVisitante compacto texto="Suas respostas são corrigidas, mas não ficam salvas. Crie uma conta para guardar o progresso e liberar o próximo mapa." />

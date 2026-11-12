@@ -14,6 +14,7 @@ import Introducao from './Components/Introducao/Introducao';
 import Perfil from './Components/Perfil/Perfil';
 import BoasVindas from './Components/BoasVindas/BoasVindas';
 import Ranking from './Components/Ranking/Ranking';
+import Revisar from './Components/Revisar/Revisar';
 import NaoEncontrada from './Components/NaoEncontrada/NaoEncontrada';
 
 function App() {
@@ -39,6 +40,9 @@ function App() {
 
           {/* Perguntas logo depois do cadastro: objetivo, nível (ou teste diagnóstico) e meta da semana */}
           <Route path="/boas-vindas" element={<BoasVindas/>}/>
+
+          {/* Revisar erros: questões erradas de todos os mapas num lugar só */}
+          <Route path="/revisar" element={<Revisar/>}/>
 
           {/* Ranking de pontos dos alunos (semana e geral) */}
           <Route path="/ranking" element={<Ranking/>}/>

@@ -1,8 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M18 8h28v14c0 9-6 16-14 16s-14-7-14-16V8z" fill="#FFFFFF"/>
-  <path d="M18 14H8v4c0 7 5 12 11 12"/>
-  <path d="M46 14h10v4c0 7-5 12-11 12"/>
-  <path d="M32 38v10"/>
-  <path d="M20 56h24"/>
-  <path d="M24 48h16v8H24z" fill="#FFFFFF"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="4 3 56 56">
+  <!-- Troféu branco e simétrico em torno de x = 32 (mesmo estilo cheio dos outros ícones da barra) -->
+  <g fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round">
+    <path d="M17 12H9.5c0 9 3.5 15 10 16.5"/>
+    <path d="M47 12h7.5c0 9-3.5 15-10 16.5"/>
+  </g>
+  <g fill="#FFFFFF">
+    <path d="M15 6h34v15c0 10-7.5 17.5-17 17.5S15 31 15 21V6z"/>
+    <rect x="28" y="37" width="8" height="9"/>
+    <rect x="19" y="45" width="26" height="6" rx="2"/>
+    <rect x="14" y="51" width="36" height="7" rx="2"/>
+  </g>
 </svg>

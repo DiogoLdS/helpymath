@@ -5,6 +5,7 @@ import authAdmin from '../services/authAdmin.js';
 import authOpcional from '../services/authOpcional.js';
 
 import { corrigirDiagnostico, questoesDoDiagnostico } from '../services/diagnostico.js';
+import { questoesParaRevisar } from '../services/revisao.js';
 
 const routes = express.Router();
 const questaoController = controller();
@@ -12,6 +13,16 @@ const questaoController = controller();
 // Visitante (sem conta) também pode fazer as questões: a resposta é corrigida, mas não fica salva
 routes.get('/mapas/:mapaId/questoes', authOpcional, questaoController.listarQuestoesPorMapa);
 routes.post('/questoes/:id/responder', authOpcional, questaoController.responderQuestao);
+
+// Revisar erros: as questões erradas de todos os mapas num lugar só (responde pela rota normal acima)
+routes.get('/revisao', authUser, async (req, res) => {
+    try {
+        res.status(200).json(await questoesParaRevisar(req.usuario.usuarioId));
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json("Internal server error!");
+    }
+});
 
 // Teste diagnóstico das perguntas de boas-vindas (services/diagnostico.js): não mexe no progresso
 routes.get('/diagnostico', authUser, async (req, res) => {

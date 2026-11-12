@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { useCallback, useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import api from "../../../services/api.js";
 import niveis from "../../data/niveis.js";
 import { decodificarToken, ehVisitante } from "../../utils/auth.js";
@@ -10,6 +10,9 @@ import Sidebar from "../Sidebar/SidebarChapeu";
 import Assistente from "./Assistente.jsx";
 import Trilha from "./Trilha.jsx";
 import { recomendacao } from "./trilhaUtils.js";
+import { buscarMapas } from "./buscaUtils.js";
+import Comemoracao from "../Comemoracao/Comemoracao.jsx";
+import { desbloqueiosNovos } from "../Comemoracao/comemoracaoUtils.js";
 import Carregando from "../Carregando/Carregando.jsx";
 
 // Página da trilha de estudos: o assistente "Helpy" no topo e, embaixo, cada nível como um caminho de mapas
@@ -23,6 +26,9 @@ const Mapas = () => {
     const [carregando, setCarregando] = useState(true);
     // Nível do aluno (respondido nas boas-vindas): o Helpy começa a recomendar por ele
     const [nivelPreferido, setNivelPreferido] = useState(null);
+    // Mapa desbloqueado desde a última visita (abre a tela de comemoração)
+    const [desbloqueado, setDesbloqueado] = useState(null);
+    const fecharComemoracao = useCallback(() => setDesbloqueado(null), []);
     const navigate = useNavigate();
 
     // A dificuldade escolhida fica na URL (/mapas?nivel=basico): os cards da página inicial já abrem filtrados
@@ -44,7 +50,14 @@ const Mapas = () => {
                     headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {}
                 });
 
-                setMapas(Array.isArray(resposta.data) ? resposta.data : []);
+                const lista = Array.isArray(resposta.data) ? resposta.data : [];
+                setMapas(lista);
+
+                // Mapa desbloqueado desde a última visita: comemora (admin vê tudo liberado, não conta)
+                if (storedToken && !decodificarToken(storedToken)?.admin) {
+                    const novos = desbloqueiosNovos(lista);
+                    if (novos.length > 0) setDesbloqueado(novos[0]);
+                }
 
                 // Se falhar, a trilha funciona igual (só recomenda a partir do Básico)
                 if (storedToken) api.get('/me', { headers: { Authorization: `Bearer ${storedToken}` } })
@@ -67,6 +80,13 @@ const Mapas = () => {
         setSearchParams(chave ? { nivel: chave } : {});
     };
 
+    // Busca de mapas (nome e conteúdos). Respeita o filtro de nível escolhido.
+    const [busca, setBusca] = useState('');
+    const resultados = buscarMapas(
+        nivelEscolhido ? mapas.filter((m) => (m.nivel ?? 'basico') === nivelEscolhido) : mapas,
+        busca
+    );
+
     // Sem filtro mostra todos os níveis, cada um na sua trilha
     const niveisMostrados = nivelEscolhido ? niveis.filter((n) => n.chave === nivelEscolhido) : niveis;
 
@@ -81,8 +101,69 @@ const Mapas = () => {
 
                     {visitante && <AvisoVisitante />}
 
+                    {desbloqueado && (
+                        <Comemoracao
+                            titulo="Mapa novo desbloqueado!"
+                            texto={`Você concluiu "${desbloqueado.anterior.nome}" e liberou "${desbloqueado.nome}". Bora continuar?`}
+                            mapa={desbloqueado}
+                            fechar={fecharComemoracao}
+                        />
+                    )}
+
                     {!carregando && !visitante && (
                         <Assistente nome={nome} recomendacao={recomendacao(mapas, niveis, nivelEscolhido, nivelPreferido)} />
+                    )}
+
+                    {/* Busca: procura no nome do mapa e nos conteúdos dele */}
+                    <div className='mapas-busca'>
+                        <label htmlFor='busca-mapas' className='sr-only'>Buscar mapas</label>
+                        <span aria-hidden='true'>🔍</span>
+                        <input
+                            id='busca-mapas'
+                            type='search'
+                            value={busca}
+                            onChange={(e) => setBusca(e.target.value)}
+                            placeholder='Buscar mapa ou assunto (ex: fração, porcentagem)'
+                            autoComplete='off'
+                        />
+                        {busca && (
+                            <button type='button' onClick={() => setBusca('')} aria-label='Limpar busca'>×</button>
+                        )}
+                    </div>
+
+                    {busca.trim() && !carregando && (
+                        <section className='mapas-resultados' aria-live='polite'>
+                            <h2>
+                                {resultados.length === 0
+                                    ? `Nenhum mapa encontrado para "${busca.trim()}"`
+                                    : `${resultados.length} ${resultados.length === 1 ? 'mapa encontrado' : 'mapas encontrados'}`}
+                            </h2>
+                            {resultados.length === 0 && <p>Tente outra palavra, ou veja a trilha completa limpando a busca.</p>}
+                            <ul>
+                                {resultados.map(({ mapa, conteudos }) => {
+                                    const estado = !mapa.liberado ? 'trancado' : mapa.concluido ? 'concluido' : 'livre';
+                                    const rotulo = { trancado: '🔒 Bloqueado', concluido: '✓ Concluído', livre: '▶ Liberado' }[estado];
+                                    const nivel = niveis.find((n) => n.chave === (mapa.nivel ?? 'basico'));
+                                    const corpo = (
+                                        <>
+                                            <strong>{mapa.nome}</strong>
+                                            <span className='mapas-resultado-info'>{nivel?.nome} · {visitante ? 'Liberado' : rotulo}</span>
+                                            {conteudos.length > 0 && (
+                                                <span className='mapas-resultado-conteudos'>Fala de: {conteudos.slice(0, 3).join(', ')}</span>
+                                            )}
+                                            {!mapa.liberado && mapa.anterior && (
+                                                <span className='mapas-resultado-conteudos'>Conclua "{mapa.anterior.nome}" para liberar.</span>
+                                            )}
+                                        </>
+                                    );
+                                    return (
+                                        <li key={mapa.mapaId} className={`mapas-resultado ${estado}`}>
+                                            {mapa.liberado ? <Link to={`/mapas/${mapa.mapaId}`}>{corpo}</Link> : <div>{corpo}</div>}
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </section>
                     )}
 
                     <div className='mapas-filtros' role='group' aria-label='Filtrar por dificuldade'>
@@ -109,7 +190,7 @@ const Mapas = () => {
 
                     {carregando && <Carregando pagina texto='Carregando sua trilha' />}
 
-                    {!carregando && niveisMostrados.map((n) => (
+                    {!carregando && !busca.trim() && niveisMostrados.map((n) => (
                         <Trilha
                             key={n.chave}
                             numero={niveis.indexOf(n) + 1}

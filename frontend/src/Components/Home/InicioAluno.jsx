@@ -82,7 +82,7 @@ const InicioAluno = ({ sair }) => {
     const [ranking, setRanking] = useState(null);
     useEffect(() => {
         api.get('/ranking', { params: { periodo: 'semana' }, headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
-            .then((resposta) => setRanking(resposta.data))
+            .then((resposta) => { if (Array.isArray(resposta.data?.top)) setRanking(resposta.data); })
             .catch((error) => console.log(error.message));
     }, []);
 
@@ -250,7 +250,10 @@ const InicioAluno = ({ sair }) => {
 
                 {paraRevisar.length > 0 && (
                     <section className='iaBloco'>
-                        <div className='iaBlocoTitulo'><h2>Para revisar</h2></div>
+                        <div className='iaBlocoTitulo'>
+                            <h2>Para revisar</h2>
+                            <Link to='/revisar'>Refazer as questões erradas →</Link>
+                        </div>
                         <ul className='iaRevisar'>
                             {paraRevisar.map((r) => (
                                 <li key={r.mapa.mapaId}>

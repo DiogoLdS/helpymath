@@ -30,6 +30,8 @@ const Ranking = () => {
             setErro("");
             try {
                 const resposta = await api.get("/ranking", { params: { periodo }, headers: cabecalhoAuth() });
+                // Resposta fora do formato esperado vira erro na tela (em vez de quebrar a página)
+                if (!Array.isArray(resposta.data?.top)) throw new Error("Resposta inesperada do ranking");
                 setRanking(resposta.data);
             } catch (error) {
                 if (error.response?.status === 401) {
@@ -88,7 +90,7 @@ const Ranking = () => {
                     {ranking && (
                         <>
                             <p className="rkDescricao">
-                                {PERIODOS.find((p) => p.chave === ranking.periodo).descricao}
+                                {PERIODOS.find((p) => p.chave === ranking.periodo)?.descricao}
                                 {ranking.participantes > 0 && ` · ${ranking.participantes} ${ranking.participantes === 1 ? "aluno pontuou" : "alunos pontuaram"}`}
                             </p>
 

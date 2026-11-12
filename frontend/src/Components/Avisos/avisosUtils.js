@@ -44,12 +44,11 @@ export function avisosDoAluno(perfil, agora = new Date()) {
     // Questões erradas para refazer
     const erradas = perfil.respostas.filter((r) => !r.correta);
     if (erradas.length > 0) {
-        const mapa = erradas[0].mapa;
         avisos.push({
             id: "revisar",
             icone: "✏️",
             texto: `${erradas.length} ${erradas.length === 1 ? "questão errada espera" : "questões erradas esperam"} uma nova tentativa.`,
-            link: mapa ? `/mapas/${mapa.mapaId}/questoes` : "/mapas",
+            link: "/revisar",
         });
     }
 

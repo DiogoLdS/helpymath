@@ -37,7 +37,18 @@ function controller() {
                 // Visitante (req.usuario null): todos liberados, sem progresso
                 const mapas = await situacaoDosMapas(req.usuario?.usuarioId ?? null, req.usuario?.admin ?? false);
 
-                res.status(200).json(mapas);
+                // Títulos dos conteúdos de cada mapa: a busca da página de mapas procura neles também
+                const vinculos = await prisma.mapaconteudo.findMany({
+                    select: { mapaId: true, conteudo: { select: { titulo: true } } },
+                    orderBy: { conteudoId: 'asc' }
+                });
+                const titulosPorMapa = new Map();
+                for (const v of vinculos) {
+                    if (!titulosPorMapa.has(v.mapaId)) titulosPorMapa.set(v.mapaId, []);
+                    titulosPorMapa.get(v.mapaId).push(v.conteudo.titulo);
+                }
+
+                res.status(200).json(mapas.map((m) => ({ ...m, conteudos: titulosPorMapa.get(m.mapaId) ?? [] })));
             } catch (error) {
                 console.log(error.message);
                 res.status(500).json("Internal server error!");
