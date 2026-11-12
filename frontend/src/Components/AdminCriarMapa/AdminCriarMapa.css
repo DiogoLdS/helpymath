@@ -405,3 +405,25 @@
     color: #1E7A4C;
     font-weight: 600;
 }
+
+/* Resolução comentada e fonte da questão */
+.rotuloCampoQuestao {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1F2D44;
+}
+
+.rotuloCampoQuestao span {
+    font-weight: 400;
+    color: #4A5A73;
+}
+
+.formCriarMapa input.campoFonte {
+    max-width: 260px;
+}
+
+.previaResolucao {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed #B7C3D6;
+}

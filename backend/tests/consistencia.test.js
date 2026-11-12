@@ -23,3 +23,10 @@ test('pontos por conteúdo e por acerto são os mesmos nos dois lados', () => {
 test('objetivos de estudo do perfil batem', () => {
     assert.deepEqual(frontendPerfil.OBJETIVOS.map((o) => o.chave).sort(), [...backendPerfil.OBJETIVOS].sort());
 });
+
+test('limites da resolução e da fonte das questões batem', async () => {
+    const backend = await import('../services/resolucao.js');
+    const frontend = await import('../../frontend/src/Components/AdminCriarMapa/limitesQuestao.js');
+    assert.equal(frontend.MAX_RESOLUCAO, backend.MAX_RESOLUCAO);
+    assert.equal(frontend.MAX_FONTE, backend.MAX_FONTE);
+});

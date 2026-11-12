@@ -10,13 +10,14 @@ mock.module(new URL('../services/adapter.js', import.meta.url).href, { exports: 
             consulta = argumentos;
             const { where } = argumentos;
             pedido = where;
-            const questao = (questaoId, mapa) => ({
+            const questao = (questaoId, mapa, resolucaoVistaEm = null) => ({
+                resolucaoVistaEm,
                 respondidaEm: new Date(),
                 questao: { questaoId, enunciado: `Questão ${questaoId}`, alternativa: [{ id: 1, letra: 'a', texto: 'x' }], mapaconceitual: mapa },
             });
             const segundo = { mapaId: 1, nome: 'Frações', nivel: 'basico', ordem: 5 };
             const primeiro = { mapaId: 2, nome: 'Números', nivel: 'basico', ordem: 1 };
-            return [questao(10, segundo), questao(11, primeiro), questao(12, segundo)];
+            return [questao(10, segundo, new Date()), questao(11, primeiro), questao(12, segundo)];
         },
     },
 } } });
@@ -40,4 +41,12 @@ test('a consulta não pede o campo "correta" das alternativas (o aluno refaz a q
     await questoesParaRevisar(7);
     const camposDaAlternativa = consulta.select.questao.select.alternativa.select;
     assert.deepEqual(Object.keys(camposDaAlternativa).sort(), ['id', 'letra', 'texto']);
+});
+
+test('questão com resolução vista há pouco vem com a data em que libera; a resolução em si não vem', async () => {
+    const r = await questoesParaRevisar(7);
+    const fracoes = r.mapas.find((m) => m.nome === 'Frações');
+    assert.ok(fracoes.questoes[0].liberadaEm instanceof Date);
+    assert.equal(fracoes.questoes[1].liberadaEm, null);
+    assert.ok(!('resolucao' in consulta.select.questao.select), 'a resolução não é buscada na revisão');
 });

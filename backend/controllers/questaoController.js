@@ -1,5 +1,6 @@
 import prisma from '../services/adapter.js';
 import { progressoNoMapa, resultadoQuestoes, situacaoDoMapa } from '../services/progresso.js';
+import { liberadaEm, mensagemEspera, validarCamposQuestao } from '../services/resolucao.js';
 
 function controller() {
     return {
@@ -9,13 +10,17 @@ function controller() {
 
         async criarQuestao(req, res) {
             try {
-                const { mapaId, data, enunciado } = req.body;
+                const { mapaId, data, enunciado, resolucao, fonte } = req.body;
+
+                const campos = validarCamposQuestao({ resolucao, fonte });
+                if (campos.erro) return res.status(400).json({ error: campos.erro });
 
                 const novaQuestao = await prisma.questao.create({
                     data: {
                         mapaId: parseInt(mapaId),
                         data: new Date(data),
-                        enunciado: enunciado
+                        enunciado: enunciado,
+                        ...campos.dados
                     }
                 });
 
@@ -28,13 +33,17 @@ function controller() {
         async atualizarQuestao(req, res) {
             try {
                 const { id } = req.params;
-                const { enunciado, data } = req.body;
+                const { enunciado, data, resolucao, fonte } = req.body;
+
+                const campos = validarCamposQuestao({ resolucao, fonte });
+                if (campos.erro) return res.status(400).json({ error: campos.erro });
 
                 const questaoAtualizada = await prisma.questao.update({
                     where: { questaoId: parseInt(id) },
                     data: {
                         ...(enunciado !== undefined && { enunciado }),
-                        ...(data !== undefined && { data: new Date(data) })
+                        ...(data !== undefined && { data: new Date(data) }),
+                        ...campos.dados
                     }
                 });
 
@@ -98,6 +107,8 @@ function controller() {
                         questaoId: true,
                         enunciado: true,
                         data: true,
+                        fonte: true,
+                        resolucao: true,
                         alternativa: {
                             select: {
                                 id: true,
@@ -108,7 +119,11 @@ function controller() {
                     }
                 });
 
-                res.status(200).json(questoes);
+                // A resolução não vai junto (entregaria a resposta): só se a questão tem uma
+                res.status(200).json(questoes.map(({ resolucao, ...questao }) => ({
+                    ...questao,
+                    temResolucao: Boolean(resolucao)
+                })));
             } catch (error) {
                 console.log(error.message);
                 res.status(500).json("Internal server error!");
@@ -127,6 +142,8 @@ function controller() {
                         questaoId: true,
                         enunciado: true,
                         data: true,
+                        resolucao: true,
+                        fonte: true,
                         alternativa: {
                             orderBy: { letra: 'asc' },
                             select: {
@@ -188,9 +205,13 @@ function controller() {
                     const correta = alternativaEscolhida.correta
                         ? await prisma.alternativa.findFirst({ where: { questaoId, correta: true } })
                         : null;
+                    const questaoVisitante = alternativaEscolhida.correta
+                        ? await prisma.questao.findUnique({ where: { questaoId }, select: { resolucao: true } })
+                        : null;
                     return res.status(200).json({
                         correto: alternativaEscolhida.correta,
                         letraCorreta: correta ? correta.letra : null,
+                        resolucao: questaoVisitante?.resolucao ?? null,
                         resultado: null,
                         mapaConcluido: false,
                         proximo: null,
@@ -201,8 +222,18 @@ function controller() {
                 const { usuarioId, admin } = req.usuario;
                 const questao = await prisma.questao.findUnique({
                     where: { questaoId },
-                    select: { mapaId: true }
+                    select: { mapaId: true, resolucao: true }
                 });
+
+                // Quem viu a resolução depois de errar espera um pouco antes de refazer (ver services/resolucao.js)
+                const anterior = await prisma.usuarioquestao.findUnique({
+                    where: { usuarioId_questaoId: { usuarioId, questaoId } },
+                    select: { resolucaoVistaEm: true }
+                });
+                const libera = liberadaEm(anterior?.resolucaoVistaEm);
+                if (libera && !admin) {
+                    return res.status(409).json({ error: mensagemEspera(libera), liberadaEm: libera });
+                }
 
                 // Só responde quem já concluiu os conteúdos do mapa (admin passa direto)
                 if (!admin) {
@@ -216,7 +247,7 @@ function controller() {
                 const correto = alternativaEscolhida.correta;
                 await prisma.usuarioquestao.upsert({
                     where: { usuarioId_questaoId: { usuarioId, questaoId } },
-                    update: { alternativaId: alternativaEscolhida.id, correta: correto, respondidaEm: new Date() },
+                    update: { alternativaId: alternativaEscolhida.id, correta: correto, respondidaEm: new Date(), resolucaoVistaEm: null },
                     create: { usuarioId, questaoId, alternativaId: alternativaEscolhida.id, correta: correto }
                 });
 
@@ -231,9 +262,61 @@ function controller() {
                     correto,
                     // Se errou, não entrega a resposta certa: o aluno pode refazer a questão
                     letraCorreta: correto && alternativaCorreta ? alternativaCorreta.letra : null,
+                    // Acertou: a resolução já vem junto, pra conferir o raciocínio
+                    resolucao: correto ? questao.resolucao : null,
                     resultado,
                     mapaConcluido: situacao?.concluido ?? false,
                     proximo: situacao?.proximo ?? null
+                });
+            } catch (error) {
+                console.log(error.message);
+                res.status(500).json("Internal server error!");
+            }
+        },
+        // Mostra a resposta certa e a resolução de uma questão que o aluno já respondeu.
+        // Se ele tinha errado, a questão fica um tempo sem poder ser refeita (ver services/resolucao.js).
+        // Visitante e admin veem direto (nada fica salvo / o admin precisa conferir).
+        async verResolucao(req, res) {
+            try {
+                const questaoId = parseInt(req.params.id);
+                if (Number.isNaN(questaoId)) return res.status(400).json({ error: "Questão inválida" });
+
+                const questao = await prisma.questao.findUnique({
+                    where: { questaoId },
+                    select: {
+                        resolucao: true,
+                        alternativa: { where: { correta: true }, select: { letra: true }, take: 1 }
+                    }
+                });
+                if (!questao) return res.status(404).json({ error: "Questão não encontrada" });
+
+                let liberada = null;
+                if (req.usuario && !req.usuario.admin) {
+                    const { usuarioId } = req.usuario;
+                    const resposta = await prisma.usuarioquestao.findUnique({
+                        where: { usuarioId_questaoId: { usuarioId, questaoId } },
+                        select: { correta: true, resolucaoVistaEm: true }
+                    });
+                    if (!resposta) {
+                        return res.status(403).json({ error: "Responda a questão antes de ver a resolução" });
+                    }
+                    // Só conta a primeira vez (abrir de novo não empurra o prazo pra frente)
+                    if (!resposta.correta && !resposta.resolucaoVistaEm) {
+                        const agora = new Date();
+                        await prisma.usuarioquestao.update({
+                            where: { usuarioId_questaoId: { usuarioId, questaoId } },
+                            data: { resolucaoVistaEm: agora }
+                        });
+                        liberada = liberadaEm(agora);
+                    } else if (!resposta.correta) {
+                        liberada = liberadaEm(resposta.resolucaoVistaEm);
+                    }
+                }
+
+                res.status(200).json({
+                    resolucao: questao.resolucao,
+                    letraCorreta: questao.alternativa[0]?.letra ?? null,
+                    liberadaEm: liberada
                 });
             } catch (error) {
                 console.log(error.message);

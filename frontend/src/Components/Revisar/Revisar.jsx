@@ -10,6 +10,8 @@ import Carimbo from "../Carimbo/Carimbo.jsx";
 import { TextoComFormulas } from "../Formulas/Formula.jsx";
 import { formulasNaLinha } from "../Formulas/formulaUtils.js";
 import niveis from "../../data/niveis.js";
+import RespostaQuestao from "../Questoes/RespostaQuestao.jsx";
+import { quandoLibera } from "../Questoes/resolucaoUtils.js";
 import "../Questoes/Questoes.css";
 import "./Revisar.css";
 
@@ -25,14 +27,24 @@ const Revisar = () => {
     const [revisao, setRevisao] = useState(null);
     const [erro, setErro] = useState("");
     const [respostas, setRespostas] = useState({});     // { questaoId: alternativaId }
-    const [resultados, setResultados] = useState({});   // { questaoId: { correto } }
+    const [resultados, setResultados] = useState({});   // { questaoId: { correto, revelada, resolucao, letraCorreta, liberadaEm } }
     const [respondendo, setRespondendo] = useState(null);
     const [mapasConcluidos, setMapasConcluidos] = useState([]); // mapas concluídos nesta revisão
 
     useEffect(() => {
         if (visitante) return;
         api.get("/revisao", { headers: cabecalhoAuth() })
-            .then((resposta) => setRevisao(resposta.data))
+            .then((resposta) => {
+                setRevisao(resposta.data);
+                // Questões cuja resolução o aluno viu há pouco: ficam esperando o prazo pra refazer
+                const esperando = {};
+                for (const mapa of resposta.data.mapas) {
+                    for (const q of mapa.questoes) {
+                        if (q.liberadaEm) esperando[q.questaoId] = { correto: false, revelada: false, liberadaEm: q.liberadaEm };
+                    }
+                }
+                setResultados(esperando);
+            })
             .catch((error) => {
                 if (error.response?.status === 401) {
                     navigate("/login");
@@ -50,14 +62,17 @@ const Revisar = () => {
         setRespondendo(questaoId);
         try {
             const resposta = await api.post(`/questoes/${questaoId}/responder`, { alternativaId }, { headers: cabecalhoAuth() });
-            const { correto, mapaConcluido, proximo } = resposta.data;
-            setResultados((atual) => ({ ...atual, [questaoId]: { correto } }));
+            const { correto, resolucao, mapaConcluido, proximo } = resposta.data;
+            setResultados((atual) => ({ ...atual, [questaoId]: { correto, revelada: correto, resolucao: resolucao ?? null, liberadaEm: null } }));
 
             if (mapaConcluido && !mapasConcluidos.some((m) => m.mapaId === mapa.mapaId)) {
                 setMapasConcluidos((atual) => [...atual, { mapaId: mapa.mapaId, nome: mapa.nome, proximo, em: new Date() }]);
             }
         } catch (error) {
-            window.alert(error.response?.data?.error ?? "Não foi possível enviar sua resposta. Tente de novo.");
+            const libera = error.response?.status === 409 ? error.response.data?.liberadaEm : null;
+            window.alert(libera
+                ? `Você viu a resolução desta questão. Pode refazer ${quandoLibera(libera)}.`
+                : error.response?.data?.error ?? "Não foi possível enviar sua resposta. Tente de novo.");
             console.log(error.message);
         } finally {
             setRespondendo(null);
@@ -72,6 +87,10 @@ const Revisar = () => {
         };
         setResultados(semEssa);
         setRespostas(semEssa);
+    };
+
+    const revelar = (questaoId, dados) => {
+        setResultados((atual) => ({ ...atual, [questaoId]: { ...atual[questaoId], ...dados } }));
     };
 
     const corrigidasAgora = Object.values(resultados).filter((r) => r.correto).length;
@@ -145,6 +164,7 @@ const Revisar = () => {
                                         let classe = "alternativa";
                                         if (selecionada) classe += " selecionada";
                                         if (resultado && selecionada) classe += resultado.correto ? " correta" : " incorreta";
+                                        else if (resultado?.revelada && resultado.letraCorreta === alternativa.letra) classe += " correta";
                                         return (
                                             <button
                                                 type="button"
@@ -168,15 +188,19 @@ const Revisar = () => {
                                     >
                                         {respondendo === questao.questaoId ? <Carregando texto="Corrigindo" /> : "Responder"}
                                     </button>
-                                ) : resultado.correto ? (
-                                    <p className="feedback correto">Agora foi! Resposta correta.</p>
                                 ) : (
-                                    <div className="feedback-linha">
-                                        <p className="feedback incorreto">Ainda não. Que tal rever o conteúdo do mapa?</p>
-                                        <button type="button" className="botao-responder" onClick={() => tentarDeNovo(questao.questaoId)}>
-                                            Tentar de novo
-                                        </button>
-                                    </div>
+                                    <RespostaQuestao
+                                        questaoId={questao.questaoId}
+                                        resultado={resultado}
+                                        textos={{
+                                            correto: "Agora foi! Resposta correta.",
+                                            incorreto: resultado.liberadaEm && !resultado.revelada && !respostas[questao.questaoId]
+                                                ? "Você errou esta questão."
+                                                : "Ainda não. Que tal rever o conteúdo do mapa?",
+                                        }}
+                                        onTentarDeNovo={() => tentarDeNovo(questao.questaoId)}
+                                        onRevelar={(dados) => revelar(questao.questaoId, dados)}
+                                    />
                                 )}
                             </article>
                         );

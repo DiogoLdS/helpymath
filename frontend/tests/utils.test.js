@@ -149,3 +149,13 @@ test('perfil: iniciais e pontos', () => {
     assert.equal(iniciais('  '), '?');
     assert.equal(pontos({ conteudosConcluidos: 3, acertos: 4 }), 50);
 });
+
+// ---------- Resolução das questões ----------
+
+test('resolução: diz quando a questão libera pra refazer', async () => {
+    const { quandoLibera } = await import('../src/Components/Questoes/resolucaoUtils.js');
+    const agora = new Date(2026, 10, 12, 15, 0);
+    assert.match(quandoLibera(new Date(2026, 10, 13, 15, 0), agora), /^amanhã às 15:00$/);
+    assert.match(quandoLibera(new Date(2026, 10, 12, 18, 30), agora), /^hoje às 18:30$/);
+    assert.match(quandoLibera(new Date(2026, 10, 20, 9, 5), agora), /^em 20\/11\/2026 às 09:05$/);
+});

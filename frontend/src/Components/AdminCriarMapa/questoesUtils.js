@@ -1,13 +1,17 @@
 // Funções de apoio das questões (fora do QuestoesForm.jsx porque arquivo de componente só deve exportar componentes)
 //
-// Cada questão: { idTemp, enunciado, alternativas: [{ idTemp, texto }], indiceCorreta }
+// Cada questão: { idTemp, enunciado, alternativas: [{ idTemp, texto }], indiceCorreta, resolucao, fonte }
+// resolucao: explicação passo a passo que o aluno vê depois de responder (opcional)
+// fonte: de onde veio a questão, ex: "ENEM 2023" (opcional)
 // A letra (A, B, C...) não é guardada: sai da posição da alternativa na lista.
 // Questões e alternativas que já estão no banco trazem também questaoId / alternativaId.
 
 import api from "../../../services/api.js";
+import { MAX_FONTE, MAX_RESOLUCAO } from "./limitesQuestao.js";
 
 export const LETRAS = ["A", "B", "C", "D", "E"];
 export const MIN_ALTERNATIVAS = 2;
+export { MAX_FONTE, MAX_RESOLUCAO } from "./limitesQuestao.js";
 
 let proximoIdTemporario = 1;
 
@@ -19,6 +23,8 @@ export const novaQuestao = () => ({
     // Começa com 4 alternativas (A-D), que é o mais comum; dá pra adicionar a E ou tirar
     alternativas: [novaAlternativa(), novaAlternativa(), novaAlternativa(), novaAlternativa()],
     indiceCorreta: null,
+    resolucao: "",
+    fonte: "",
 });
 
 // Devolve a mensagem do primeiro problema encontrado, ou "" se estiver tudo certo
@@ -37,6 +43,14 @@ export function validarQuestoes(questoes) {
 
         if (q.indiceCorreta === null) {
             return `Marque qual é a alternativa correta da questão ${numero}.`;
+        }
+
+        if (q.resolucao.trim().length > MAX_RESOLUCAO) {
+            return `A resolução da questão ${numero} pode ter no máximo ${MAX_RESOLUCAO} caracteres.`;
+        }
+
+        if (q.fonte.trim().length > MAX_FONTE) {
+            return `A fonte da questão ${numero} pode ter no máximo ${MAX_FONTE} caracteres.`;
         }
     }
 
@@ -58,6 +72,8 @@ export function questaoDoBanco(q) {
         })),
         // Se nenhuma estiver marcada no banco, o admin vai ter que marcar antes de salvar
         indiceCorreta: indiceCorreta === -1 ? null : indiceCorreta,
+        resolucao: q.resolucao ?? "",
+        fonte: q.fonte ?? "",
     };
 }
 
@@ -70,6 +86,8 @@ export async function criarQuestaoComAlternativas(mapaId, questao, headers) {
             // O banco pede uma data pra questão; usa o dia em que ela foi cadastrada
             data: new Date().toISOString().slice(0, 10),
             enunciado: questao.enunciado.trim(),
+            resolucao: questao.resolucao.trim(),
+            fonte: questao.fonte.trim(),
         },
         { headers }
     );

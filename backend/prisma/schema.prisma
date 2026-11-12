@@ -48,12 +48,14 @@ model mapaconteudo {
 
 model questao {
   mapaId         Int
-  data           DateTime       @db.Date
-  enunciado      String         @db.Text
-  questaoId      Int            @id @default(autoincrement())
+  data           DateTime         @db.Date
+  enunciado      String           @db.Text
+  resolucao      String?          @db.Text
+  fonte          String?          @db.VarChar(60)
+  questaoId      Int              @id @default(autoincrement())
   alternativa    alternativa[]
   usuarioquestao usuarioquestao[]
-  mapaconceitual mapaconceitual @relation(fields: [mapaId], references: [mapaId], map: "Questao_mapaId_fkey")
+  mapaconceitual mapaconceitual   @relation(fields: [mapaId], references: [mapaId], map: "Questao_mapaId_fkey")
 
   @@index([mapaId], map: "Questao_mapaId_idx")
 }
@@ -80,13 +82,13 @@ model usuario {
 }
 
 model usuarioconteudo {
-  usuarioId  Int
-  conteudoId Int
-  concluido  Boolean  @default(false)
+  usuarioId   Int
+  conteudoId  Int
+  concluido   Boolean   @default(false)
   // Quando o aluno marcou como concluído (histórico de estudos, sequência de dias e meta da semana)
   concluidoEm DateTime?
-  conteudo   conteudo @relation(fields: [conteudoId], references: [conteudoId], map: "UsuarioConteudo_conteudoId_fkey")
-  usuario    usuario  @relation(fields: [usuarioId], references: [usuarioId], map: "UsuarioConteudo_usuarioId_fkey")
+  conteudo    conteudo  @relation(fields: [conteudoId], references: [conteudoId], map: "UsuarioConteudo_conteudoId_fkey")
+  usuario     usuario   @relation(fields: [usuarioId], references: [usuarioId], map: "UsuarioConteudo_usuarioId_fkey")
 
   @@id([usuarioId, conteudoId])
   @@index([conteudoId], map: "UsuarioConteudo_conteudoId_idx")
@@ -96,13 +98,14 @@ model usuarioconteudo {
 // alternativaId não tem chave estrangeira de propósito: se o admin apagar a alternativa, a resposta continua valendo.
 // Apagar a questão apaga as respostas dela junto (onDelete: Cascade).
 model usuarioquestao {
-  usuarioId     Int
-  questaoId     Int
-  alternativaId Int
-  correta       Boolean
-  respondidaEm  DateTime @default(now())
-  usuario       usuario  @relation(fields: [usuarioId], references: [usuarioId], map: "UsuarioQuestao_usuarioId_fkey")
-  questao       questao  @relation(fields: [questaoId], references: [questaoId], onDelete: Cascade, map: "UsuarioQuestao_questaoId_fkey")
+  usuarioId        Int
+  questaoId        Int
+  alternativaId    Int
+  correta          Boolean
+  respondidaEm     DateTime  @default(now())
+  resolucaoVistaEm DateTime?
+  usuario          usuario   @relation(fields: [usuarioId], references: [usuarioId], map: "UsuarioQuestao_usuarioId_fkey")
+  questao          questao   @relation(fields: [questaoId], references: [questaoId], onDelete: Cascade, map: "UsuarioQuestao_questaoId_fkey")
 
   @@id([usuarioId, questaoId])
   @@index([questaoId], map: "UsuarioQuestao_questaoId_idx")

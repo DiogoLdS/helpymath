@@ -13,6 +13,7 @@ const questaoController = controller();
 // Visitante (sem conta) também pode fazer as questões: a resposta é corrigida, mas não fica salva
 routes.get('/mapas/:mapaId/questoes', authOpcional, questaoController.listarQuestoesPorMapa);
 routes.post('/questoes/:id/responder', authOpcional, questaoController.responderQuestao);
+routes.post('/questoes/:id/resolucao', authOpcional, questaoController.verResolucao);
 
 // Revisar erros: as questões erradas de todos os mapas num lugar só (responde pela rota normal acima)
 routes.get('/revisao', authUser, async (req, res) => {

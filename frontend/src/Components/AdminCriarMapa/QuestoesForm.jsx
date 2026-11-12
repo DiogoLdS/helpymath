@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { LETRAS, MIN_ALTERNATIVAS, novaAlternativa, novaQuestao } from "./questoesUtils.js";
+import { LETRAS, MAX_FONTE, MAX_RESOLUCAO, MIN_ALTERNATIVAS, novaAlternativa, novaQuestao } from "./questoesUtils.js";
 import FormulaEditor from "../Formulas/FormulaEditor.jsx";
 import { TextoComFormulas } from "../Formulas/Formula.jsx";
 import { temFormula } from "../Formulas/formulaUtils.js";
@@ -8,12 +8,12 @@ import { temFormula } from "../Formulas/formulaUtils.js";
 // Quem guarda a lista é o MapaForm; aqui só se mostra e altera.
 //
 // Fórmulas (KaTeX): cada questão tem um editor de fórmulas. Ele insere no campo em que o cursor
-// estava por último (o enunciado ou uma das alternativas), igual à explicação dos conteúdos.
+// estava por último (o enunciado, uma das alternativas ou a resolução), igual à explicação dos conteúdos.
 
 const QuestoesForm = ({ questoes, setQuestoes, enviando }) => {
     // Questões com o editor de fórmulas aberto: { idTemp: true }
     const [formulaAberta, setFormulaAberta] = useState({});
-    // Campo onde a fórmula vai entrar, por questão: { idTemp: "enunciado" | idTemp da alternativa }
+    // Campo onde a fórmula vai entrar, por questão: { idTemp: "enunciado" | "resolucao" | idTemp da alternativa }
     const [alvo, setAlvo] = useState({});
     // Os campos de verdade (pra saber a posição do cursor): chave "questao:campo"
     const campos = useRef({});
@@ -29,9 +29,11 @@ const QuestoesForm = ({ questoes, setQuestoes, enviando }) => {
     const inserirFormula = (questao, trecho) => {
         const campoAlvo = alvo[questao.idTemp] ?? "enunciado";
         const alternativa = questao.alternativas.find((a) => a.idTemp === campoAlvo);
-        const ehEnunciado = campoAlvo === "enunciado" || !alternativa;
-        const textoAtual = ehEnunciado ? questao.enunciado : alternativa.texto;
-        const chave = `${questao.idTemp}:${ehEnunciado ? "enunciado" : campoAlvo}`;
+        // Enunciado e resolução são textos de várias linhas; alternativa é uma linha só
+        const campoTexto = campoAlvo === "resolucao" ? "resolucao" : (!alternativa ? "enunciado" : null);
+        const ehEnunciado = campoTexto !== null;
+        const textoAtual = ehEnunciado ? questao[campoTexto] : alternativa.texto;
+        const chave = `${questao.idTemp}:${ehEnunciado ? campoTexto : campoAlvo}`;
         const el = campos.current[chave];
 
         const inicio = el ? el.selectionStart : textoAtual.length;
@@ -41,7 +43,7 @@ const QuestoesForm = ({ questoes, setQuestoes, enviando }) => {
         const novoTexto = textoAtual.slice(0, inicio) + trechoFinal + textoAtual.slice(fim);
 
         if (ehEnunciado) {
-            atualizarQuestao(questao.idTemp, { enunciado: novoTexto });
+            atualizarQuestao(questao.idTemp, { [campoTexto]: novoTexto });
         } else {
             atualizarAlternativa(questao, alternativa.idTemp, novoTexto);
         }
@@ -57,6 +59,7 @@ const QuestoesForm = ({ questoes, setQuestoes, enviando }) => {
 
     // Nome do campo onde a fórmula vai entrar, pro botão ("Inserir no enunciado", "Inserir na alternativa B")
     const nomeDoAlvo = (questao) => {
+        if (alvo[questao.idTemp] === "resolucao") return "Inserir na resolução";
         const indice = questao.alternativas.findIndex((a) => a.idTemp === alvo[questao.idTemp]);
         return indice >= 0 ? `Inserir na alternativa ${LETRAS[indice]}` : "Inserir no enunciado";
     };
@@ -174,6 +177,35 @@ const QuestoesForm = ({ questoes, setQuestoes, enviando }) => {
                         )}
                     </fieldset>
 
+                    <label className="rotuloCampoQuestao" htmlFor={`resolucao-${questao.idTemp}`}>
+                        Resolução comentada <span>(opcional)</span>
+                    </label>
+                    <textarea
+                        id={`resolucao-${questao.idTemp}`}
+                        ref={guardarCampo(questao, "resolucao")}
+                        value={questao.resolucao}
+                        maxLength={MAX_RESOLUCAO}
+                        onChange={(e) => atualizarQuestao(questao.idTemp, { resolucao: e.target.value })}
+                        onFocus={() => marcarAlvo(questao, "resolucao")}
+                        placeholder="Explique o caminho até a resposta, passo a passo. O aluno vê depois de responder."
+                        rows={4}
+                        disabled={enviando}
+                    />
+
+                    <label className="rotuloCampoQuestao" htmlFor={`fonte-${questao.idTemp}`}>
+                        Fonte <span>(opcional)</span>
+                    </label>
+                    <input
+                        type="text"
+                        id={`fonte-${questao.idTemp}`}
+                        className="campoFonte"
+                        value={questao.fonte}
+                        maxLength={MAX_FONTE}
+                        onChange={(e) => atualizarQuestao(questao.idTemp, { fonte: e.target.value })}
+                        placeholder="Ex: ENEM 2023"
+                        disabled={enviando}
+                    />
+
                     <label className="opcaoFormula">
                         <input
                             type="checkbox"
@@ -187,19 +219,19 @@ const QuestoesForm = ({ questoes, setQuestoes, enviando }) => {
                     {formulaAberta[questao.idTemp] && (
                         <>
                             <p className="dicaTipo">
-                                Clique no enunciado ou numa alternativa e depois monte a fórmula: ela entra onde o cursor estava.
+                                Clique no enunciado, numa alternativa ou na resolução e depois monte a fórmula: ela entra onde o cursor estava.
                             </p>
                             <FormulaEditor
                                 onInserir={(trecho) => inserirFormula(questao, trecho)}
                                 disabled={enviando}
                                 rotuloInserir={nomeDoAlvo(questao)}
-                                permitirBloco={nomeDoAlvo(questao) === "Inserir no enunciado"}
+                                permitirBloco={!nomeDoAlvo(questao).startsWith("Inserir na alternativa")}
                             />
                         </>
                     )}
 
                     {/* Como o aluno vai ver a questão, com as fórmulas desenhadas */}
-                    {(temFormula(questao.enunciado) || questao.alternativas.some((a) => temFormula(a.texto))) && (
+                    {(temFormula(questao.enunciado) || temFormula(questao.resolucao) || questao.alternativas.some((a) => temFormula(a.texto))) && (
                         <div className="previaExplicacao">
                             <span>Pré-visualização da questão</span>
                             <div>
@@ -211,6 +243,11 @@ const QuestoesForm = ({ questoes, setQuestoes, enviando }) => {
                                         </li>
                                     ))}
                                 </ol>
+                                {questao.resolucao.trim() && (
+                                    <div className="previaResolucao">
+                                        <strong>Resolução:</strong> <TextoComFormulas texto={questao.resolucao} />
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}

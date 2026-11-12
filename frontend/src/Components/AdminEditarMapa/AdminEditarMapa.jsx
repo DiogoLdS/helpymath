@@ -169,12 +169,14 @@ const AdminEditarMapa = () => {
 
                 setEtapaAtual("Atualizando questões...");
 
-                if (questao.enunciado.trim() !== original.enunciado) {
-                    await api.patch(
-                        `/questoes/${questao.questaoId}`,
-                        { enunciado: questao.enunciado.trim() },
-                        { headers }
-                    );
+                // Enunciado, resolução e fonte: manda só o que mudou
+                const mudancas = {};
+                if (questao.enunciado.trim() !== original.enunciado) mudancas.enunciado = questao.enunciado.trim();
+                if (questao.resolucao.trim() !== (original.resolucao ?? "")) mudancas.resolucao = questao.resolucao.trim();
+                if (questao.fonte.trim() !== (original.fonte ?? "")) mudancas.fonte = questao.fonte.trim();
+
+                if (Object.keys(mudancas).length > 0) {
+                    await api.patch(`/questoes/${questao.questaoId}`, mudancas, { headers });
                 }
 
                 // Alternativas removidas

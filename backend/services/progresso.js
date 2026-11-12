@@ -1,5 +1,6 @@
 import prisma from './adapter.js';
 import { ORDEM_DOS_MAPAS } from './ordemMapas.js';
+import { liberadaEm } from './resolucao.js';
 
 // Tipo de conteúdo que o aluno precisa "Marcar como concluído": o botão explicativo (tipo 1),
 // que abre a janela com a explicação. Indicadores (tipo 2) e links (tipo 3) não contam.
@@ -37,10 +38,14 @@ export async function resultadoQuestoes(mapaId, usuarioId) {
     });
     const ids = questoes.map((q) => q.questaoId);
 
-    const respostas = await prisma.usuarioquestao.findMany({
+    const respostas = (await prisma.usuarioquestao.findMany({
         where: { usuarioId: usuarioId, questaoId: { in: ids } },
-        select: { questaoId: true, alternativaId: true, correta: true }
-    });
+        select: { questaoId: true, alternativaId: true, correta: true, resolucaoVistaEm: true }
+    })).map(({ resolucaoVistaEm, ...resposta }) => ({
+        ...resposta,
+        // Viu a resolução depois de errar: data em que pode refazer (null = já pode)
+        liberadaEm: liberadaEm(resolucaoVistaEm)
+    }));
     const acertos = respostas.filter((r) => r.correta).length;
 
     return {
