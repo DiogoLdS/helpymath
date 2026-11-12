@@ -92,13 +92,15 @@
     opacity: 1;
 }
 
+/* Título e texto menores que os dos botões (26px): o indicador costuma ter mais texto */
 .mapaIndicador strong {
+    font-size: 20px;
     font-weight: 600;
 }
 
 .mapaIndicador > div {
     width: auto;
-    font-size: 20px;
+    font-size: 15px;
     font-weight: 400;
     white-space: pre-line;
 }

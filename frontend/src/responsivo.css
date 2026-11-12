@@ -178,8 +178,12 @@
         font-size: 14px;
     }
 
+    .App .mapaIndicador strong {
+        font-size: 13px;
+    }
+
     .App .mapaIndicador > div {
-        font-size: 15px;
+        font-size: 12px;
     }
 
     .App .mapaAcoesTopo {
@@ -428,5 +432,14 @@
     .App .mapaNo {
         font-size: 15px;
         overflow-wrap: break-word;
+    }
+
+    /* Indicador explicativo: um pouco menor que os botões (15px) */
+    .App .mapaIndicador strong {
+        font-size: 13px;
+    }
+
+    .App .mapaIndicador > div {
+        font-size: 12px;
     }
 }
