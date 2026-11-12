@@ -496,6 +496,7 @@
 .cronogramaDia input:focus {
     outline: none;
     border-color: var(--azul-escuro);
+    box-shadow: 0 0 0 3px rgba(43, 76, 126, 0.35);
 }
 
 .cronogramaAtividade {
@@ -516,7 +517,7 @@
 }
 
 .cronogramaSem {
-    color: #8A919B;
+    color: #646B75;
     font-weight: 500;
 }
 
@@ -693,7 +694,7 @@
     gap: 4px;
     padding: 14px 10px;
     text-align: center;
-    color: #8A919B;
+    color: #646B75;
     background-color: #F1F1EE;
     border: 2px dashed #B0B5BC;
     border-radius: 4px;
@@ -720,7 +721,7 @@
     font-size: 22px;
     font-weight: 700;
     font-style: italic;
-    color: #9AA1AB;
+    color: #646B75;
     background-color: #E4E6EA;
     border: 2px solid #B0B5BC;
     border-radius: 6px;

@@ -193,11 +193,13 @@ const MapaForm = ({
                                         atualizarConteudo(conteudo.idTemp, "titulo", e.target.value)
                                     }
                                     placeholder="Título do conteúdo"
+                                    aria-label={`Título do conteúdo ${index + 1}`}
                                     disabled={enviando}
                                 />
 
                                 <select
                                     value={conteudo.tipo}
+                                    aria-label={`Tipo do conteúdo ${index + 1}`}
                                     onChange={(e) =>
                                         atualizarConteudo(conteudo.idTemp, "tipo", e.target.value)
                                     }
@@ -239,6 +241,7 @@ const MapaForm = ({
                                         placeholder={tipo === 2
                                             ? "Texto curto que fica sempre visível no mapa (ex: uma fórmula). Pode ficar vazio se o título já explicar."
                                             : "Explicação que aparece quando o aluno clica no conteúdo"}
+                                        aria-label={tipo === 2 ? `Texto do conteúdo ${index + 1}` : `Explicação do conteúdo ${index + 1}`}
                                         rows={tipo === 2 ? 2 : 5}
                                         disabled={enviando}
                                     />

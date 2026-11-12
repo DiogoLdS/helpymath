@@ -18,7 +18,7 @@ const PaginaTermos = () => {
             <article className="ptFolha">
                 <h1>Termos de uso e privacidade</h1>
                 <p className="ptAtualizado">Última atualização: novembro de 2026</p>
-                <TextoTermos />
+                <TextoTermos nivel={2} />
             </article>
 
             <div className="ptAcoes">

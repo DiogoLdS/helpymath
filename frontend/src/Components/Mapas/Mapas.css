@@ -62,7 +62,7 @@
 
 .mapas-vazio {
     font-size: 14px;
-    color: #567EBB;
+    color: #3D6096;
 }
 
 /* =====================================================================
@@ -317,7 +317,7 @@
 .trilhaVazia {
     margin-top: 16px;
     font-size: 14px;
-    color: #567EBB;
+    color: #3D6096;
 }
 
 /* O caminho em si: os mapas são posicionados (left/top) pelo Trilha.jsx */
@@ -632,16 +632,6 @@ a.trilhaMapa:active .trilhaFicha {
 
 /* ---------- Busca de mapas ---------- */
 
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    border: 0;
-}
 
 .mapas-busca {
     display: flex;

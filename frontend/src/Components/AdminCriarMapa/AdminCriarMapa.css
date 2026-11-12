@@ -44,7 +44,7 @@
 .subtitulo {
     margin-bottom: 24px;
     font-size: 15px;
-    color: #567EBB;
+    color: #3D6096;
 }
 
 .mensagemAdmin {
@@ -122,7 +122,7 @@
 .vazio {
     padding: 16px;
     font-size: 14px;
-    color: #567EBB;
+    color: #3D6096;
     background-color: #F4F6FA;
     border: 2px dashed #567EBB;
     border-radius: 12px;
@@ -188,7 +188,7 @@
 .previaExplicacao > span {
     font-size: 12px;
     font-weight: 700;
-    color: #567EBB;
+    color: #3D6096;
 }
 
 /* ---------- Questões do mapa ---------- */
@@ -253,7 +253,7 @@
     height: 32px;
     flex-shrink: 0;
     font-size: 18px;
-    color: #C0392B;
+    color: #A93226;
     background: transparent;
     border: 1px solid #D7A39E;
     border-radius: 8px;
@@ -269,7 +269,7 @@
     align-self: flex-start;
     padding: 6px 12px;
     font-size: 13px;
-    color: #567EBB;
+    color: #3D6096;
     background: transparent;
     border: 1px dashed #567EBB;
     border-radius: 8px;
@@ -311,7 +311,7 @@
 
 .botaoSecundario {
     padding: 8px 16px;
-    background-color: #567EBB;
+    background-color: #3D6096;
     color: #FFFFFF;
     font-size: 14px;
     font-weight: 600;
@@ -379,7 +379,7 @@
 .mensagemEtapa {
     margin-top: 8px;
     font-size: 14px;
-    color: #567EBB;
+    color: #3D6096;
 }
 
 /* ---------- Telas menores ---------- */

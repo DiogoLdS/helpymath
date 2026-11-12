@@ -9,6 +9,7 @@ import { linkExterno, linkInterno } from "../../utils/linkDestino.js";
 import "./MapaConceitual.css";
 import useTituloPagina from "../../utils/useTituloPagina.js";
 import Carregando from "../Carregando/Carregando.jsx";
+import Janela from "../Janela/Janela.jsx";
 
 // Nome de cada tipo de conteúdo na versão impressa (mesmos tipos do MapaForm)
 const ROTULOS_TIPO = {
@@ -318,7 +319,7 @@ const MapaConceitual = () => {
                     ))}
                 </svg>
 
-                <div className="mapaTitulo">{mapa.nome}</div>
+                <h1 className="mapaTitulo">{mapa.nome}</h1>
 
                 {itens.map((item, index) => {
                     const posicao = layout.posicoes[index];
@@ -432,7 +433,7 @@ const MapaConceitual = () => {
             {itemAberto && (
                 <>
                     <div className="backdrop" onClick={() => setAbertoId(null)} />
-                    <div className="mapaExplicacao" role="dialog" aria-modal="true" aria-label={itemAberto.titulo}>
+                    <Janela className="mapaExplicacao" aria-label={itemAberto.titulo} onFechar={() => setAbertoId(null)}>
                         <h3>{itemAberto.titulo}</h3>
                         <div className="mapaExplicacaoTexto">
                             {itemAberto.explicacao
@@ -467,7 +468,7 @@ const MapaConceitual = () => {
                                 Fechar
                             </button>
                         </div>
-                    </div>
+                    </Janela>
                 </>
             )}
         </div>

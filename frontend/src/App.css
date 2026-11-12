@@ -84,3 +84,36 @@ body {
     box-shadow: 3px 3px 0 #1F2D44;
     cursor: pointer;
 }
+
+/* Texto só para leitores de tela (rótulos de campos, avisos) */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* Foco do teclado: contorno grosso e escuro em tudo o que dá pra usar com Tab.
+   Nas áreas de fundo escuro (barra lateral, quadro do mapa, faixas escuras da introdução) o contorno fica branco.
+   :focus-visible só aparece no teclado, não quando a pessoa clica com o mouse. */
+:focus-visible {
+    outline: 3px solid #1F2D44;
+    outline-offset: 2px;
+}
+
+.art :focus-visible,
+.homeLateral :focus-visible,
+.mapaGrid :focus-visible,
+.introMapa :focus-visible,
+.introFinal :focus-visible {
+    outline-color: #FFFFFF;
+}
+
+/* A própria janela recebe o foco ao abrir (para o leitor de tela começar por ela): sem contorno nela */
+[role="dialog"]:focus {
+    outline: none;
+}

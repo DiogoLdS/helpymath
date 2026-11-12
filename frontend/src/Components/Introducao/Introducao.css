@@ -54,7 +54,7 @@
     font-weight: 700;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    color: var(--azul);
+    color: var(--azul-texto);
 }
 
 /* O símbolo matemático num quadradinho, como a marca do site */
@@ -222,7 +222,7 @@
     font-weight: 700;
     letter-spacing: 1px;
     text-transform: uppercase;
-    color: var(--quadro);
+    color: var(--tinta);
     background-color: var(--verde);
     border-radius: 3px;
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import TextoTermos from "../Termos/TextoTermos.jsx";
+import Janela from "../Janela/Janela.jsx";
 
 // Janela com os Termos e Condições. O botão "Li e concordo" só libera depois que a pessoa
 // rola o texto até o fim: a conta só é criada por quem leu os termos.
@@ -17,7 +18,7 @@ const Termos = ({ onAceitar, onFechar }) => {
     return (
         <>
             <div className="termosFundo" onClick={onFechar} />
-            <div className="termosJanela" role="dialog" aria-modal="true" aria-labelledby="termosTitulo">
+            <Janela className="termosJanela" aria-labelledby="termosTitulo" onFechar={onFechar}>
                 <h2 id="termosTitulo">Termos e Condições de Uso</h2>
                 <p className="termosDica">Leia até o fim para poder aceitar.</p>
 
@@ -35,7 +36,7 @@ const Termos = ({ onAceitar, onFechar }) => {
                         Fechar
                     </button>
                 </div>
-            </div>
+            </Janela>
         </>
     );
 };

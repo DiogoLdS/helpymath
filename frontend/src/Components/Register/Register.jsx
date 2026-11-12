@@ -88,15 +88,15 @@ const Register = () => {
             <h1>Crie uma conta</h1>
 
             <div className="input-field">
-              <input type="text" id="user" name="user" autoComplete="name" placeholder="Seu nome *" value={nome} maxLength={80} onChange={(e) => { setUsername(e.target.value) }} disabled={enviando} />
+              <input type="text" id="user" name="user" aria-label="Seu nome" autoComplete="name" placeholder="Seu nome *" value={nome} maxLength={80} onChange={(e) => { setUsername(e.target.value) }} disabled={enviando} />
             </div>
 
             <div className="input-field">
-              <input type="email" id="email" name="email" autoComplete="email" placeholder="Seu e-mail *" value={email} onChange={(e) => { setEmail(e.target.value) }} disabled={enviando} />
+              <input type="email" id="email" name="email" aria-label="Seu e-mail" autoComplete="email" placeholder="Seu e-mail *" value={email} onChange={(e) => { setEmail(e.target.value) }} disabled={enviando} />
             </div>
 
             <div className="input-field">
-              <input type="password" id="password" name="password" autoComplete="new-password" placeholder={`Sua senha (mínimo ${SENHA_MINIMA} caracteres) *`} value={senha} onChange={(e) => { setPassword(e.target.value) }} disabled={enviando} />
+              <input type="password" id="password" name="password" aria-label={`Sua senha, mínimo ${SENHA_MINIMA} caracteres`} autoComplete="new-password" placeholder={`Sua senha (mínimo ${SENHA_MINIMA} caracteres) *`} value={senha} onChange={(e) => { setPassword(e.target.value) }} disabled={enviando} />
             </div>
             {/* Aviso enquanto a pessoa digita */}
             {senha.length > 0 && senha.length < SENHA_MINIMA && (
@@ -104,7 +104,7 @@ const Register = () => {
             )}
 
             <div className="input-field">
-              <input type="password" id="confirmacao" name="confirmacao" autoComplete="new-password" placeholder="Repita a senha *" value={confirmacao} onChange={(e) => { setConfirmacao(e.target.value) }} disabled={enviando} />
+              <input type="password" id="confirmacao" name="confirmacao" aria-label="Repita a senha" autoComplete="new-password" placeholder="Repita a senha *" value={confirmacao} onChange={(e) => { setConfirmacao(e.target.value) }} disabled={enviando} />
             </div>
             {confirmacao.length > 0 && confirmacao !== senha && (
               <p className="avisoFormulario">As senhas ainda não são iguais.</p>

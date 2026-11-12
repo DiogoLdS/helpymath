@@ -66,11 +66,11 @@ const Login = () => {
             <h1>Faça seu login</h1>
 
             <div className="input-field">
-              <input type="email" id="user" name="user" autoComplete="email" value={email} onChange={(e) => { setEmail(e.target.value) }} placeholder="E-mail" disabled={enviando} />
+              <input type="email" id="user" name="user" aria-label="E-mail" autoComplete="email" value={email} onChange={(e) => { setEmail(e.target.value) }} placeholder="E-mail" disabled={enviando} />
             </div>
 
             <div className="input-field">
-              <input type="password" id="password" name="password" autoComplete="current-password" value={senha} onChange={(e) => { setPassword(e.target.value) }} placeholder="Senha" disabled={enviando} />
+              <input type="password" id="password" name="password" aria-label="Senha" autoComplete="current-password" value={senha} onChange={(e) => { setPassword(e.target.value) }} placeholder="Senha" disabled={enviando} />
             </div>
 
             <div className="remember-me">

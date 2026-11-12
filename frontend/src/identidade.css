@@ -10,6 +10,7 @@
     --tinta: #1F2D44;
     --azul-escuro: #2B4C7E;
     --azul: #567EBB;
+    --azul-texto: #3D6096;  /* azul escurecido para textos pequenos (contraste mínimo 4,5:1) */
     --papel: #FBF9F4;
     --linha: #DCE3EE;
     --verde: #9CCB7E;

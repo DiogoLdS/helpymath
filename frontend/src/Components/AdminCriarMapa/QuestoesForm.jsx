@@ -149,6 +149,7 @@ const QuestoesForm = ({ questoes, setQuestoes, enviando }) => {
                                     onChange={(e) => atualizarAlternativa(questao, alternativa.idTemp, e.target.value)}
                                     onFocus={() => marcarAlvo(questao, alternativa.idTemp)}
                                     placeholder={`Texto da alternativa ${LETRAS[indice]}`}
+                                    aria-label={`Texto da alternativa ${LETRAS[indice]}`}
                                 />
                                 <button
                                     type="button"

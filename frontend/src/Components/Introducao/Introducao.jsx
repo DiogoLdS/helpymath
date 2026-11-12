@@ -10,6 +10,7 @@ import { TextoComMidia } from "../Midia/Midia.jsx";
 import fotoQuadro from "../../Assets/Images/quadro-formulas.jpg";
 import fotoSala from "../../Assets/Images/sala-de-aula.jpg";
 import "./Introducao.css";
+import Janela from "../Janela/Janela.jsx";
 
 // Página pública de apresentação do HelpyMath (não precisa de login).
 // Os textos seguem o TCC; o mapa e a questão de exemplo funcionam de verdade, só não usam o banco.
@@ -553,7 +554,7 @@ const Introducao = () => {
             {itemAberto && (
                 <>
                     <div className="introFundo" onClick={() => setConteudoAberto(null)} />
-                    <div className="introJanela" role="dialog" aria-modal="true" aria-label={itemAberto.titulo}>
+                    <Janela className="introJanela" aria-label={itemAberto.titulo} onFechar={() => setConteudoAberto(null)}>
                         <h3>{itemAberto.titulo}</h3>
                         <div className="introJanelaTexto">
                             <TextoComMidia texto={itemAberto.explicacao} />
@@ -561,7 +562,7 @@ const Introducao = () => {
                         <button type="button" className="introBotao" onClick={() => setConteudoAberto(null)} autoFocus>
                             Fechar
                         </button>
-                    </div>
+                    </Janela>
                 </>
             )}
         </div>

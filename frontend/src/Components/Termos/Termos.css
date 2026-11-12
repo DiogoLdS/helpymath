@@ -33,9 +33,10 @@
     color: #4A5A73;
 }
 
-.ptFolha h3 {
+.ptFolha h2 {
     margin: 22px 0 6px;
     font-size: 17px;
+    font-weight: 700;
     color: #2B4C7E;
 }
 
