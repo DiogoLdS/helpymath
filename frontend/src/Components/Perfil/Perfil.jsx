@@ -85,6 +85,18 @@ const Perfil = () => {
         }
     };
 
+    // Devolve a mensagem de erro; se deu certo, sai da conta e vai pra página inicial
+    const excluirConta = async (senha) => {
+        try {
+            await api.delete("/perfil", { headers: headers(), data: { senha } });
+        } catch (error) {
+            return error.response?.data?.error ?? "Não foi possível excluir a conta. Tente de novo.";
+        }
+        localStorage.removeItem("token");
+        navigate("/", { replace: true, state: { contaExcluida: true } });
+        return "";
+    };
+
     const sair = () => {
         localStorage.removeItem("token");
         navigate("/login");
@@ -147,6 +159,7 @@ const Perfil = () => {
                             usuario={usuario}
                             onSalvar={salvarPerfil}
                             onTrocarSenha={trocarSenha}
+                            onExcluirConta={excluirConta}
                             onFechar={() => setEditando(false)}
                         />
                     )}

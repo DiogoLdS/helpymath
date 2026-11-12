@@ -10,6 +10,9 @@ import cors from 'cors';
 //  Inicializando aplicação express
 const app = express();
 
+// No Render o pedido chega por um proxy: confia nele pra saber o IP real (usado no limite de login)
+app.set('trust proxy', 1);
+
 //Utilizando CORS (pensar na explicação dps)
 app.use(cors({ origin: process.env.FRONTEND_URL || true }));
 

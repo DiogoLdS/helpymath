@@ -22,6 +22,8 @@ routes.get('/me',authUser, usuarioController.getUsuario);
 routes.get('/perfil', authUser, usuarioController.perfil);
 routes.patch('/perfil', authUser, usuarioController.editarPerfil);
 routes.patch('/perfil/senha', authUser, usuarioController.trocarSenha);
+// LGPD: o aluno exclui a própria conta (confirmando a senha)
+routes.delete('/perfil', authUser, usuarioController.excluirMinhaConta);
 routes.patch('/usuario/:id/promover',authUser,authAdmin,usuarioController.promoverAdmin);
 routes.patch('/usuario/:id/despromover',authUser,authAdmin,usuarioController.despromoverAdmin);
 // Esqueci minha senha: o admin gera uma senha temporária pro usuário

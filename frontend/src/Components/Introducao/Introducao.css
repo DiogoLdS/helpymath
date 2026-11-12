@@ -1109,3 +1109,13 @@
         margin-left: 0;
     }
 }
+
+/* Aviso de conta excluída (logo abaixo do topo) */
+.introAviso {
+    margin: 0;
+    padding: 12px 5%;
+    font-weight: 700;
+    color: var(--tinta);
+    background-color: #E3F1DA;
+    border-bottom: 2px solid var(--tinta);
+}

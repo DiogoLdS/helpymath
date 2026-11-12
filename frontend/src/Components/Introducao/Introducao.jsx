@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import useTituloPagina from "../../utils/useTituloPagina.js";
 import niveis from "../../data/niveis.js";
 import Marca from "../Marca/Marca.jsx";
@@ -183,6 +183,8 @@ const Introducao = () => {
 
     // Quem já entrou vê a mesma apresentação, mas com o caminho de volta pro painel no lugar de "Entrar"
     const logado = Boolean(localStorage.getItem("token"));
+    // Veio do perfil depois de excluir a conta: confirma que deu certo
+    const contaExcluida = useLocation().state?.contaExcluida === true;
 
     const itemAberto = conteudosExemplo.find((c) => c.id === conteudoAberto);
     const respondeu = respostaEscolhida !== null;
@@ -212,6 +214,10 @@ const Introducao = () => {
                     )}
                 </div>
             </header>
+
+            {contaExcluida && (
+                <p className="introAviso" role="status">Sua conta e todos os seus dados foram excluídos. Obrigado por ter estudado com a gente!</p>
+            )}
 
             <main>
                 {/* ---------- Abertura ---------- */}
@@ -540,6 +546,7 @@ const Introducao = () => {
                 <Marca />
                 <p>Trabalho de Conclusão de Curso · Cecília Sales e Diogo Lima · 2026</p>
                 <p className="introCreditos">Fotos: Artturi Jalli e Vitaly Gariev (Unsplash)</p>
+                <Link to="/termos" className="introCreditos">Termos de uso e privacidade</Link>
             </footer>
 
             {/* Janela do botão explicativo do mapa de exemplo */}

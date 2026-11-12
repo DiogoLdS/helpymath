@@ -40,10 +40,13 @@ const Login = () => {
       }
     } catch (error) {
       // 400/401/404: e-mail ou senha errados (não dizemos qual, por segurança)
+      // 429: muitas tentativas erradas, o servidor diz quantos minutos esperar
       setErro(
-        error.response && error.response.status < 500
-          ? 'E-mail ou senha incorretos.'
-          : 'Não foi possível entrar agora. Tente novamente em instantes.'
+        error.response?.status === 429
+          ? error.response.data?.error ?? 'Muitas tentativas erradas. Espere alguns minutos.'
+          : error.response && error.response.status < 500
+            ? 'E-mail ou senha incorretos.'
+            : 'Não foi possível entrar agora. Tente novamente em instantes.'
       );
       console.log(error.message);
     } finally {

@@ -225,6 +225,33 @@
     margin-top: 8px;
 }
 
+/* Excluir conta: ocupa a linha toda, separado por um tracejado e em vermelho */
+.editarContaPerigo {
+    grid-column: 1 / -1;
+    padding-top: 16px;
+    border-top: 2px dashed var(--linha);
+}
+
+.editarContaPerigo h3 {
+    color: #B3261E;
+}
+
+.editarContaPerigo input {
+    max-width: 320px;
+}
+
+.editarContaAcoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.App .perfilBotaoPerigo {
+    color: #FFFFFF;
+    background-color: #B3261E;
+    border-color: #7A1A14;
+}
+
 .editarContaFechar {
     grid-column: 1 / -1;
     justify-self: start;

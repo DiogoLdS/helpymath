@@ -15,6 +15,7 @@ import Perfil from './Components/Perfil/Perfil';
 import BoasVindas from './Components/BoasVindas/BoasVindas';
 import Ranking from './Components/Ranking/Ranking';
 import Revisar from './Components/Revisar/Revisar';
+import PaginaTermos from './Components/Termos/PaginaTermos';
 import NaoEncontrada from './Components/NaoEncontrada/NaoEncontrada';
 
 function App() {
@@ -58,6 +59,10 @@ function App() {
           <Route path="/admin/mapas/:id/editar" element={<AdminEditarMapa/>}/>
 
           {/* Qualquer outro endereço: página 404 */}
+          {/* Termos de uso e privacidade (abre sem conta) */}
+          <Route path="/termos" element={<PaginaTermos/>}/>
+          <Route path="/privacidade" element={<Navigate to="/termos" replace/>}/>
+
           <Route path="*" element={<NaoEncontrada/>}/>
         </Routes>
       </BrowserRouter>

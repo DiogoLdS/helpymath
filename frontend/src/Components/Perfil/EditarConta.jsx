@@ -2,8 +2,8 @@ import { useState } from "react";
 import { OBJETIVOS } from "./perfilUtils.js";
 import Carregando from "../Carregando/Carregando.jsx";
 
-// Editar nome e objetivo de estudo, e trocar a senha
-const EditarConta = ({ usuario, onSalvar, onTrocarSenha, onFechar }) => {
+// Editar nome e objetivo de estudo, trocar a senha e excluir a conta
+const EditarConta = ({ usuario, onSalvar, onTrocarSenha, onExcluirConta, onFechar }) => {
     const [nome, setNome] = useState(usuario.nome);
     const [objetivo, setObjetivo] = useState(usuario.objetivo ?? "");
     const [mensagemDados, setMensagemDados] = useState("");
@@ -48,6 +48,29 @@ const EditarConta = ({ usuario, onSalvar, onTrocarSenha, onFechar }) => {
         }
     };
 
+    // Excluir conta: primeiro clique só abre a confirmação; precisa digitar a senha
+    const [confirmandoExclusao, setConfirmandoExclusao] = useState(false);
+    const [senhaExclusao, setSenhaExclusao] = useState("");
+    const [mensagemExclusao, setMensagemExclusao] = useState("");
+    const [excluindo, setExcluindo] = useState(false);
+
+    const excluir = async (e) => {
+        e.preventDefault();
+        setExcluindo(true);
+        const erro = await onExcluirConta(senhaExclusao);
+        // Deu certo: o Perfil já saiu da página
+        if (erro) {
+            setExcluindo(false);
+            setMensagemExclusao(erro);
+        }
+    };
+
+    const cancelarExclusao = () => {
+        setConfirmandoExclusao(false);
+        setSenhaExclusao("");
+        setMensagemExclusao("");
+    };
+
     return (
         <div className="editarConta">
             <form onSubmit={salvarDados} className="editarContaBloco">
@@ -83,6 +106,37 @@ const EditarConta = ({ usuario, onSalvar, onTrocarSenha, onFechar }) => {
                 <button type="submit" className="perfilBotao" disabled={!senhaAtual || !novaSenha || salvandoSenha}>
                     {salvandoSenha ? <Carregando texto="Trocando" /> : "Trocar senha"}
                 </button>
+            </form>
+
+            {/* LGPD: o aluno pode apagar a conta e os dados dele sem precisar pedir pra ninguém */}
+            <form onSubmit={excluir} className="editarContaBloco editarContaPerigo">
+                <h3>Excluir conta</h3>
+                {!confirmandoExclusao ? (
+                    <>
+                        <p className="perfilDica">
+                            Apaga sua conta e todos os seus dados: progresso, respostas, anotações e cronograma.
+                            Não dá para desfazer.
+                        </p>
+                        <button type="button" className="perfilBotao perfilBotaoPerigo" onClick={() => setConfirmandoExclusao(true)}>
+                            Quero excluir minha conta
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        <p className="perfilDica"><strong>Tem certeza?</strong> Digite sua senha para confirmar. Tudo será apagado.</p>
+                        <label htmlFor="senhaExclusao">Sua senha</label>
+                        <input id="senhaExclusao" type="password" autoComplete="current-password" value={senhaExclusao} onChange={(e) => setSenhaExclusao(e.target.value)} />
+                        {mensagemExclusao && <p className="perfilMensagem">{mensagemExclusao}</p>}
+                        <div className="editarContaAcoes">
+                            <button type="submit" className="perfilBotao perfilBotaoPerigo" disabled={!senhaExclusao || excluindo}>
+                                {excluindo ? <Carregando texto="Excluindo" /> : "Excluir para sempre"}
+                            </button>
+                            <button type="button" className="perfilBotao perfilBotaoContorno" onClick={cancelarExclusao}>
+                                Cancelar
+                            </button>
+                        </div>
+                    </>
+                )}
             </form>
 
             <button type="button" className="perfilBotao perfilBotaoContorno editarContaFechar" onClick={onFechar}>

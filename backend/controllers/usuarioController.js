@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken';
 import { dadosDoPainelAdmin } from '../services/painelAdmin.js';
 import { gerarSenhaTemporaria } from '../services/senhaTemporaria.js';
 import { rankingDosAlunos } from '../services/ranking.js';
+import { excluirUsuario } from '../services/excluirConta.js';
+import { limparErros, minutosBloqueado, registrarErro } from '../services/limiteLogin.js';
 import { CAMPOS_PERFIL, SENHA_MINIMA, dadosDoPerfil, validarCadastro, validarEdicaoPerfil } from '../services/perfil.js';
 
 // Token de login (o mesmo do login e de quando o aluno muda o nome no perfil)
@@ -81,6 +83,12 @@ function controller() {
                     return res.status(400).json({ error: "Informe o e-mail e a senha" });
                 }
 
+                // Muitas senhas erradas seguidas: trava um tempo (contra quem fica chutando senha)
+                const espera = minutosBloqueado(req.ip, email);
+                if (espera > 0) {
+                    return res.status(429).json({ error: `Muitas tentativas erradas. Tente de novo em ${espera} ${espera === 1 ? "minuto" : "minutos"}.` });
+                }
+
                 // Procurando usuário (sem diferenciar maiúsculas de minúsculas no e-mail)
                 const logUsuario = await prisma.usuario.findFirst({
                     where: {
@@ -91,6 +99,7 @@ function controller() {
                 // Usuário inexistente e senha errada dão a mesma resposta,
                 // pra ninguém descobrir quais e-mails têm conta
                 if (!logUsuario) {
+                    registrarErro(req.ip, email);
                     return res.status(401).json({ error: "E-mail ou senha incorretos" });
                 }
 
@@ -102,10 +111,12 @@ function controller() {
 
                 if (matchingPassword) {
                     //Realiza o login com sucesso
+                    limparErros(req.ip, email);
                     return res.status(200).json(token);
                 }
 
                 // Caso a senha seja incorreta, o login não é realizado
+                registrarErro(req.ip, email);
                 res.status(401).json({ error: "E-mail ou senha incorretos" });
             } catch (error) {
                 console.log(error.message)
@@ -359,21 +370,40 @@ function controller() {
                     return res.status(400).json("Não é possível remover a própria conta por aqui");
                 }
 
-                await prisma.usuario.delete({
-                    where: { usuarioId: parseInt(id) }
-                });
+                // Apaga junto o progresso e as respostas do usuário
+                const resultado = await excluirUsuario(parseInt(id));
+                if (resultado === "nao-encontrado") {
+                    return res.status(404).json("Usuário não encontrado");
+                }
 
                 res.status(200).json("Usuário removido com sucesso");
             } catch (error) {
                 console.log(error.message);
-
-                if (error.code === 'P2025') {
-                    return res.status(404).json("Usuário não encontrado");
+                res.status(500).json("Internal server error!");
+            }
+        },
+        // LGPD: o próprio usuário apaga a conta e todos os dados dela. Pede a senha de novo, por segurança.
+        async excluirMinhaConta(req, res) {
+            try {
+                const { senha } = req.body ?? {};
+                if (!senha) {
+                    return res.status(400).json({ error: "Digite sua senha para confirmar" });
                 }
-                if (error.code === 'P2003') {
-                    return res.status(409).json("Não é possível remover: existem dados vinculados a esse usuário (ex: progresso em conteúdos).");
+
+                const usuario = await prisma.usuario.findUnique({ where: { usuarioId: req.usuario.usuarioId } });
+                const confere = usuario && await bcrypt.compare(String(senha), usuario.senha);
+                if (!confere) {
+                    return res.status(400).json({ error: "Senha incorreta" });
                 }
 
+                const resultado = await excluirUsuario(usuario.usuarioId);
+                if (resultado === "ultimo-admin") {
+                    return res.status(409).json({ error: "Você é o único administrador. Promova outra pessoa a admin antes de excluir sua conta." });
+                }
+
+                res.status(200).json("Conta excluída");
+            } catch (error) {
+                console.log(error.message);
                 res.status(500).json("Internal server error!");
             }
         }
