@@ -333,3 +333,41 @@
         font-size: 22px;
     }
 }
+
+/* ---------- Senha temporária (esqueci minha senha) ---------- */
+
+.adminTabelaAcoes .adminLinkBotao + .adminLinkBotao {
+    margin-left: 10px;
+}
+
+.adminSenhaGerada {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 12px 14px;
+    background-color: #FFF8E1;
+    border: 2px solid #E0A800;
+    border-radius: 4px;
+}
+
+.adminSenhaGerada p {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.adminSenhaLinha {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.adminSenhaLinha code {
+    padding: 4px 10px;
+    font-size: 18px;
+    letter-spacing: 1px;
+    background-color: #FFFFFF;
+    border: 1px solid #1F2D44;
+    border-radius: 4px;
+    user-select: all;
+}

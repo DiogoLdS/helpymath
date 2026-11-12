@@ -13,6 +13,7 @@ import AdminEditarMapa from './Components/AdminEditarMapa/AdminEditarMapa';
 import Introducao from './Components/Introducao/Introducao';
 import Perfil from './Components/Perfil/Perfil';
 import BoasVindas from './Components/BoasVindas/BoasVindas';
+import NaoEncontrada from './Components/NaoEncontrada/NaoEncontrada';
 
 function App() {
   return (
@@ -47,6 +48,9 @@ function App() {
           <Route path="/admin/mapas/criar" element={<AdminCriarMapa/>}/>
 
           <Route path="/admin/mapas/:id/editar" element={<AdminEditarMapa/>}/>
+
+          {/* Qualquer outro endereço: página 404 */}
+          <Route path="*" element={<NaoEncontrada/>}/>
         </Routes>
       </BrowserRouter>
     </div>

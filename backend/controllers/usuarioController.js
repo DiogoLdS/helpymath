@@ -2,6 +2,7 @@ import prisma from '../services/adapter.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { dadosDoPainelAdmin } from '../services/painelAdmin.js';
+import { gerarSenhaTemporaria } from '../services/senhaTemporaria.js';
 import { CAMPOS_PERFIL, SENHA_MINIMA, dadosDoPerfil, validarCadastro, validarEdicaoPerfil } from '../services/perfil.js';
 
 // Token de login (o mesmo do login e de quando o aluno muda o nome no perfil)
@@ -303,6 +304,37 @@ function controller() {
                 // Prisma lança esse código quando o registro não existe
                 if (error.code === 'P2025') {
                     return res.status(404).json("Usuário não encontrado");
+                }
+
+                res.status(500).json("Internal server error!");
+            }
+        },
+        // "Esqueci minha senha": o admin gera uma senha temporária pro aluno (o site não envia e-mail).
+        // A senha só aparece nesta resposta; no banco fica só o hash, como sempre.
+        async redefinirSenha(req, res) {
+            try {
+                const id = parseInt(req.params.id);
+
+                if (Number.isNaN(id)) {
+                    return res.status(400).json({ error: "Usuário inválido" });
+                }
+                // A própria senha se troca no perfil (lá pede a senha atual)
+                if (id === req.usuario.usuarioId) {
+                    return res.status(400).json({ error: "Para trocar a sua própria senha, use o seu perfil" });
+                }
+
+                const senhaTemporaria = gerarSenhaTemporaria();
+                await prisma.usuario.update({
+                    where: { usuarioId: id },
+                    data: { senha: await bcrypt.hash(senhaTemporaria, 10) }
+                });
+
+                res.status(200).json({ senhaTemporaria });
+            } catch (error) {
+                console.log(error.message);
+
+                if (error.code === 'P2025') {
+                    return res.status(404).json({ error: "Usuário não encontrado" });
                 }
 
                 res.status(500).json("Internal server error!");

@@ -81,8 +81,8 @@ const Login = () => {
             {/* O site ainda não envia e-mail, então a recuperação é feita por um administrador */}
             {mostrarAjudaSenha && (
               <p className="avisoFormulario">
-                A recuperação de senha pelo site ainda não está disponível. Fale com um administrador do HelpyMath
-                para redefinir sua senha. Se você lembra a senha atual, pode trocá-la no seu perfil.
+                Peça ao seu professor ou a um administrador do HelpyMath uma senha temporária (informe o e-mail
+                da sua conta). Entre com ela e troque por uma senha nova no seu perfil.
               </p>
             )}
 

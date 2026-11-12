@@ -24,6 +24,8 @@ routes.patch('/perfil', authUser, usuarioController.editarPerfil);
 routes.patch('/perfil/senha', authUser, usuarioController.trocarSenha);
 routes.patch('/usuario/:id/promover',authUser,authAdmin,usuarioController.promoverAdmin);
 routes.patch('/usuario/:id/despromover',authUser,authAdmin,usuarioController.despromoverAdmin);
+// Esqueci minha senha: o admin gera uma senha temporária pro usuário
+routes.patch('/usuario/:id/senha-temporaria',authUser,authAdmin,usuarioController.redefinirSenha);
 
 // Painel da página inicial do administrador
 routes.get('/admin/painel', authUser, authAdmin, usuarioController.painelAdmin);

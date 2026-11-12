@@ -16,6 +16,8 @@ const InicioAdmin = ({ sair }) => {
     const [painel, setPainel] = useState(null);
     const [erro, setErro] = useState("");
     const [alterandoUsuario, setAlterandoUsuario] = useState(null);
+    // Senha temporária recém-gerada: { nome, email, senha, copiada }
+    const [senhaGerada, setSenhaGerada] = useState(null);
 
     const eu = decodificarToken(localStorage.getItem("token") ?? "");
     const headers = () => ({ Authorization: `Bearer ${localStorage.getItem("token")}` });
@@ -59,6 +61,36 @@ const InicioAdmin = ({ sair }) => {
             console.log(error.message);
         } finally {
             setAlterandoUsuario(null);
+        }
+    };
+
+    // "Esqueci minha senha": gera uma senha temporária pro usuário (o site não envia e-mail).
+    // Ela só aparece aqui, uma vez; o admin passa pra pessoa, que troca no perfil depois de entrar.
+    const gerarSenha = async (usuario) => {
+        const confirmou = window.confirm(
+            `Gerar uma senha temporária para ${usuario.nome}? A senha atual dessa pessoa deixa de funcionar.`
+        );
+        if (!confirmou) return;
+
+        setAlterandoUsuario(usuario.usuarioId);
+        setSenhaGerada(null);
+        try {
+            const resposta = await api.patch(`/usuario/${usuario.usuarioId}/senha-temporaria`, {}, { headers: headers() });
+            setSenhaGerada({ nome: usuario.nome, email: usuario.email, senha: resposta.data.senhaTemporaria, copiada: false });
+        } catch (error) {
+            window.alert(error.response?.data?.error ?? "Não foi possível gerar a senha. Tente de novo.");
+            console.log(error.message);
+        } finally {
+            setAlterandoUsuario(null);
+        }
+    };
+
+    const copiarSenha = async () => {
+        try {
+            await navigator.clipboard.writeText(senhaGerada.senha);
+            setSenhaGerada((atual) => ({ ...atual, copiada: true }));
+        } catch {
+            window.alert("Não deu pra copiar automaticamente. Selecione a senha e copie.");
         }
     };
 
@@ -196,6 +228,30 @@ const InicioAdmin = ({ sair }) => {
             {/* ---------- Usuários ---------- */}
             <section className="adminBloco">
                 <h2>Usuários</h2>
+                <p className="adminDica">
+                    Esqueceram a senha? Use "Nova senha" e passe a senha temporária para a pessoa.
+                    Depois de entrar, ela troca a senha no perfil.
+                </p>
+
+                {senhaGerada && (
+                    <div className="adminSenhaGerada" role="status">
+                        <p>
+                            Senha temporária de <strong>{senhaGerada.nome}</strong> ({senhaGerada.email}):
+                        </p>
+                        <div className="adminSenhaLinha">
+                            <code>{senhaGerada.senha}</code>
+                            <button type="button" className="adminLinkBotao" onClick={copiarSenha}>
+                                {senhaGerada.copiada ? "Copiada!" : "Copiar"}
+                            </button>
+                        </div>
+                        <p className="adminDica">
+                            Ela só aparece agora. Peça para a pessoa entrar com ela e trocar no perfil.
+                        </p>
+                        <button type="button" className="adminLinkBotao" onClick={() => setSenhaGerada(null)}>
+                            Fechar
+                        </button>
+                    </div>
+                )}
                 <div className="adminTabelaRolagem">
                     <table className="adminTabela">
                         <thead>
@@ -214,18 +270,28 @@ const InicioAdmin = ({ sair }) => {
                                         <td className="adminTabelaAcoes">
                                             <span className={u.admin ? "adminPapel admin" : "adminPapel"}>{u.admin ? "Admin" : "Aluno"}</span>
                                             {/* Ninguém tira o próprio acesso (o backend também bloqueia) */}
-                                            {!souEu && (
-                                                <button
-                                                    type="button"
-                                                    className="adminLinkBotao"
-                                                    onClick={() => alterarAdmin(u)}
-                                                    disabled={alterandoUsuario !== null}
-                                                >
-                                                    {alterandoUsuario === u.usuarioId
-                                                        ? <Carregando texto="Salvando" />
-                                                        : u.admin ? "Remover admin" : "Tornar admin"}
-                                                </button>
-                                            )}
+                                            {!souEu && (alterandoUsuario === u.usuarioId ? (
+                                                <Carregando texto="Salvando" />
+                                            ) : (
+                                                <>
+                                                    <button
+                                                        type="button"
+                                                        className="adminLinkBotao"
+                                                        onClick={() => alterarAdmin(u)}
+                                                        disabled={alterandoUsuario !== null}
+                                                    >
+                                                        {u.admin ? "Remover admin" : "Tornar admin"}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="adminLinkBotao"
+                                                        onClick={() => gerarSenha(u)}
+                                                        disabled={alterandoUsuario !== null}
+                                                    >
+                                                        Nova senha
+                                                    </button>
+                                                </>
+                                            ))}
                                         </td>
                                     </tr>
                                 );
