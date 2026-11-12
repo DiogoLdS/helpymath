@@ -427,3 +427,59 @@
     padding-top: 8px;
     border-top: 1px dashed #B7C3D6;
 }
+
+/* "Resolução comentada" + botão "Gerar com IA" na mesma linha */
+.linhaRotuloResolucao {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.botaoGerarIA {
+    min-height: 34px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1F2D44;
+    background-color: #F4F6FA;
+    border: 2px solid #1F2D44;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.botaoGerarIA:hover:not(:disabled) {
+    background-color: #FFFFFF;
+}
+
+.botaoGerarIA:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.avisoIA {
+    margin: 0;
+    padding: 8px 12px;
+    font-size: 13px;
+    border-left: 4px solid;
+    border-radius: 2px;
+}
+
+.avisoIA.ok {
+    color: #1F2D44;
+    background-color: #EEF2F8;
+    border-color: #3D6096;
+}
+
+.avisoIA.alerta {
+    color: #6B3A00;
+    background-color: #FFF3DC;
+    border-color: #C7861F;
+}
+
+.avisoIA.erro {
+    color: #8C2B21;
+    background-color: #FBE7E4;
+    border-color: #A93226;
+}

@@ -47,6 +47,8 @@ routes.post('/diagnostico', authUser, async (req, res) => {
 
 routes.get('/admin/mapas/:mapaId/questoes', authUser, authAdmin, questaoController.listarQuestoesAdmin);
 routes.post('/criarQuestao', authUser, authAdmin, questaoController.criarQuestao);
+// Rascunho da resolução comentada feito por IA (o admin revisa antes de salvar a questão)
+routes.post('/admin/questoes/resolucao-ia', authUser, authAdmin, questaoController.gerarResolucaoIA);
 routes.patch('/questoes/:id', authUser, authAdmin, questaoController.atualizarQuestao);
 routes.delete('/questoes/:id', authUser, authAdmin, questaoController.deletarQuestao);
 routes.post('/questoes/:id/alternativas', authUser, authAdmin, questaoController.criarAlternativa);

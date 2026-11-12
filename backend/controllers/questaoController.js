@@ -1,6 +1,7 @@
 import prisma from '../services/adapter.js';
 import { progressoNoMapa, resultadoQuestoes, situacaoDoMapa } from '../services/progresso.js';
 import { liberadaEm, mensagemEspera, validarCamposQuestao } from '../services/resolucao.js';
+import { ErroIA, gerarResolucao, registrarPedido, validarPedido } from '../services/iaResolucao.js';
 
 function controller() {
     return {
@@ -321,6 +322,31 @@ function controller() {
             } catch (error) {
                 console.log(error.message);
                 res.status(500).json("Internal server error!");
+            }
+        },
+        // Rascunho da resolução comentada feito por IA (só admin, no editor do mapa).
+        // Recebe a questão como está no formulário (pode ainda nem estar salva) e devolve o texto
+        // pro admin revisar: nada é gravado no banco aqui.
+        async gerarResolucaoIA(req, res) {
+            const pedido = validarPedido(req.body ?? {});
+            if (pedido.erro) return res.status(400).json({ error: pedido.erro });
+
+            const minutos = registrarPedido(req.usuario.usuarioId);
+            if (minutos > 0) {
+                return res.status(429).json({ error: `Você já pediu muitas resoluções nesta hora. Tente de novo em ${minutos} min.` });
+            }
+
+            try {
+                const resultado = await gerarResolucao(pedido.dados);
+                res.status(200).json(resultado);
+            } catch (error) {
+                if (error instanceof ErroIA) {
+                    // O detalhe técnico (resposta da OpenRouter) fica só no log, não vai pro navegador
+                    console.log('[resolucao-ia]', error.message, error.detalhe);
+                    return res.status(error.status).json({ error: error.message });
+                }
+                console.log('[resolucao-ia]', error.message);
+                res.status(500).json({ error: 'Não foi possível gerar a resolução agora.' });
             }
         },
         async atualizarAlternativa(req, res) {
