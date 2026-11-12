@@ -1,4 +1,5 @@
 import prisma from './adapter.js';
+import { ORDEM_DOS_MAPAS } from './ordemMapas.js';
 
 const SETE_DIAS = 7 * 24 * 60 * 60 * 1000;
 
@@ -25,7 +26,7 @@ export async function dadosDoPainelAdmin() {
             }
         }),
         prisma.mapaconceitual.findMany({
-            orderBy: { mapaId: 'asc' },
+            orderBy: ORDEM_DOS_MAPAS,
             select: {
                 mapaId: true,
                 nome: true,

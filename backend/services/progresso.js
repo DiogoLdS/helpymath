@@ -1,4 +1,5 @@
 import prisma from './adapter.js';
+import { ORDEM_DOS_MAPAS } from './ordemMapas.js';
 
 // Tipo de conteúdo que o aluno precisa "Marcar como concluído": o botão explicativo (tipo 1),
 // que abre a janela com a explicação. Indicadores (tipo 2) e links (tipo 3) não contam.
@@ -61,7 +62,7 @@ export async function situacaoDosMapas(usuarioId, admin) {
     const visitante = usuarioId === null || usuarioId === undefined;
     const mapas = await prisma.mapaconceitual.findMany({
         select: { mapaId: true, nome: true, nivel: true },
-        orderBy: { mapaId: 'asc' }
+        orderBy: ORDEM_DOS_MAPAS
     });
 
     const anteriorPorNivel = {};

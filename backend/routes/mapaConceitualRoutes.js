@@ -15,6 +15,7 @@ routes.get('/mapas/:id/progresso', authOpcional, mapaController.progressoMapa);
 // Escrita: apenas administradores
 routes.post('/criarMapa', authUser, authAdmin, mapaController.criarMapa);
 routes.patch('/mapas/:id', authUser, authAdmin, mapaController.atualizarMapa);
+routes.patch('/mapas/:id/ordem', authUser, authAdmin, mapaController.moverMapa);
 routes.delete('/mapas/:id', authUser, authAdmin, mapaController.deletarMapa);
 routes.post('/mapas/:id/conteudo', authUser, authAdmin, mapaController.adicionarConteudo);
 routes.delete('/mapas/:id/conteudo/:conteudoId', authUser, authAdmin, mapaController.removerConteudo);

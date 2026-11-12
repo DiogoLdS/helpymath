@@ -1,5 +1,6 @@
 import prisma from '../services/adapter.js';
 import { progressoNoMapa, resultadoQuestoes, situacaoDosMapas, situacaoDoMapa } from '../services/progresso.js';
+import { moverMapa as moverNaOrdem, proximaOrdem } from '../services/ordemMapas.js';
 
 // Dificuldades possíveis de um mapa (as mesmas dos cards da página inicial)
 const NIVEIS = ['basico', 'intermediario', 'avancado', 'treino'];
@@ -20,8 +21,8 @@ function controller() {
                 }
 
                 const novoMapa = await prisma.mapaconceitual.create({
-                    // Sem nível informado, o banco usa "basico"
-                    data: { nome: nome, ...(nivel !== undefined && { nivel }) }
+                    // Sem nível informado, o banco usa "basico". O mapa novo entra no fim da trilha do nível.
+                    data: { nome: nome, ordem: await proximaOrdem(), ...(nivel !== undefined && { nivel }) }
                 });
 
                 res.status(201).json(novoMapa);
@@ -135,12 +136,17 @@ function controller() {
                     return res.status(400).json("Nível inválido");
                 }
 
+                // Mudou de nível: o mapa vai pro fim da trilha do nível novo
+                const atual = await prisma.mapaconceitual.findUnique({ where: { mapaId: parseInt(id) }, select: { nivel: true } });
+                const mudouDeNivel = atual && nivel !== undefined && nivel !== atual.nivel;
+
                 // Só altera os campos enviados
                 const mapaAtualizado = await prisma.mapaconceitual.update({
                     where: { mapaId: parseInt(id) },
                     data: {
                         ...(nome !== undefined && { nome }),
-                        ...(nivel !== undefined && { nivel })
+                        ...(nivel !== undefined && { nivel }),
+                        ...(mudouDeNivel && { ordem: await proximaOrdem() })
                     }
                 });
 
@@ -152,6 +158,31 @@ function controller() {
                     return res.status(404).json("Mapa não encontrado");
                 }
 
+                res.status(500).json("Internal server error!");
+            }
+        },
+
+        // Admin muda a posição do mapa na trilha do nível: { direcao: "cima" | "baixo" }
+        async moverMapa(req, res) {
+            try {
+                const mapaId = parseInt(req.params.id);
+                const { direcao } = req.body;
+
+                if (Number.isNaN(mapaId) || !['cima', 'baixo'].includes(direcao)) {
+                    return res.status(400).json({ error: "Informe o mapa e a direção (cima ou baixo)" });
+                }
+
+                const resultado = await moverNaOrdem(mapaId, direcao);
+                if (resultado === null) {
+                    return res.status(404).json({ error: "Mapa não encontrado" });
+                }
+                if (resultado === false) {
+                    return res.status(400).json({ error: "O mapa já está na ponta da trilha" });
+                }
+
+                res.status(200).json("Ordem atualizada");
+            } catch (error) {
+                console.log(error.message);
                 res.status(500).json("Internal server error!");
             }
         },

@@ -79,7 +79,7 @@ export async function dadosDoPerfil(usuarioId, admin) {
 
     const vinculos = await prisma.mapaconteudo.findMany({
         where: { mapaId: { in: mapasEmAndamento }, conteudo: { tipo: TIPO_INTERATIVO } },
-        orderBy: [{ mapaId: 'asc' }, { conteudoId: 'asc' }],
+        orderBy: [{ mapaconceitual: { ordem: 'asc' } }, { mapaId: 'asc' }, { conteudoId: 'asc' }],
         select: {
             conteudoId: true,
             conteudo: { select: { titulo: true } },

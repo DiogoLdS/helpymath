@@ -18,6 +18,8 @@ const InicioAdmin = ({ sair }) => {
     const [alterandoUsuario, setAlterandoUsuario] = useState(null);
     // Senha temporária recém-gerada: { nome, email, senha, copiada }
     const [senhaGerada, setSenhaGerada] = useState(null);
+    // Mapa que está mudando de posição na trilha (trava as setas enquanto salva)
+    const [movendoMapa, setMovendoMapa] = useState(null);
 
     const eu = decodificarToken(localStorage.getItem("token") ?? "");
     const headers = () => ({ Authorization: `Bearer ${localStorage.getItem("token")}` });
@@ -85,6 +87,31 @@ const InicioAdmin = ({ sair }) => {
         }
     };
 
+    // Sobe ou desce o mapa uma posição na trilha do nível dele
+    const moverMapa = async (mapa, direcao) => {
+        setMovendoMapa(mapa.mapaId);
+        try {
+            await api.patch(`/mapas/${mapa.mapaId}/ordem`, { direcao }, { headers: headers() });
+
+            // Troca de lugar com o vizinho do mesmo nível (a lista já vem na ordem da trilha)
+            setPainel((atual) => {
+                const lista = [...atual.mapas];
+                const i = lista.findIndex((m) => m.mapaId === mapa.mapaId);
+                const mesmoNivel = (m) => (m.nivel ?? "basico") === (mapa.nivel ?? "basico");
+                const vizinhos = lista.map((m, k) => k).filter((k) => mesmoNivel(lista[k]));
+                const j = vizinhos[vizinhos.indexOf(i) + (direcao === "cima" ? -1 : 1)];
+                if (j === undefined) return atual;
+                [lista[i], lista[j]] = [lista[j], lista[i]];
+                return { ...atual, mapas: lista };
+            });
+        } catch (error) {
+            window.alert(error.response?.data?.error ?? "Não foi possível mudar a ordem. Tente de novo.");
+            console.log(error.message);
+        } finally {
+            setMovendoMapa(null);
+        }
+    };
+
     const copiarSenha = async () => {
         try {
             await navigator.clipboard.writeText(senhaGerada.senha);
@@ -119,6 +146,16 @@ const InicioAdmin = ({ sair }) => {
             tipo: "aviso", texto: `O nível ${n.nome} ainda não tem mapas.`, mapaId: null,
         })),
     ];
+
+    // ---------- Mapas na ordem da trilha: nível por nível, com a posição dentro do nível ----------
+    // Mapa sem nível salvo conta como básico (mesmo padrão do banco)
+    const nivelDe = (m) => m.nivel ?? "basico";
+    const chavesConhecidas = niveis.map((n) => n.chave);
+    const mapasPorNivel = [...chavesConhecidas, ...new Set(painel.mapas.map(nivelDe).filter((c) => !chavesConhecidas.includes(c)))]
+        .flatMap((chave) => {
+            const doNivel = painel.mapas.filter((m) => nivelDe(m) === chave);
+            return doNivel.map((m, i) => ({ m, posicao: i + 1, total: doNivel.length }));
+        });
 
     // ---------- Onde os alunos mais erram (mapas com respostas, do pior pro melhor) ----------
     const maisErram = painel.mapas
@@ -178,14 +215,41 @@ const InicioAdmin = ({ sair }) => {
             {/* ---------- Mapas ---------- */}
             <section className="adminBloco">
                 <h2>Mapas</h2>
+                <p className="adminDica">
+                    Os mapas aparecem na trilha nesta ordem, nível por nível. Use as setas para mudar a posição;
+                    o aluno precisa concluir um mapa para liberar o próximo do mesmo nível.
+                </p>
                 <div className="adminTabelaRolagem">
                     <table className="adminTabela">
                         <thead>
-                            <tr><th>Mapa</th><th>Nível</th><th>Conteúdos</th><th>Questões</th><th>Acerto dos alunos</th><th></th></tr>
+                            <tr><th>Ordem</th><th>Mapa</th><th>Nível</th><th>Conteúdos</th><th>Questões</th><th>Acerto dos alunos</th><th></th></tr>
                         </thead>
                         <tbody>
-                            {painel.mapas.map((m) => (
+                            {mapasPorNivel.map(({ m, posicao, total }) => (
                                 <tr key={m.mapaId}>
+                                    <td className="adminOrdem">
+                                        <span className="adminOrdemNumero">{posicao}</span>
+                                        <button
+                                            type="button"
+                                            className="adminSeta"
+                                            onClick={() => moverMapa(m, "cima")}
+                                            disabled={movendoMapa !== null || posicao === 1}
+                                            aria-label={`Subir ${m.nome} na trilha`}
+                                            title="Subir na trilha"
+                                        >
+                                            ↑
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="adminSeta"
+                                            onClick={() => moverMapa(m, "baixo")}
+                                            disabled={movendoMapa !== null || posicao === total}
+                                            aria-label={`Descer ${m.nome} na trilha`}
+                                            title="Descer na trilha"
+                                        >
+                                            ↓
+                                        </button>
+                                    </td>
                                     <td>{m.nome}</td>
                                     <td><span className={`adminNivel nivel-tag-${m.nivel}`}>{nomeDoNivel(m.nivel)}</span></td>
                                     <td>{m.conteudos}</td>
