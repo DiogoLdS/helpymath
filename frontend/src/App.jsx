@@ -1,27 +1,36 @@
 import './App.css';
 import './identidade.css';
 import './responsivo.css';
-import  { BrowserRouter, Routes, Route, Navigate } from "react-router";
-import Login from "./Components/Login/Login";
-import Register from "./Components/Register/Register";
-import Home from './Components/Home/Home';
-import Mapas from './Components/Mapas/Mapas';
-import Questoes from './Components/Questoes/Questoes';
-import MapaConceitual from './Components/MapaConceitual/MapaConceitual';
-import AdminCriarMapa from './Components/AdminCriarMapa/AdminCriarMapa';
-import AdminEditarMapa from './Components/AdminEditarMapa/AdminEditarMapa';
+import { lazy, Suspense } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import Introducao from './Components/Introducao/Introducao';
-import Perfil from './Components/Perfil/Perfil';
-import BoasVindas from './Components/BoasVindas/BoasVindas';
-import Ranking from './Components/Ranking/Ranking';
-import Revisar from './Components/Revisar/Revisar';
-import PaginaTermos from './Components/Termos/PaginaTermos';
-import NaoEncontrada from './Components/NaoEncontrada/NaoEncontrada';
+import Carregando from './Components/Carregando/Carregando';
+import ErroPagina from './Components/ErroPagina/ErroPagina';
+
+// Cada página vira um arquivo separado, baixado só quando a pessoa abre a página.
+// A apresentação ("/") vem junto no arquivo principal: é a primeira coisa que quase todo mundo vê.
+const Login = lazy(() => import('./Components/Login/Login'));
+const Register = lazy(() => import('./Components/Register/Register'));
+const Home = lazy(() => import('./Components/Home/Home'));
+const Mapas = lazy(() => import('./Components/Mapas/Mapas'));
+const Questoes = lazy(() => import('./Components/Questoes/Questoes'));
+const MapaConceitual = lazy(() => import('./Components/MapaConceitual/MapaConceitual'));
+const AdminCriarMapa = lazy(() => import('./Components/AdminCriarMapa/AdminCriarMapa'));
+const AdminEditarMapa = lazy(() => import('./Components/AdminEditarMapa/AdminEditarMapa'));
+const Perfil = lazy(() => import('./Components/Perfil/Perfil'));
+const BoasVindas = lazy(() => import('./Components/BoasVindas/BoasVindas'));
+const Ranking = lazy(() => import('./Components/Ranking/Ranking'));
+const Revisar = lazy(() => import('./Components/Revisar/Revisar'));
+const PaginaTermos = lazy(() => import('./Components/Termos/PaginaTermos'));
+const NaoEncontrada = lazy(() => import('./Components/NaoEncontrada/NaoEncontrada'));
 
 function App() {
   return (
     <div className='App'>
       <BrowserRouter>
+        {/* Enquanto o arquivo da página chega, mostra o mesmo "carregando" do resto do site */}
+        <ErroPagina>
+        <Suspense fallback={<Carregando pagina texto="Abrindo a página" />}>
         <Routes>
           <Route path="/login" element={<Login/>}/>
 
@@ -58,13 +67,15 @@ function App() {
 
           <Route path="/admin/mapas/:id/editar" element={<AdminEditarMapa/>}/>
 
-          {/* Qualquer outro endereço: página 404 */}
           {/* Termos de uso e privacidade (abre sem conta) */}
           <Route path="/termos" element={<PaginaTermos/>}/>
           <Route path="/privacidade" element={<Navigate to="/termos" replace/>}/>
 
+          {/* Qualquer outro endereço: página 404 */}
           <Route path="*" element={<NaoEncontrada/>}/>
         </Routes>
+        </Suspense>
+        </ErroPagina>
       </BrowserRouter>
     </div>
 

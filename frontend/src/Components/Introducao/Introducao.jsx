@@ -244,7 +244,7 @@ const Introducao = () => {
 
                     {/* Foto do quadro com uma "ficha" do mapa conceitual por cima */}
                     <figure className="introHeroFoto">
-                        <img src={fotoQuadro} alt="Quadro-negro verde cheio de fórmulas escritas a giz" />
+                        <img src={fotoQuadro} alt="Quadro-negro verde cheio de fórmulas escritas a giz" fetchPriority="high" />
                         <figcaption className="introFicha" aria-hidden="true">
                             <span className="introFichaTitulo">Funções</span>
                             <span>Domínio</span>
