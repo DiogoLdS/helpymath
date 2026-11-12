@@ -1,0 +1,105 @@
+.avisosFundo {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 80px 16px 16px;
+    background-color: rgba(31, 45, 68, 0.35);
+    box-sizing: border-box;
+}
+
+.avisosPainel {
+    width: 100%;
+    max-width: 400px;
+    max-height: calc(100vh - 110px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 18px 18px;
+    color: #1F2D44;
+    background-color: #FFFFFF;
+    border: 2px solid #1F2D44;
+    border-radius: 4px;
+    box-shadow: 6px 6px 0 #567EBB;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.avisosPainel header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.avisosPainel h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.avisosFechar {
+    width: 32px;
+    height: 32px;
+    font-size: 22px;
+    line-height: 1;
+    color: #1F2D44;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.avisosLista {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.avisosLista a {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #1F2D44;
+    text-decoration: none;
+    background-color: #F4F6FA;
+    border-radius: 4px;
+}
+
+.avisosLista a:hover,
+.avisosLista a:focus-visible {
+    background-color: #E8F0FB;
+}
+
+.avisosLista li.importante a {
+    background-color: #FFF8E1;
+    border-left: 4px solid #E0A800;
+}
+
+.avisosIcone {
+    font-size: 18px;
+}
+
+.avisosVazio {
+    margin: 0;
+    font-size: 14px;
+    color: #4A5A73;
+}
+
+.avisosVazio a {
+    font-weight: 700;
+    color: #2B4C7E;
+}
+
+/* Botão do sino na barra lateral (era só uma imagem) */
+.btnSino {
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
