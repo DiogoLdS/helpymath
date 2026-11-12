@@ -724,7 +724,7 @@
    Ela desce pra baixo do conteúdo e os cartões dela ficam lado a lado */
 @media (max-width: 1100px) {
     .home:has(.iaLateral) {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         height: auto;
         min-height: 90vh;
     }

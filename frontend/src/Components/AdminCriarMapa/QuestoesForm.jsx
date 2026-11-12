@@ -131,14 +131,17 @@ const QuestoesForm = ({ questoes, setQuestoes, enviando }) => {
 
                         {questao.alternativas.map((alternativa, indice) => (
                             <div className="linhaAlternativa" key={alternativa.idTemp}>
-                                <input
-                                    type="radio"
-                                    name={`correta-${questao.idTemp}`}
-                                    checked={questao.indiceCorreta === indice}
-                                    onChange={() => atualizarQuestao(questao.idTemp, { indiceCorreta: indice })}
-                                    aria-label={`Alternativa ${LETRAS[indice]} é a correta`}
-                                />
-                                <span className="letraAlternativa">{LETRAS[indice]}</span>
+                                {/* Bolinha + letra num label só: clicar (ou tocar) na letra também marca a correta */}
+                                <label className="marcarCorreta">
+                                    <input
+                                        type="radio"
+                                        name={`correta-${questao.idTemp}`}
+                                        checked={questao.indiceCorreta === indice}
+                                        onChange={() => atualizarQuestao(questao.idTemp, { indiceCorreta: indice })}
+                                        aria-label={`Alternativa ${LETRAS[indice]} é a correta`}
+                                    />
+                                    <span className="letraAlternativa" aria-hidden="true">{LETRAS[indice]}</span>
+                                </label>
                                 <input
                                     type="text"
                                     ref={guardarCampo(questao, alternativa.idTemp)}

@@ -15,7 +15,9 @@
     border-radius: 0px 20px 20px 0px;
     max-width: 1500px;
     display: grid;
-    grid-template-columns: 1fr minmax(230px, 26%);
+    /* minmax(0, ...): a coluna pode ficar mais estreita que o texto mais comprido dela
+       (senão uma linha longa empurra a página pro lado no celular) */
+    grid-template-columns: minmax(0, 1fr) minmax(230px, 26%);
     overflow: hidden;
 }
 
@@ -266,7 +268,7 @@
 
 @media (max-width: 900px) {
     .home {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         height: auto;
         min-height: 90vh;
     }
@@ -407,7 +409,7 @@
 
 /* Admin não tem a coluna da direita: o painel ocupa a largura toda */
 .home.homeAdmin {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
 }
 
 /* ---------- Plano do aluno (respostas das boas-vindas) ---------- */

@@ -220,6 +220,16 @@
     gap: 8px;
 }
 
+/* Bolinha da alternativa correta + letra: a área de clique é o conjunto */
+.marcarCorreta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
 .linhaAlternativa input[type="radio"] {
     width: 18px;
     height: 18px;
