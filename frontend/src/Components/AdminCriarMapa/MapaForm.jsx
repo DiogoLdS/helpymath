@@ -10,6 +10,7 @@ import QuestoesForm from "./QuestoesForm.jsx";
 import { validarQuestoes } from "./questoesUtils.js";
 import "./AdminCriarMapa.css";
 import Carregando from "../Carregando/Carregando.jsx";
+import simulacoes from "../../data/simulacoes.js";
 
 // Tipos de elemento de conteúdo, conforme seção 3.7 do TCC:
 // 1 - Botão ampliado a uma explicação (expande em janela detalhada)
@@ -215,13 +216,27 @@ const MapaForm = ({
 
                             {tipo === 3 ? (
                                 <>
+                                    {/* Atalho: escolher uma simulação do próprio HelpyMath preenche o link */}
+                                    <select
+                                        value={simulacoes.some((s) => s.caminho === conteudo.explicacao) ? conteudo.explicacao : ""}
+                                        onChange={(e) => {
+                                            if (e.target.value) atualizarConteudo(conteudo.idTemp, "explicacao", e.target.value);
+                                        }}
+                                        aria-label={`Simulação do HelpyMath para o conteúdo ${index + 1}`}
+                                        disabled={enviando}
+                                    >
+                                        <option value="">Escolher uma simulação do HelpyMath (ou escreva outro link abaixo)</option>
+                                        {simulacoes.map((s) => (
+                                            <option key={s.caminho} value={s.caminho}>Simulação: {s.nome}</option>
+                                        ))}
+                                    </select>
                                     <input
                                         type="text"
                                         value={conteudo.explicacao}
                                         onChange={(e) =>
                                             atualizarConteudo(conteudo.idTemp, "explicacao", e.target.value)
                                         }
-                                        placeholder="Link de destino. Ex: https://www.geogebra.org ou /simulacoes/dados"
+                                        placeholder="Link de destino. Ex: https://www.geogebra.org ou /simulacoes/funcao-afim"
                                         aria-label="Link de destino"
                                         disabled={enviando}
                                     />

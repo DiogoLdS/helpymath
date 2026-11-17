@@ -5,7 +5,7 @@
     border-radius: 20px 0px 0px 20px;
     max-width: 90px;
     display: grid;
-    grid-template-rows: 2% 9% 6% 13% 9% 9% 9% 9% 9% auto;
+    grid-template-rows: 2% 9% 6% 13% 9% 9% 9% 9% 9% 9% auto;
     align-items: center;
     justify-items: center;
     border-right: 7px solid #567EBB;
@@ -44,17 +44,20 @@
     grid-row: 5;
     position: relative;
 }
-#iconspace2 {
+#iconspaceSim {
     grid-row: 6;
 }
-#iconspace3 {
+#iconspace2 {
     grid-row: 7;
 }
-#iconspace4 {
+#iconspace3 {
     grid-row: 8;
 }
-#iconspace5 {
+#iconspace4 {
     grid-row: 9;
+}
+#iconspace5 {
+    grid-row: 10;
 }
 #form {
     width: 60%;
@@ -73,6 +76,10 @@
     height: 50%;
 }
 #sino {
+    width: 50%;
+    height: 50%;
+}
+#sim {
     width: 50%;
     height: 50%;
 }

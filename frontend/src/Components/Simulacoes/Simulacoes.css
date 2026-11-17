@@ -1,0 +1,493 @@
+/* Simulações: mesmo painel do perfil/ranking (Perfil.css), com o visual de caderno do site */
+
+.simCabecalho h1 {
+    margin: 4px 0 6px;
+    font-size: 28px;
+    color: #1F2D44;
+}
+
+.simCabecalho p {
+    margin: 0;
+    max-width: 720px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #4A5A73;
+}
+
+.simVoltar {
+    display: inline-block;
+    padding: 10px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2B4C7E;
+}
+
+.simBotao {
+    min-height: 40px;
+    padding: 8px 16px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    color: #FFFFFF;
+    background-color: #2B4C7E;
+    border: 2px solid #1F2D44;
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 #1F2D44;
+    cursor: pointer;
+}
+
+.simBotao.contorno {
+    color: #1F2D44;
+    background-color: #FFFFFF;
+}
+
+.simBotao:active:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 #1F2D44;
+}
+
+.simBotao:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ---------- Lista ---------- */
+
+.simLista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 18px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.simCartao {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 18px;
+    color: #1F2D44;
+    text-decoration: none;
+    background-color: #FFFFFF;
+    border: 2px solid #1F2D44;
+    border-top: 6px solid #9CCB7E;
+    border-radius: 4px;
+    box-shadow: 4px 4px 0 #DCE3EE;
+}
+
+.simCartao:hover {
+    box-shadow: 4px 4px 0 #9CCB7E;
+}
+
+.simCartao strong {
+    font-size: 20px;
+}
+
+.simCartao > span {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #4A5A73;
+}
+
+.simCartao .simAssunto {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #2F6B1D;
+}
+
+.simCartao .simAbrir {
+    margin-top: auto;
+    font-weight: 700;
+    color: #2B4C7E;
+}
+
+/* ---------- Função afim ---------- */
+
+.afimArea {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.afimGrafico {
+    margin: 0;
+}
+
+.afimGrafico svg {
+    display: block;
+    width: 100%;
+    max-width: 480px;
+    background-color: #FFFFFF;
+    border: 2px solid #1F2D44;
+    box-shadow: 5px 5px 0 #DCE3EE;
+}
+
+.afimGrade line {
+    stroke: #DCE3EE;
+    stroke-width: 1;
+}
+
+.afimEixo line {
+    stroke: #1F2D44;
+    stroke-width: 2;
+}
+
+.afimNumero text {
+    font-size: 11px;
+    fill: #4A5A73;
+}
+
+.afimNomeEixo {
+    font-size: 14px;
+    font-weight: 700;
+    font-style: italic;
+    fill: #1F2D44;
+}
+
+.afimReta {
+    stroke: #2B4C7E;
+    stroke-width: 4;
+    stroke-linecap: round;
+}
+
+.afimPontoB {
+    fill: #E8A27C;
+    stroke: #1F2D44;
+    stroke-width: 2;
+}
+
+.afimPontoRaiz {
+    fill: #9CCB7E;
+    stroke: #1F2D44;
+    stroke-width: 2;
+}
+
+.afimAlvo {
+    fill: #FFFFFF;
+    stroke: #A93226;
+    stroke-width: 3;
+    stroke-dasharray: 4 3;
+}
+
+.afimAlvo.certo {
+    fill: #E3F2D9;
+    stroke: #2F6B1D;
+    stroke-dasharray: none;
+}
+
+.afimLegenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #4A5A73;
+}
+
+.afimBolinha {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 4px;
+    vertical-align: -1px;
+    border: 2px solid #1F2D44;
+    border-radius: 50%;
+}
+
+.afimBolinha.b { background-color: #E8A27C; }
+.afimBolinha.raiz { background-color: #9CCB7E; }
+
+.afimControles {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.afimFormula {
+    min-height: 64px;
+    padding: 8px 12px;
+    font-size: 20px;
+    background-color: #FBF9F4;
+    border: 2px solid #1F2D44;
+    border-radius: 4px;
+}
+
+.afimControle {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 15px;
+    color: #1F2D44;
+}
+
+.afimControle input[type="range"] {
+    width: 100%;
+    height: 28px;
+    accent-color: #2B4C7E;
+    cursor: pointer;
+}
+
+.afimLeitura {
+    margin: 0;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #1F2D44;
+}
+
+.afimDesafio {
+    padding: 12px 16px;
+    background-color: #FBF9F4;
+    border-left: 4px solid #C7861F;
+    color: #1F2D44;
+}
+
+.afimDesafio.certo {
+    border-left-color: #4F8A31;
+}
+
+.afimDesafio p {
+    margin: 6px 0 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.afimResultado {
+    font-weight: 700;
+    color: #2F6B1D;
+}
+
+.afimDica {
+    color: #4A5A73;
+}
+
+.afimBotoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* ---------- Dados ---------- */
+
+.dadosTopo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.dadosEscolha,
+.dadosBotoes {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.dadosUltimo {
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    color: #1F2D44;
+}
+
+.dadosVazio {
+    color: #4A5A73;
+}
+
+.dadosRolando {
+    display: inline-flex;
+    gap: 8px;
+}
+
+.dadoFace {
+    width: 48px;
+    height: 48px;
+}
+
+.dadoFace rect {
+    fill: #FFFFFF;
+    stroke: #1F2D44;
+    stroke-width: 3;
+}
+
+.dadoFace circle {
+    fill: #1F2D44;
+}
+
+/* O dado dá uma viradinha a cada lançamento (a key muda e a animação recomeça) */
+.dadosRolando .dadoFace {
+    animation: dadoVira 0.35s ease-out;
+}
+
+@keyframes dadoVira {
+    from { transform: rotate(-90deg) scale(0.7); }
+    to { transform: rotate(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dadosRolando .dadoFace {
+        animation: none;
+    }
+}
+
+.dadosTotal {
+    margin-left: auto;
+    font-weight: 700;
+    color: #1F2D44;
+}
+
+.dadosGrafico {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+    height: 260px;
+    padding: 12px 12px 8px;
+    background-color: #FFFFFF;
+    border: 2px solid #1F2D44;
+    box-shadow: 5px 5px 0 #DCE3EE;
+}
+
+.dadosColuna {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0;
+    font-family: inherit;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.dadosTrilho {
+    position: relative;
+    flex: 1;
+    width: 100%;
+    border-bottom: 2px solid #1F2D44;
+}
+
+.dadosBarra {
+    position: absolute;
+    left: 15%;
+    right: 15%;
+    bottom: 0;
+    background-color: #8DB3EC;
+    border: 2px solid #1F2D44;
+    border-bottom: none;
+    transition: height 0.25s ease-out;
+}
+
+.dadosColuna.escolhida .dadosBarra {
+    background-color: #E8A27C;
+}
+
+.dadosRisco {
+    position: absolute;
+    left: 5%;
+    right: 5%;
+    height: 0;
+    border-top: 3px dashed #A93226;
+}
+
+.dadosValor {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1F2D44;
+}
+
+.dadosColuna.escolhida .dadosValor {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.dadosLegenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin: -8px 0 0;
+    font-size: 13px;
+    color: #4A5A73;
+}
+
+.dadosLegBarra,
+.dadosLegRisco {
+    display: inline-block;
+    width: 18px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.dadosLegBarra {
+    height: 12px;
+    background-color: #8DB3EC;
+    border: 2px solid #1F2D44;
+}
+
+.dadosLegRisco {
+    border-top: 3px dashed #A93226;
+}
+
+.dadosDetalhe {
+    padding: 12px 16px;
+    background-color: #FBF9F4;
+    border-left: 4px solid #E8A27C;
+    color: #1F2D44;
+}
+
+.dadosDetalhe p {
+    margin: 6px 0 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.dadosDica {
+    color: #4A5A73;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dadosBarra {
+        transition: none;
+    }
+}
+
+/* ---------- Telas menores ---------- */
+
+@media (max-width: 900px) {
+    .afimArea {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .afimGrafico svg {
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 520px) {
+    .dadosGrafico {
+        gap: 2px;
+        height: 220px;
+        padding: 10px 6px 6px;
+    }
+
+    .dadosValor {
+        font-size: 13px;
+    }
+
+    .dadosTotal {
+        width: 100%;
+        margin-left: 0;
+    }
+}

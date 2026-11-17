@@ -23,6 +23,9 @@ const Ranking = lazy(() => import('./Components/Ranking/Ranking'));
 const Revisar = lazy(() => import('./Components/Revisar/Revisar'));
 const PaginaTermos = lazy(() => import('./Components/Termos/PaginaTermos'));
 const NaoEncontrada = lazy(() => import('./Components/NaoEncontrada/NaoEncontrada'));
+const Simulacoes = lazy(() => import('./Components/Simulacoes/Simulacoes'));
+const FuncaoAfim = lazy(() => import('./Components/Simulacoes/FuncaoAfim'));
+const Dados = lazy(() => import('./Components/Simulacoes/Dados'));
 
 function App() {
   return (
@@ -68,6 +71,11 @@ function App() {
           <Route path="/admin/mapas/:id/editar" element={<AdminEditarMapa/>}/>
 
           {/* Termos de uso e privacidade (abre sem conta) */}
+          {/* Simulações do próprio HelpyMath (abertas pra todo mundo) */}
+          <Route path="/simulacoes" element={<Simulacoes/>}/>
+          <Route path="/simulacoes/funcao-afim" element={<FuncaoAfim/>}/>
+          <Route path="/simulacoes/dados" element={<Dados/>}/>
+
           <Route path="/termos" element={<PaginaTermos/>}/>
           <Route path="/privacidade" element={<Navigate to="/termos" replace/>}/>
 

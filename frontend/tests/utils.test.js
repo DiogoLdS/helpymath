@@ -159,3 +159,48 @@ test('resolução: diz quando a questão libera pra refazer', async () => {
     assert.match(quandoLibera(new Date(2026, 10, 12, 18, 30), agora), /^hoje às 18:30$/);
     assert.match(quandoLibera(new Date(2026, 10, 20, 9, 5), agora), /^em 20\/11\/2026 às 09:05$/);
 });
+
+// ---------- Simulações ----------
+
+test('simulação função afim: fórmula, raiz, reta no quadro e desafios possíveis', async () => {
+    const u = await import('../src/Components/Simulacoes/simulacoesUtils.js');
+    assert.equal(u.latexFuncao(2, 1), 'f(x) = 2x + 1');
+    assert.equal(u.latexFuncao(-1, -3), 'f(x) = -x - 3');
+    assert.equal(u.latexFuncao(0.5, 0), 'f(x) = 0{,}5x');
+    assert.equal(u.latexFuncao(0, 4), 'f(x) = 4');
+    assert.equal(u.raizDaAfim(2, 1), -0.5);
+    assert.equal(u.raizDaAfim(0, 3), null);
+    assert.deepEqual(u.segmentoNoQuadro(2, 1), [[-4.5, -8], [3.5, 8]]);
+    assert.equal(u.segmentoNoQuadro(0, 9), null, 'reta fora do quadro');
+    assert.equal(u.numeroBR(-0.5), '-0,5');
+
+    // Cada desafio tem resposta com os passos do controle (a de -5 a 5 e b de -6 a 6, de 0,5 em 0,5)
+    for (const d of u.DESAFIOS) {
+        let achou = false;
+        for (let a = -5; a <= 5; a += 0.5) for (let b = -6; b <= 6; b += 0.5) if (d.pontos.every((p) => u.passaPor(a, b, p))) achou = true;
+        assert.ok(achou, JSON.stringify(d.pontos));
+    }
+});
+
+test('simulação dados: probabilidades somam 1 e a contagem soma os lançamentos', async () => {
+    const u = await import('../src/Components/Simulacoes/simulacoesUtils.js');
+    for (const n of [1, 2]) {
+        const soma = u.probabilidadesTeoricas(n).reduce((s, t) => s + t.prob, 0);
+        assert.ok(Math.abs(soma - 1) < 1e-12);
+    }
+    assert.equal(u.probabilidadesTeoricas(2).find((t) => t.valor === 7).casos, 6);
+
+    // "Acaso" fixo: 0 vira face 1, 0.99 vira face 6
+    const sequencia = [0, 0.99, 0.5, 0.5];
+    let i = 0;
+    const r = u.lancarVarias({ 7: 3 }, 2, 2, () => sequencia[i++]);
+    assert.deepEqual(r.contagem, { 7: 4, 8: 1 });
+    assert.deepEqual(r.ultimo, [4, 4]);
+    assert.equal(u.porcentagem(1, 3), '33,3%');
+    assert.equal(u.porcentagem(0, 0), '0%');
+});
+
+test('simulações: caminhos da lista são links internos válidos', async () => {
+    const { default: lista } = await import('../src/data/simulacoes.js');
+    for (const s of lista) assert.ok(linkInterno(s.caminho), s.caminho);
+});

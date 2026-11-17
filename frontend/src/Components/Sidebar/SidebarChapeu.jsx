@@ -9,6 +9,7 @@ import AvisosPainel from "../Avisos/AvisosPainel.jsx";
 import sino from "../../Assets/Images/sino.svg";
 import pessoa from "../../Assets/Images/pessoa.svg";
 import mais from "../../Assets/Images/mais.svg";
+import grafico from "../../Assets/Images/grafico.svg";
 import { ehVisitante, usuarioEhAdmin } from "../../utils/auth.js";
 
 const Sidebar = () => {
@@ -24,8 +25,12 @@ const Sidebar = () => {
             </div>
             <div className="linhaLogo"></div>
             <div className="iconspace" id="iconspace1">
-                <Link to="/mapas" className="btnSB"><img src={chapeu} alt="Chapeu" id="form" /></Link>
+                <Link to="/mapas" className="btnSB" title="Mapas"><img src={chapeu} alt="Mapas" id="form" /></Link>
                 <div className="space"></div>
+            </div>
+            {/* Simulações: aparece pra todo mundo, visitante também */}
+            <div className="iconspace" id="iconspaceSim">
+                <Link to="/simulacoes" className="btnSB" title="Simulações"><img src={grafico} alt="Simulações" id="sim" /></Link>
             </div>
             {!visitante && (
                 <>

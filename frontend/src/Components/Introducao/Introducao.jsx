@@ -163,9 +163,9 @@ const conteudosExemplo = [
     {
         id: "simulacao",
         tipo: 3,
-        titulo: "Simular no GeoGebra",
+        titulo: "Simular com dados",
         posicao: "noBaixoDireita",
-        link: "https://www.geogebra.org/calculator",
+        link: "/simulacoes/dados",
     },
 ];
 
@@ -346,15 +346,9 @@ const Introducao = () => {
 
                                 if (c.tipo === 3) {
                                     return (
-                                        <a
-                                            key={c.id}
-                                            href={c.link}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className={`introNo ${c.posicao}`}
-                                        >
+                                        <Link key={c.id} to={c.link} className={`introNo ${c.posicao}`}>
                                             {c.titulo}
-                                        </a>
+                                        </Link>
                                     );
                                 }
 
