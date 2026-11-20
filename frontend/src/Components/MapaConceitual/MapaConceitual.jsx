@@ -160,14 +160,28 @@ const MapaConceitual = () => {
         }
     };
 
-    // Antes de abrir a impressão, espera as imagens da parte "Conteúdos do mapa" carregarem
-    // (senão elas saem em branco no PDF). Se alguma demorar demais, imprime assim mesmo.
+    // Antes de abrir a impressão, espera a parte "Conteúdos do mapa" ficar pronta: imagens e fórmulas.
+    // Essa parte fica escondida na tela, então o navegador só baixaria as fontes do KaTeX (letras e
+    // números das fórmulas) na hora de montar a impressão, tarde demais: na 1ª vez as fórmulas saíam
+    // sem letras. Por isso as fontes são carregadas aqui antes. Se algo demorar demais, imprime assim mesmo.
     const imprimirMapa = async () => {
         setPreparandoImpressao(true);
 
         const limite = Date.now() + 8000;
-        while (document.querySelector(".mapaImpressao [data-carregando]") && Date.now() < limite) {
-            await new Promise((resolve) => setTimeout(resolve, 200));
+        const esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+        while (
+            document.querySelector(".mapaImpressao [data-carregando], .mapaImpressao .formulaEsperando") &&
+            Date.now() < limite
+        ) {
+            await esperar(200);
+        }
+
+        if (document.querySelector(".mapaImpressao .katex") && document.fonts) {
+            const fontesKatex = [...document.fonts].filter((fonte) => fonte.family.replace(/["']/g, "").startsWith("KaTeX"));
+            const carregarFontes = Promise.all(fontesKatex.map((fonte) => fonte.load().catch(() => null)))
+                .then(() => document.fonts.ready);
+            await Promise.race([carregarFontes, esperar(Math.max(0, limite - Date.now()))]);
         }
 
         setPreparandoImpressao(false);
