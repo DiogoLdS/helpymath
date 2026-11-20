@@ -535,3 +535,56 @@
         font-size: 12px;
     }
 }
+
+/* =====================================================================
+   Impressão do mapa (Imprimir / PDF)
+   A folha A4 deitada tem uns 1050px de largura, então as regras de tablet acima
+   (769px a 1100px) também valiam no papel: o mapa ficava com 92vh de altura e se
+   espalhava por várias folhas. Aqui o mapa cabe numa folha só e o fundo sai branco.
+   ===================================================================== */
+
+@media print {
+    .App,
+    .App .mapaConceitualPage {
+        background: #FFFFFF none;
+    }
+
+    .App .mapaConceitualPage {
+        display: block;
+        min-height: 0;
+        padding: 0;
+    }
+
+    /* Repetir a classe só aumenta a prioridade, pra ganhar das regras de tela */
+    .App .mapaGrid.mapaGrid.mapaGrid {
+        width: 100%;
+        max-width: none;
+        /* A4 deitada: 210mm de altura menos as margens da folha (2 x 10mm) e uma folga */
+        height: 184mm;
+        min-height: 0;
+        margin: 0;
+        padding: 12mm 10mm;
+        border-width: 3px;
+        border-radius: 4px;
+        box-shadow: none;
+        overflow: hidden;
+        break-inside: avoid;
+        break-after: page;
+    }
+
+    .App .mapaTitulo {
+        font-size: 28px;
+        padding: 14px 22px;
+    }
+
+    .App .mapaNo {
+        font-size: 15px;
+        overflow-wrap: break-word;
+    }
+
+    /* "Conteúdos do mapa": texto corrido em folha branca */
+    .App .mapaImpressao {
+        break-before: auto;
+        background-color: #FFFFFF;
+    }
+}
