@@ -4,10 +4,13 @@ import { mapaAtual, porcentagemDoMapa } from "./trilhaUtils.js";
 // Deslocamento horizontal de cada mapa no caminho, formando um zigue-zague que se repete.
 // As posições são calculadas numa largura de referência e viram porcentagem, então o caminho
 // encolhe junto com a tela no celular sem nada vazar pro lado.
-const ZIGUEZAGUE = [0, 60, 90, 60, 0, -60, -90, -60];
-const LARGURA = 320;  // largura de referência (e máxima) do caminho
+const ZIGUEZAGUE = [0, 75, 120, 75, 0, -75, -120, -75];
+const LARGURA = 420;  // largura de referência (e máxima) do caminho
 const ALTURA_PASSO = 170; // distância vertical entre um mapa e o próximo (com folga pro balão "COMEÇAR")
 const TOPO = 64;      // espaço em cima do primeiro mapa (pro balão "COMEÇAR")
+
+// Símbolo de cada nível, grandão e clarinho no canto da folha (como os símbolos da página inicial)
+const SIMBOLOS = { basico: "÷", intermediario: "f(x)", avancado: "∫", treino: "Σ" };
 
 // Um nível da trilha: faixa colorida no topo ("unidade") e os mapas do nível num caminho.
 // numero = posição do nível (1 = Básico...), nivel = item de data/niveis.js, mapas = mapas desse nível em ordem
@@ -41,8 +44,12 @@ const Trilha = ({ numero, nivel, mapas, abrindo = [] }) => {
                 )}
             </header>
 
+            {/* A "folha" do nível: papel quadriculado na cor do nível, com o símbolo dele bem clarinho */}
+            <div className={mapas.length === 0 ? "trilhaFolha vazia" : "trilhaFolha"}>
+            <span className="trilhaSimbolo" aria-hidden="true">{SIMBOLOS[nivel.chave] ?? "π"}</span>
+
             {mapas.length === 0 ? (
-                <p className="trilhaVazia">Nenhum mapa neste nível ainda.</p>
+                <p className="trilhaVazia">Em breve: ainda não tem mapas neste nível.</p>
             ) : (
                 <div className="trilhaCaminho" style={{ maxWidth: LARGURA, height: TOPO + (mapas.length - 1) * ALTURA_PASSO + 110 }}>
                     {/* Linha "de giz" ligando os mapas na ordem */}
@@ -61,10 +68,6 @@ const Trilha = ({ numero, nivel, mapas, abrindo = [] }) => {
                         const estado = mapa.concluido ? "concluido" : ehAtual ? "atual" : mapa.liberado ? "livre" : "trancado";
                         const estilo = { left: `${(pontos[i].x / LARGURA) * 100}%`, top: pontos[i].y };
                         const abrindoAgora = abrindo.includes(mapa.mapaId);
-                        // Liberado por ter concluído o anterior e ainda nem aberto: ganha o bilhete "novo!"
-                        const novo = mapa.liberado && mapa.anterior && !mapa.concluido && porcentagem === 0;
-                        // Mapa do lado direito do zigue-zague: bilhete vai pra esquerda (senão sai da tela)
-                        const ladoDoBilhete = ZIGUEZAGUE[i % ZIGUEZAGUE.length] > 0 ? "esquerda" : "direita";
                         let classe = `trilhaMapa ${estado}`;
                         if (abrindoAgora) classe += " abrindo";
 
@@ -72,9 +75,6 @@ const Trilha = ({ numero, nivel, mapas, abrindo = [] }) => {
                             <>
                                 {ehAtual && (
                                     <span className="trilhaBalao">{porcentagem > 0 ? "Continuar" : "Começar"}</span>
-                                )}
-                                {novo && (
-                                    <span className={`trilhaBilhete ${ladoDoBilhete}`} aria-hidden="true">novo!</span>
                                 )}
                                 {/* Anel de progresso em volta do mapa da vez */}
                                 <span
@@ -117,7 +117,7 @@ const Trilha = ({ numero, nivel, mapas, abrindo = [] }) => {
                                 to={`/mapas/${mapa.mapaId}`}
                                 className={classe}
                                 style={estilo}
-                                aria-label={`${mapa.nome}${mapa.concluido ? " (concluído)" : ehAtual ? ` (mapa atual, ${porcentagem}% feito)` : ""}${novo ? " (novo)" : ""}`}
+                                aria-label={`${mapa.nome}${mapa.concluido ? " (concluído)" : ehAtual ? ` (mapa atual, ${porcentagem}% feito)` : ""}`}
                             >
                                 {ficha}
                             </Link>
@@ -125,6 +125,7 @@ const Trilha = ({ numero, nivel, mapas, abrindo = [] }) => {
                     })}
                 </div>
             )}
+            </div>
         </section>
     );
 };

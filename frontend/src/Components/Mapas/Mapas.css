@@ -13,7 +13,8 @@
     max-width: 1500px;
     padding: 32px 40px;
     overflow-y: auto;
-    background-color: #DCE0E6;
+    /* papel claro em vez de cinza: as folhas coloridas dos níveis se destacam em cima dele */
+    background-color: var(--papel, #FBF9F4);
     border: 5px solid #567EBB;
     border-radius: 0px 20px 20px 0px;
 }
@@ -247,10 +248,22 @@
    Trilha: cada nível é uma "unidade" e os mapas formam um caminho
    ===================================================================== */
 
-.trilha { --cor-nivel: var(--verde); margin-bottom: 44px; }
-.trilha.trilha-intermediario { --cor-nivel: var(--laranja); }
-.trilha.trilha-avancado { --cor-nivel: var(--vermelho); }
-.trilha.trilha-treino { --cor-nivel: var(--azul-claro); }
+/* Cada nível é uma folha de caderno: a faixa colorida em cima (como a aba de uma divisória)
+   e, embaixo, papel quadriculado tingido com a cor do nível, onde fica o caminho dos mapas.
+   --cor-nivel-escura: a cor do nível misturada com a tinta, pra linha e o quadriculado aparecerem */
+.trilha {
+    --cor-nivel: var(--verde);
+    --cor-nivel-escura: #4F8A31;
+    margin-bottom: 44px;
+    background-color: #FFFFFF;
+    border: 2px solid var(--tinta);
+    border-radius: 4px;
+    box-shadow: 6px 6px 0 var(--tinta);
+    overflow: hidden;
+}
+.trilha.trilha-intermediario { --cor-nivel: var(--laranja); --cor-nivel-escura: #B8602F; }
+.trilha.trilha-avancado { --cor-nivel: var(--vermelho); --cor-nivel-escura: #B04545; }
+.trilha.trilha-treino { --cor-nivel: var(--azul-claro); --cor-nivel-escura: #3D6096; }
 
 /* Faixa do nível, na cor dele */
 .trilhaUnidade {
@@ -262,9 +275,55 @@
     padding: 18px 20px;
     color: var(--tinta);
     background-color: var(--cor-nivel);
-    border: 2px solid var(--tinta);
-    border-radius: 4px;
-    box-shadow: 5px 5px 0 var(--tinta);
+    border-bottom: 2px solid var(--tinta);
+}
+
+/* A folha: cor do nível bem clarinha + quadriculado na mesma cor (com recuo pra fundo branco em
+   navegador antigo sem color-mix) */
+.trilhaFolha {
+    position: relative;
+    padding: 8px 20px 28px;
+    background-color: #FFFFFF;
+    background-color: color-mix(in srgb, var(--cor-nivel) 24%, #FFFFFF);
+    background-image:
+        linear-gradient(color-mix(in srgb, var(--cor-nivel-escura) 22%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--cor-nivel-escura) 22%, transparent) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: -1px -1px;
+}
+
+/* Símbolo do nível, grandão e clarinho, no canto de cima da folha */
+.trilhaSimbolo {
+    position: absolute;
+    top: 6px;
+    right: 18px;
+    font-family: "KaTeX_Main", "Times New Roman", serif;
+    font-size: 210px;
+    font-style: italic;
+    line-height: 1;
+    color: var(--cor-nivel-escura);
+    opacity: 0.16;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Folha sem mapas é baixinha: símbolo menor, pra caber inteiro */
+.trilhaFolha.vazia .trilhaSimbolo {
+    top: 50%;
+    font-size: 76px;
+    transform: translateY(-50%);
+}
+
+/* No celular a folha é estreita: o símbolo fica menor pra não brigar com os mapas */
+@media (max-width: 600px) {
+    .trilhaSimbolo {
+        font-size: 120px;
+        right: 8px;
+    }
+
+    .trilhaFolha {
+        padding: 8px 8px 24px;
+    }
 }
 
 .trilhaNumero {
@@ -315,9 +374,17 @@
 }
 
 .trilhaVazia {
-    margin-top: 16px;
-    font-size: 14px;
-    color: #3D6096;
+    position: relative;
+    margin: 20px auto 0;
+    padding: 18px 20px;
+    max-width: 420px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--tinta);
+    text-align: center;
+    background-color: #FFFFFF;
+    border: 2px dashed var(--cor-nivel-escura);
+    border-radius: 4px;
 }
 
 /* O caminho em si: os mapas são posicionados (left/top) pelo Trilha.jsx */
@@ -339,7 +406,7 @@
 
 .trilhaLinha polyline {
     fill: none;
-    stroke: #93A6C4;
+    stroke: var(--cor-nivel-escura);
     stroke-width: 5;
     stroke-dasharray: 2 12;
     stroke-linecap: round;
@@ -431,7 +498,10 @@ a.trilhaMapa:active .trilhaFicha {
     line-height: 1.3;
     color: var(--tinta);
     text-align: center;
-    background-color: var(--papel);
+    /* etiqueta branca, pra ler bem em cima do quadriculado */
+    background-color: #FFFFFF;
+    border: 1.5px solid var(--tinta);
+    border-radius: 3px;
 }
 
 .trilhaMapa.trancado .trilhaNome {
@@ -482,40 +552,6 @@ a.trilhaMapa:active .trilhaFicha {
 
 @media (prefers-reduced-motion: reduce) {
     .trilhaBalao { animation: none; }
-}
-
-/* Bilhete "novo!" a caneta vermelha, como anotação de professor no caderno */
-.trilhaBilhete {
-    position: absolute;
-    top: 8px;
-    font-family: "KaTeX_Main", "Times New Roman", serif;
-    font-size: 21px;
-    font-style: italic;
-    font-weight: 700;
-    line-height: 1;
-    color: #B3261E;
-    white-space: nowrap;
-    pointer-events: none;
-}
-
-.trilhaBilhete.direita {
-    left: calc(50% + 46px);
-    transform: rotate(-11deg);
-}
-
-.trilhaBilhete.esquerda {
-    right: calc(50% + 46px);
-    transform: rotate(9deg);
-}
-
-/* risquinho embaixo, feito à mão (meio torto de propósito) */
-.trilhaBilhete::after {
-    content: "";
-    display: block;
-    height: 6px;
-    margin-top: 1px;
-    border-bottom: 2px solid currentColor;
-    border-radius: 0 0 60% 40% / 0 0 100% 70%;
 }
 
 /* Cadeado abrindo (só no mapa desbloqueado desde a última visita) */
@@ -580,20 +616,9 @@ a.trilhaMapa:active .trilhaFicha {
     }
 }
 
-/* O bilhete é "escrito" depois que o cadeado cai */
-.trilhaMapa.abrindo .trilhaBilhete {
-    animation: trilhaEscreve 0.6s steps(6) 1.6s both;
-}
-
-@keyframes trilhaEscreve {
-    from { clip-path: inset(0 100% 0 0); }
-    to { clip-path: inset(0 0 0 0); }
-}
-
 @media (prefers-reduced-motion: reduce) {
     .trilhaCadeado { display: none; }
-    .trilhaMapa.abrindo .trilhaFicha,
-    .trilhaMapa.abrindo .trilhaBilhete { animation: none; }
+    .trilhaMapa.abrindo .trilhaFicha { animation: none; }
 }
 
 /* No celular o assistente vira uma coluna só */
