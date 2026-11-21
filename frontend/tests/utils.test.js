@@ -10,6 +10,7 @@ import { linkDestinoValido, linkExterno, linkInterno } from '../src/utils/linkDe
 import { decodificarToken } from '../src/utils/auth.js';
 import { iniciais, inicioDaSemana, pontos, resumoDaSemana, sequenciaDeDias } from '../src/Components/Perfil/perfilUtils.js';
 import { contarRespondidas, limparRascunho, porcentagemDeAcerto, respostasParaEnvio } from '../src/Components/Simulado/simuladoUtils.js';
+import layouts, { disposicaoEquilibrada, MAX_CONTEUDOS } from '../src/data/layouts.js';
 
 // ---------- Busca de mapas ----------
 
@@ -353,4 +354,30 @@ test('simulado: nota em porcentagem e trilha não aponta simulado como próximo 
         { mapaId: 2, liberado: true, concluido: false },
     ];
     assert.equal(mapaAtual(treino).mapaId, 2);
+});
+
+// ---------- Variantes de posição do mapa conceitual ----------
+
+
+test('mapa: toda quantidade de 1 a 8 tem várias variantes (8 só tem um jeito)', () => {
+    const quantas = Array.from({ length: MAX_CONTEUDOS }, (_, i) => layouts[i + 1].length);
+    assert.deepEqual(quantas, [8, 16, 52, 70, 56, 28, 8, 1]);
+});
+
+test('mapa: nenhuma variante usa o meio (título), repete célula ou deixa tudo de um lado', () => {
+    for (let quantidade = 1; quantidade <= MAX_CONTEUDOS; quantidade++) {
+        for (const { rows, cols, posicoes } of layouts[quantidade]) {
+            assert.equal(posicoes.length, quantidade);
+            assert.equal(rows, 3);
+            assert.equal(cols, 3);
+            assert.ok(posicoes.every((p) => !(p.row === 2 && p.col === 2)));
+            assert.equal(new Set(posicoes.map((p) => `${p.row}-${p.col}`)).size, quantidade);
+            assert.ok(disposicaoEquilibrada(posicoes));
+        }
+    }
+});
+
+test('mapa: dois botões na mesma linha de cima é torto; cantos opostos é equilibrado', () => {
+    assert.equal(disposicaoEquilibrada([{ row: 1, col: 1 }, { row: 1, col: 3 }]), false);
+    assert.equal(disposicaoEquilibrada([{ row: 1, col: 1 }, { row: 3, col: 3 }]), true);
 });
