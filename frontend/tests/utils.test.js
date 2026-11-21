@@ -11,6 +11,7 @@ import { decodificarToken } from '../src/utils/auth.js';
 import { iniciais, inicioDaSemana, pontos, resumoDaSemana, sequenciaDeDias } from '../src/Components/Perfil/perfilUtils.js';
 import { contarRespondidas, limparRascunho, porcentagemDeAcerto, respostasParaEnvio } from '../src/Components/Simulado/simuladoUtils.js';
 import layouts, { disposicaoBonita, MAX_CONTEUDOS } from '../src/data/layouts.js';
+import { itemDaPagina } from '../src/Components/Sidebar/sidebarUtils.js';
 
 // ---------- Busca de mapas ----------
 
@@ -385,4 +386,20 @@ test('mapa: tudo de um lado só fica de fora; desenhos espelhados entram', () =>
     // cantos opostos e o triângulo (dois em cima, um embaixo no meio)
     assert.equal(disposicaoBonita([{ row: 1, col: 1 }, { row: 3, col: 3 }]), true);
     assert.equal(disposicaoBonita([{ row: 1, col: 1 }, { row: 1, col: 3 }, { row: 3, col: 2 }]), true);
+});
+
+// ---------- Barra lateral: ícone da página aberta ----------
+
+test('barra lateral: cada página marca o ícone por onde se chega nela', () => {
+    assert.equal(itemDaPagina('/inicio'), 'inicio');
+    assert.equal(itemDaPagina('/revisar'), 'inicio');
+    assert.equal(itemDaPagina('/mapas'), 'mapas');
+    assert.equal(itemDaPagina('/mapas/7/questoes'), 'mapas');
+    assert.equal(itemDaPagina('/admin/mapas/7/editar'), 'mapas');
+    assert.equal(itemDaPagina('/admin/mapas/criar'), 'criar');
+    assert.equal(itemDaPagina('/simulacoes/dados'), 'simulacoes');
+    assert.equal(itemDaPagina('/ranking'), 'ranking');
+    assert.equal(itemDaPagina('/perfil'), 'perfil');
+    assert.equal(itemDaPagina('/login'), 'perfil');
+    assert.equal(itemDaPagina('/termos'), null);
 });
