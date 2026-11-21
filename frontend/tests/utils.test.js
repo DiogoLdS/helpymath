@@ -10,7 +10,7 @@ import { linkDestinoValido, linkExterno, linkInterno } from '../src/utils/linkDe
 import { decodificarToken } from '../src/utils/auth.js';
 import { iniciais, inicioDaSemana, pontos, resumoDaSemana, sequenciaDeDias } from '../src/Components/Perfil/perfilUtils.js';
 import { contarRespondidas, limparRascunho, porcentagemDeAcerto, respostasParaEnvio } from '../src/Components/Simulado/simuladoUtils.js';
-import layouts, { disposicaoEquilibrada, MAX_CONTEUDOS } from '../src/data/layouts.js';
+import layouts, { disposicaoBonita, MAX_CONTEUDOS } from '../src/data/layouts.js';
 
 // ---------- Busca de mapas ----------
 
@@ -361,10 +361,10 @@ test('simulado: nota em porcentagem e trilha não aponta simulado como próximo 
 
 test('mapa: toda quantidade de 1 a 8 tem várias variantes (8 só tem um jeito)', () => {
     const quantas = Array.from({ length: MAX_CONTEUDOS }, (_, i) => layouts[i + 1].length);
-    assert.deepEqual(quantas, [8, 16, 52, 70, 56, 28, 8, 1]);
+    assert.deepEqual(quantas, [4, 4, 8, 6, 8, 4, 4, 1]);
 });
 
-test('mapa: nenhuma variante usa o meio (título), repete célula ou deixa tudo de um lado', () => {
+test('mapa: nenhuma variante usa o meio (título), repete célula ou fica torta', () => {
     for (let quantidade = 1; quantidade <= MAX_CONTEUDOS; quantidade++) {
         for (const { rows, cols, posicoes } of layouts[quantidade]) {
             assert.equal(posicoes.length, quantidade);
@@ -372,12 +372,17 @@ test('mapa: nenhuma variante usa o meio (título), repete célula ou deixa tudo 
             assert.equal(cols, 3);
             assert.ok(posicoes.every((p) => !(p.row === 2 && p.col === 2)));
             assert.equal(new Set(posicoes.map((p) => `${p.row}-${p.col}`)).size, quantidade);
-            assert.ok(disposicaoEquilibrada(posicoes));
+            assert.ok(disposicaoBonita(posicoes));
         }
     }
 });
 
-test('mapa: dois botões na mesma linha de cima é torto; cantos opostos é equilibrado', () => {
-    assert.equal(disposicaoEquilibrada([{ row: 1, col: 1 }, { row: 1, col: 3 }]), false);
-    assert.equal(disposicaoEquilibrada([{ row: 1, col: 1 }, { row: 3, col: 3 }]), true);
+test('mapa: tudo de um lado só fica de fora; desenhos espelhados entram', () => {
+    // dois na linha de cima
+    assert.equal(disposicaoBonita([{ row: 1, col: 1 }, { row: 1, col: 3 }]), false);
+    // cinco: coluna da esquerda inteira + meio de cima e de baixo (espelhado, mas pesa pra esquerda)
+    assert.equal(disposicaoBonita([{ row: 1, col: 1 }, { row: 1, col: 2 }, { row: 2, col: 1 }, { row: 3, col: 1 }, { row: 3, col: 2 }]), false);
+    // cantos opostos e o triângulo (dois em cima, um embaixo no meio)
+    assert.equal(disposicaoBonita([{ row: 1, col: 1 }, { row: 3, col: 3 }]), true);
+    assert.equal(disposicaoBonita([{ row: 1, col: 1 }, { row: 1, col: 3 }, { row: 3, col: 2 }]), true);
 });

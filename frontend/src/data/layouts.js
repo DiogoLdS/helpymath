@@ -30,21 +30,31 @@ function combinacoes(lista, quantidade, inicio = 0) {
     return resultado;
 }
 
-// Uma disposição fica torta quando todos os botões caem no mesmo lado do título
-// (todos na linha de cima, todos na de baixo, todos na coluna da esquerda ou todos na da direita):
-// o mapa fica com um lado vazio. Com 1 botão não tem como equilibrar, então vale qualquer célula.
-export function disposicaoEquilibrada(posicoes) {
-    if (posicoes.length < 2) return true;
-    const mesmoLado = (campo, valor) => posicoes.every((p) => p[campo] === valor);
-    return !(mesmoLado("row", 1) || mesmoLado("row", 3) || mesmoLado("col", 1) || mesmoLado("col", 3));
+// Só entram as disposições "bonitas", que obedecem às duas regras:
+// 1) são espelhadas: iguais dos dois lados (esquerda/direita), de cima e de baixo,
+//    ou girando meia volta em torno do título;
+// 2) não pesam pra um lado: contando quantos botões ficam de cada lado do título,
+//    a diferença é no máximo 1 (tanto entre esquerda e direita quanto entre cima e baixo).
+// Assim não aparece, por exemplo, mapa com tudo na coluna da esquerda ou tudo na linha de cima.
+const temCelula = (posicoes, row, col) => posicoes.some((p) => p.row === row && p.col === col);
+const espelhada = (posicoes, espelho) => posicoes.every((p) => temCelula(posicoes, ...espelho(p)));
+
+export function disposicaoBonita(posicoes) {
+    const simetrica =
+        espelhada(posicoes, (p) => [p.row, 4 - p.col]) ||     // esquerda ↔ direita
+        espelhada(posicoes, (p) => [4 - p.row, p.col]) ||     // cima ↔ baixo
+        espelhada(posicoes, (p) => [4 - p.row, 4 - p.col]);   // meia volta
+    const pesoVertical = posicoes.reduce((soma, p) => soma + (p.row - 2), 0);
+    const pesoHorizontal = posicoes.reduce((soma, p) => soma + (p.col - 2), 0);
+    return simetrica && Math.abs(pesoVertical) <= 1 && Math.abs(pesoHorizontal) <= 1;
 }
 
-// Monta as variantes de 1 a 8 conteúdos: todas as disposições equilibradas.
-// (1: 8 variantes, 2: 16, 3: 52, 4: 70, 5: 56, 6: 28, 7: 8, 8: 1)
+// Monta as variantes de 1 a 8 conteúdos: todas as disposições bonitas.
+// (1: 4 variantes, 2: 4, 3: 8, 4: 6, 5: 8, 6: 4, 7: 4, 8: 1)
 const layouts = {};
 for (let quantidade = 1; quantidade <= MAX_CONTEUDOS; quantidade++) {
     layouts[quantidade] = combinacoes(CELULAS, quantidade)
-        .filter(disposicaoEquilibrada)
+        .filter(disposicaoBonita)
         .map((posicoes) => ({ rows: 3, cols: 3, posicoes }));
 }
 
