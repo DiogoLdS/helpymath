@@ -21,6 +21,14 @@ import {
 import "./Perfil.css";
 import Carregando from "../Carregando/Carregando.jsx";
 
+// Etiqueta no alto de cada cartão do carrossel de recomendações
+const ROTULO_RECOMENDACAO = {
+    revisar: "Para revisar",
+    simular: "Simulação",
+    continuar: "Em andamento",
+    comecar: "Próximo passo",
+};
+
 // Página de perfil do aluno (Figura 4.3.2 do TCC, CU07 e CU08, RF009, RF010, RF016 e RF017):
 // dados da conta, números, meta da semana, cronograma em carrossel, recomendações em carrossel,
 // conteúdos concluídos e pendentes, desempenho, histórico, conquistas e anotações.
@@ -238,9 +246,9 @@ const Perfil = () => {
                                 {sugestoes.map((s) => (
                                     <Link key={`${s.tipo}-${s.mapa.mapaId}`} to={s.para} className={`recomendacao ${s.tipo}`}>
                                         <span className="recomendacaoTipo">
-                                            {s.tipo === "revisar" ? "Para revisar" : s.tipo === "continuar" ? "Em andamento" : "Próximo passo"}
+                                            {ROTULO_RECOMENDACAO[s.tipo]}
                                         </span>
-                                        <strong>{s.mapa.nome}</strong>
+                                        <strong>{s.titulo ?? s.mapa.nome}</strong>
                                         <span>{s.motivo}</span>
                                         <span className="recomendacaoAcao">{s.acao} →</span>
                                     </Link>

@@ -204,3 +204,31 @@ test('simulações: caminhos da lista são links internos válidos', async () =>
     const { default: lista } = await import('../src/data/simulacoes.js');
     for (const s of lista) assert.ok(linkInterno(s.caminho), s.caminho);
 });
+
+/* ---------- Recomendações com simulações (CU08) ---------- */
+
+import { recomendacoes } from '../src/Components/Perfil/perfilUtils.js';
+import { simulacaoDoMapa } from '../src/data/simulacoes.js';
+
+test('simulação certa para o nome do mapa, com ou sem acento', () => {
+    assert.equal(simulacaoDoMapa('PROBABILIDADE')?.caminho, '/simulacoes/dados');
+    assert.equal(simulacaoDoMapa('Função Afim')?.caminho, '/simulacoes/funcao-afim');
+    assert.equal(simulacaoDoMapa('funcao afim')?.caminho, '/simulacoes/funcao-afim');
+    assert.equal(simulacaoDoMapa('Função Quadrática'), null);
+});
+
+test('recomendações: simulação logo depois do mapa para revisar, sem repetir', () => {
+    const mapa = (mapaId, nome, extra = {}) => ({ mapaId, nome, liberado: true, concluido: false, ...extra });
+    const mapas = [
+        mapa(1, 'Probabilidade', { progresso: { conteudosFeitos: 2, conteudosTotal: 4, questoesRespondidas: 2, questoesAcertos: 1, questoesTotal: 2 } }),
+        mapa(2, 'Probabilidade 2', { progresso: { conteudosFeitos: 1, conteudosTotal: 3, questoesRespondidas: 0 } }),
+        mapa(3, 'Função Quadrática'),
+    ];
+    const r = recomendacoes(mapas);
+    const tipos = r.map((x) => `${x.tipo}:${x.mapa.mapaId}`);
+    const iSim = tipos.indexOf('simular:1');
+    assert.ok(iSim > 0, `esperava uma simulação para o mapa 1 em ${tipos}`);
+    assert.equal(r.filter((x) => x.tipo === 'simular').length, 1, 'a mesma simulação não pode aparecer duas vezes');
+    assert.equal(r[iSim].para, '/simulacoes/dados');
+    assert.ok(!tipos.includes('simular:3'), 'mapa sem simulação não ganha cartão de simulação');
+});

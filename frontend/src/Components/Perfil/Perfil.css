@@ -541,6 +541,7 @@
 
 .recomendacao.revisar { border-top-color: var(--vermelho); }
 .recomendacao.continuar { border-top-color: var(--laranja); }
+.recomendacao.simular { border-top-color: var(--verde); }
 
 .recomendacao:hover {
     transform: translate(-2px, -2px);

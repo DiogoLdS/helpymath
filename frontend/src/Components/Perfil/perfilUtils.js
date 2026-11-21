@@ -1,5 +1,6 @@
 // Contas da página de perfil, feitas no navegador (no fuso horário do aluno) a partir do GET /perfil.
 // (Fora dos .jsx porque arquivo de componente só deve exportar componentes.)
+import { simulacaoDoMapa } from "../../data/simulacoes.js";
 
 // Objetivo de estudo (perguntado nas boas-vindas). Cada um muda o plano do aluno:
 // a meta sugerida da semana, se o Treino (simulados) entra no plano e a dica da página inicial.
@@ -142,7 +143,34 @@ export function desempenhoPorMapa(mapas) {
 
 // Recomendações (CU08 do TCC): primeiro os mapas com pior desempenho nas questões,
 // depois os mapas que o aluno pode continuar agora. Vira um carrossel na página.
+// Quando um mapa para revisar ou em andamento tem uma simulação do mesmo assunto,
+// ela entra logo depois dele ("mapas, simulações e exercícios", como pede o CU08).
 export function recomendacoes(mapas) {
+    const lista = recomendacoesDeMapas(mapas);
+    const comSimulacoes = [];
+    const jaSugeridas = new Set();
+
+    for (const r of lista) {
+        comSimulacoes.push(r);
+        if (r.tipo !== "revisar" && r.tipo !== "continuar") continue;
+
+        const sim = simulacaoDoMapa(r.mapa.nome);
+        if (!sim || jaSugeridas.has(sim.caminho)) continue;
+        jaSugeridas.add(sim.caminho);
+        comSimulacoes.push({
+            mapa: r.mapa,
+            tipo: "simular",
+            titulo: sim.nome,
+            motivo: `Para entender ${r.mapa.nome} na prática`,
+            acao: "Abrir simulação",
+            para: sim.caminho,
+        });
+    }
+
+    return comSimulacoes.slice(0, 8);
+}
+
+function recomendacoesDeMapas(mapas) {
     const fracos = desempenhoPorMapa(mapas)
         .filter((d) => d.porcentagem < 100)
         .sort((a, b) => a.porcentagem - b.porcentagem)
@@ -170,7 +198,7 @@ export function recomendacoes(mapas) {
             };
         });
 
-    return [...fracos, ...emAndamento].slice(0, 8);
+    return [...fracos, ...emAndamento];
 }
 
 // Conquistas (RF017 do TCC): calculadas a partir do que o aluno já fez
