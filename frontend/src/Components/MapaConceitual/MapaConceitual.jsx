@@ -331,8 +331,9 @@ const MapaConceitual = () => {
             <div
                 className="mapaGrid"
                 style={{
+                    // minmax(0, 1fr) nas colunas: ficam sempre do mesmo tamanho, mesmo com texto comprido
                     gridTemplateRows: `repeat(${layout.rows}, 1fr)`,
-                    gridTemplateColumns: `repeat(${layout.cols}, 1fr)`,
+                    gridTemplateColumns: `repeat(${layout.cols}, minmax(0, 1fr))`,
                 }}
             >
 

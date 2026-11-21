@@ -17,7 +17,10 @@
     border: 5px solid #567EBB;
     ;
     border-radius: 0px 20px 20px 0px;
-    padding: 102px;
+    /* em cima e embaixo fica a margem dos botões (imprimir, progresso, mapa anterior, questões);
+       nas laterais a margem diminui em telas menores pra sobrar espaço pros conteúdos */
+    padding: 102px clamp(40px, 6vw, 102px);
+    gap: clamp(10px, 1.4vw, 20px);
     max-width: 1500px;
     align-items: center;
 }
@@ -28,9 +31,12 @@
     grid-row: 2;
     background-color: #567EBB;
     color: #FFFFFF;
-    font-size: 40px;
+    /* Fonte acompanha o tamanho da tela (largura e altura), entre 22px e 40px */
+    font-size: clamp(22px, min(2.7vw, 4.4vh), 40px);
     font-weight: 700;
-    padding: 24px 32px;
+    padding: clamp(12px, 1.6vw, 24px) clamp(16px, 2.2vw, 32px);
+    max-width: 100%;
+    overflow-wrap: break-word;
     border-radius: 16px;
     text-align: center;
     z-index: 2;
@@ -50,9 +56,14 @@
     text-align: center;
     height: 40%;
     width: fit-content;
-    padding: 0 20px;
+    /* nunca passa da largura da própria coluna (senão invade o vizinho) */
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: break-word;
+    padding: 0 clamp(10px, 1.4vw, 20px);
     justify-self: center;
-    font-size: 26px;
+    /* Fonte acompanha o tamanho da tela, entre 15px e 26px */
+    font-size: clamp(15px, min(1.75vw, 2.9vh), 26px);
     font-weight: 600;
 }
 
@@ -95,13 +106,13 @@
 
 /* Título e texto menores que os dos botões (26px): o indicador costuma ter mais texto */
 .mapaIndicador strong {
-    font-size: 20px;
+    font-size: clamp(14px, min(1.35vw, 2.2vh), 20px);
     font-weight: 600;
 }
 
 .mapaIndicador > div {
     width: auto;
-    font-size: 15px;
+    font-size: clamp(12px, min(1vw, 1.7vh), 15px);
     font-weight: 400;
     white-space: pre-line;
 }

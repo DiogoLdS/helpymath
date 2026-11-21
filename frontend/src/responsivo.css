@@ -237,7 +237,10 @@
     .App .mapaGrid {
         /* espaço em cima e embaixo pros botões de imprimir/editar e "Fazer questões" */
         padding: 64px 8px 72px;
-        gap: 12px;
+        gap: 12px 6px;
+        /* coluna do meio (título) um pouco mais larga, pra palavra do título caber inteira.
+           !important porque as colunas vêm no style do componente */
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1fr) !important;
     }
 
     /* min-width: 0 deixa as colunas do grid encolherem por igual (sem isso a coluna do
@@ -248,18 +251,15 @@
         overflow-wrap: break-word;
     }
 
-    /* O título fica sempre no centro do mapa. Aqui ele sai da conta das colunas
-       (position: absolute), assim não alarga a coluna do meio nem quebra a palavra */
+    /* O título fica na célula do meio, como no computador. As colunas têm sempre a mesma
+       largura (minmax(0, 1fr)), então ele quebra a linha em vez de alargar a coluna,
+       e não fica por cima dos conteúdos das laterais */
     .App .mapaTitulo {
-        /* sem célula, o "absolute" passa a ser em relação à caixa toda do mapa */
-        grid-area: auto;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        max-width: calc(100% - 32px);
-        font-size: 18px;
-        padding: 12px 14px;
+        max-width: 100%;
+        font-size: 15px;
+        padding: 8px 6px;
+        overflow-wrap: break-word;
+        hyphens: auto;
     }
 
     .App .mapaNo {
@@ -434,10 +434,19 @@
     /* Mapa: cabe na altura da tela. O progresso volta pro canto de cima à esquerda
        (como no computador) e "Mapa anterior" / "Fazer questões" ficam nos cantos de baixo */
     .App .mapaGrid.mapaGrid {
-        height: calc(100vh - 28px);
-        min-height: 340px;
+        /* cresce se algum conteúdo for alto (ex.: indicador com fórmula comprida),
+           em vez de um ficar por cima do outro; aí a página rola */
+        height: auto;
+        min-height: max(340px, calc(100vh - 28px));
         padding: 60px 12px 60px;
         gap: 8px;
+        /* deitado sobra largura: as três colunas voltam a ter o mesmo tamanho */
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    /* As linhas de giz só acompanham o tamanho da grade (sem isso o SVG, quadrado, esticaria a altura) */
+    .App .mapaLinhas {
+        contain: size;
     }
 
     .App .mapaAcoesTopo {
