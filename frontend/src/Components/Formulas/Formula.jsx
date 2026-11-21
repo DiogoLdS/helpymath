@@ -2,6 +2,7 @@ import { Fragment, useMemo } from "react";
 // O CSS do KaTeX continua no arquivo principal: as fontes dele (KaTeX_Main) são usadas no site todo
 import "katex/dist/katex.min.css";
 import { useKatex } from "./carregarKatex.js";
+import { separarFormulas } from "./formulaUtils.js";
 import "./Formulas.css";
 
 // Renderiza uma fórmula LaTeX com KaTeX.
@@ -29,25 +30,21 @@ export function Formula({ latex, bloco = false }) {
 }
 
 // Pedaços entre $$...$$ (bloco) e $...$ (na linha) viram fórmulas; o resto continua texto normal.
-// Como o split usa um grupo de captura, as fórmulas ficam sempre nas posições ímpares.
-const PADRAO_FORMULA = /(\$\$[\s\S]+?\$\$|\$[^$\n]+?\$)/g;
-
+// O "R$ 5,00" das questões de dinheiro continua texto (ver separarFormulas).
 export function TextoComFormulas({ texto }) {
-    const partes = texto.split(PADRAO_FORMULA);
+    const partes = separarFormulas(texto);
 
-    const ehBloco = (parte) => parte !== undefined && parte.startsWith("$$");
+    const ehBloco = (parte) => parte?.tipo === "bloco";
 
     return (
         <>
             {partes.map((parte, i) => {
-                if (i % 2 === 1) {
-                    return ehBloco(parte)
-                        ? <Formula key={i} latex={parte.slice(2, -2).trim()} bloco />
-                        : <Formula key={i} latex={parte.slice(1, -1).trim()} />;
+                if (parte.tipo !== "texto") {
+                    return <Formula key={i} latex={parte.conteudo} bloco={parte.tipo === "bloco"} />;
                 }
 
                 // A quebra de linha colada numa fórmula em bloco só atrapalha (o bloco já quebra a linha)
-                let textoNormal = parte;
+                let textoNormal = parte.conteudo;
                 if (ehBloco(partes[i - 1])) textoNormal = textoNormal.replace(/^\n/, "");
                 if (ehBloco(partes[i + 1])) textoNormal = textoNormal.replace(/\n$/, "");
 

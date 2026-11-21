@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 
 import { buscarMapas, normalizar } from '../src/Components/Mapas/buscaUtils.js';
 import { acertosNecessarios, mapaAtual, porcentagemDoMapa, recomendacao } from '../src/Components/Mapas/trilhaUtils.js';
-import { formulasNaLinha, temFormula, textoSemFormulas } from '../src/Components/Formulas/formulaUtils.js';
+import { formulasNaLinha, separarFormulas, temFormula, textoSemFormulas } from '../src/Components/Formulas/formulaUtils.js';
 import { idVideoYoutube, linkValido, montarMarcacaoMidia } from '../src/Components/Midia/midiaUtils.js';
 import { linkDestinoValido, linkExterno, linkInterno } from '../src/utils/linkDestino.js';
 import { decodificarToken } from '../src/utils/auth.js';
@@ -231,4 +231,26 @@ test('recomendações: simulação logo depois do mapa para revisar, sem repetir
     assert.equal(r.filter((x) => x.tipo === 'simular').length, 1, 'a mesma simulação não pode aparecer duas vezes');
     assert.equal(r[iSim].para, '/simulacoes/dados');
     assert.ok(!tipos.includes('simular:3'), 'mapa sem simulação não ganha cartão de simulação');
+});
+
+/* ---------- Cifrão de dinheiro não é fórmula ---------- */
+
+const resumo = (texto) => separarFormulas(texto).map((p) => `${p.tipo}:${p.conteudo}`);
+
+test('R$ e US$ com número continuam texto', () => {
+    assert.deepEqual(resumo('Custa R$ 8,00 mais R$ 1,50 por km'), ['texto:Custa R$ 8,00 mais R$ 1,50 por km']);
+    assert.deepEqual(resumo('Paga US$10 e $x = 2$'), ['texto:Paga US$10 e ', 'linha:x = 2', 'texto:']);
+    assert.equal(temFormula('Uma taxa de R$ 5,00 e outra de R$ 2,00'), false);
+});
+
+test('"$R$ 5,00$" digitado por engano vira dinheiro', () => {
+    const texto = 'taxa fixa de $R$ 5,00$ mais $R$ 2,00$ por quilômetro';
+    assert.deepEqual(resumo(texto), ['texto:taxa fixa de R$ 5,00 mais R$ 2,00 por quilômetro']);
+});
+
+test('fórmulas de verdade continuam funcionando', () => {
+    assert.deepEqual(resumo('O raio $R$ vale 5'), ['texto:O raio ', 'linha:R', 'texto: vale 5']);
+    assert.deepEqual(resumo(String.raw`$$P(A) = \frac{n(A)}{n(\Omega)}$$`), ['texto:', String.raw`bloco:P(A) = \frac{n(A)}{n(\Omega)}`, 'texto:']);
+    assert.deepEqual(resumo(String.raw`Use \$ para escrever um cifrão`), ['texto:Use $ para escrever um cifrão']);
+    assert.deepEqual(resumo(String.raw`Lucro: $L = R\$ 10 \cdot x$`), ['texto:Lucro: ', String.raw`linha:L = R\$ 10 \cdot x`, 'texto:']);
 });
