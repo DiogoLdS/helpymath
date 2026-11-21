@@ -149,12 +149,6 @@
     box-shadow: none;
 }
 
-/* "Fazer questões" já usa transform pra se centralizar; a sombra fica, o movimento não */
-.App .mapaQuestoes:hover,
-.App .mapaQuestoes:active {
-    transform: translateY(-50%);
-}
-
 /* O botão de cancelar é de contorno: sombra só de linha, mais discreta */
 .App .botaoCancelar {
     border-radius: 4px;
@@ -732,11 +726,11 @@
     transform: translate(1px, 1px);
 }
 
-/* ---------- "← Mapa anterior": meio da lateral esquerda, espelhando o "Fazer questões" ---------- */
+/* ---------- "← Mapa anterior": canto de baixo à esquerda, espelhando o "Fazer questões" ---------- */
 
 .App .mapaAnterior {
     position: absolute;
-    top: 50%;
+    bottom: 24px;
     left: 24px;
     z-index: 5;
     display: flex;
@@ -752,7 +746,6 @@
     border: 2px solid #FFFFFF;
     border-radius: 4px;
     box-shadow: 3px 3px 0 var(--tinta);
-    transform: translateY(-50%);
     transition: box-shadow 0.1s ease;
 }
 
@@ -767,7 +760,7 @@
     text-overflow: ellipsis;
 }
 
-/* Já usa transform pra se centralizar; no hover só a sombra muda */
+/* No hover só a sombra muda */
 .App .mapaAnterior:hover {
     background-color: var(--azul);
     box-shadow: 2px 2px 0 var(--tinta);

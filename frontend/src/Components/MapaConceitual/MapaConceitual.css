@@ -159,11 +159,12 @@
     z-index: 5;
 }
 
+/* Canto de baixo à direita, na margem do quadro (fora da grade dos conteúdos,
+   pra nunca ficar em cima de um botão do mapa) */
 .mapaQuestoes {
     position: absolute;
-    top: 50%;
+    bottom: 24px;
     right: 24px;
-    transform: translateY(-50%);
     z-index: 5;
 }
 

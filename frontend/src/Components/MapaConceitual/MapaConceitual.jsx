@@ -278,7 +278,7 @@ const MapaConceitual = () => {
                 </div>
             )}
 
-            {/* Meio da lateral esquerda (espelha o "Fazer questões" da direita): volta pro mapa anterior
+            {/* Canto de baixo à esquerda (espelha o "Fazer questões" da direita): volta pro mapa anterior
                 do nível. O primeiro mapa do nível não tem anterior, então ali o botão não aparece */}
             {mapaAnterior && (
                 <Link to={`/mapas/${mapaAnterior.mapaId}`} className="mapaAnterior" title={`Voltar para ${mapaAnterior.nome}`}>

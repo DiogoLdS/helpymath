@@ -513,7 +513,13 @@
     /* Mapa: título e conteúdos um pouco menores, pra não quebrar em várias linhas */
     .App .mapaGrid {
         height: 92vh;
-        padding: 72px 70px;
+        /* embaixo sobra mais: é onde ficam "Mapa anterior" e "Fazer questões" */
+        padding: 72px 70px 96px;
+    }
+
+    .App .mapaQuestoes,
+    .App .mapaAnterior {
+        bottom: 16px;
     }
 
     .App .mapaTitulo {
