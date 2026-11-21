@@ -1,12 +1,10 @@
 import prisma from './adapter.js';
-import { liberadaEm } from './resolucao.js';
 
 // Simulados: "mapas" do Treino que só têm questões (ex: "ENEM 2024") e são feitos como prova.
 // - O aluno marca as alternativas de todas as questões e entrega; só aí vê a nota, o gabarito e as resoluções.
 // - Cada resposta fica salva em usuarioquestao, como nas questões dos mapas (conta no ranking, no perfil
 //   e no "Revisar erros"). Questão deixada em branco conta como erro na nota, mas não é salva.
-// - Como o gabarito aparece na entrega, o simulado só pode ser refeito 24 h depois (a mesma espera de quem
-//   vê a resolução de uma questão errada, em services/resolucao.js). Admin refaz quando quiser.
+// - Depois de entregar, o aluno pode refazer o simulado quando quiser (a nova entrega substitui a anterior).
 // - Visitante (sem conta) faz e vê a correção, mas nada fica salvo.
 
 const MAX_QUESTOES = 200;
@@ -78,11 +76,7 @@ async function ultimaEntrega(questoes, usuarioId) {
     if (salvas.length === 0) return null;
 
     const entregueEm = new Date(Math.max(...salvas.map((s) => new Date(s.respondidaEm).getTime())));
-    return {
-        ...corrigirSimulado(questoes, salvas),
-        entregueEm,
-        refazerEm: liberadaEm(entregueEm)
-    };
+    return { ...corrigirSimulado(questoes, salvas), entregueEm };
 }
 
 // GET: a prova (sem gabarito nem resolução) e, se o aluno já entregou, a correção da última entrega.
@@ -92,7 +86,6 @@ export async function buscarSimulado(mapaId, usuarioId = null, admin = false) {
     if (!dados) return null;
 
     const entrega = usuarioId ? await ultimaEntrega(dados.questoes, usuarioId) : null;
-    if (entrega && admin) entrega.refazerEm = null;
 
     return {
         mapaId: dados.mapa.mapaId,
@@ -107,7 +100,7 @@ export async function buscarSimulado(mapaId, usuarioId = null, admin = false) {
     };
 }
 
-// POST: corrige a prova e salva as respostas. Devolve a correção, ou { erro, status } (e refazerEm na espera).
+// POST: corrige a prova e salva as respostas. Devolve a correção, ou { erro, status }.
 export async function entregarSimulado(mapaId, usuarioId, admin, respostas) {
     if (!Array.isArray(respostas) || respostas.length > MAX_QUESTOES) {
         return { erro: 'Respostas inválidas', status: 400 };
@@ -120,14 +113,7 @@ export async function entregarSimulado(mapaId, usuarioId, admin, respostas) {
     const resultado = corrigirSimulado(dados.questoes, respostas);
 
     // Visitante: só corrige
-    if (!usuarioId) return { ...resultado, entregueEm: new Date(), refazerEm: null, visitante: true };
-
-    if (!admin) {
-        const anterior = await ultimaEntrega(dados.questoes, usuarioId);
-        if (anterior?.refazerEm) {
-            return { erro: 'Você já entregou este simulado. Dá para refazer 24 horas depois da entrega.', status: 409, refazerEm: anterior.refazerEm };
-        }
-    }
+    if (!usuarioId) return { ...resultado, entregueEm: new Date(), visitante: true };
 
     const agora = new Date();
     const emBranco = resultado.itens.filter((i) => i.alternativaId === null).map((i) => i.questaoId);
@@ -140,7 +126,7 @@ export async function entregarSimulado(mapaId, usuarioId, admin, respostas) {
                 alternativaId: i.alternativaId,
                 correta: i.correta,
                 respondidaEm: agora,
-                // O gabarito aparece na entrega: errada conta como "viu a resolução" (mesma regra das questões)
+                // O gabarito aparece na entrega: errada fica registrada como "viu a resolução"
                 resolucaoVistaEm: i.correta ? null : agora
             };
             return prisma.usuarioquestao.upsert({
@@ -152,5 +138,5 @@ export async function entregarSimulado(mapaId, usuarioId, admin, respostas) {
         prisma.usuarioquestao.deleteMany({ where: { usuarioId, questaoId: { in: emBranco } } })
     ]);
 
-    return { ...resultado, entregueEm: agora, refazerEm: admin ? null : liberadaEm(agora) };
+    return { ...resultado, entregueEm: agora };
 }

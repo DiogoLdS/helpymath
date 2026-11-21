@@ -43,10 +43,9 @@ test('a consulta não pede o campo "correta" das alternativas (o aluno refaz a q
     assert.deepEqual(Object.keys(camposDaAlternativa).sort(), ['id', 'letra', 'texto']);
 });
 
-test('questão com resolução vista há pouco vem com a data em que libera; a resolução em si não vem', async () => {
+test('a resolução não vem na revisão e não há espera pra refazer', async () => {
     const r = await questoesParaRevisar(7);
     const fracoes = r.mapas.find((m) => m.nome === 'Frações');
-    assert.ok(fracoes.questoes[0].liberadaEm instanceof Date);
-    assert.equal(fracoes.questoes[1].liberadaEm, null);
+    assert.ok(fracoes.questoes.every((q) => !('liberadaEm' in q)));
     assert.ok(!('resolucao' in consulta.select.questao.select), 'a resolução não é buscada na revisão');
 });

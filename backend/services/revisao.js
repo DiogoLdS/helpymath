@@ -1,5 +1,4 @@
 import prisma from './adapter.js';
-import { liberadaEm } from './resolucao.js';
 
 // "Revisar erros": as questões que o aluno errou (na última tentativa), de todos os mapas, num lugar só.
 // Vem agrupado por mapa, na ordem da trilha. A alternativa correta NÃO vai junto (o aluno refaz a questão).
@@ -10,7 +9,6 @@ export async function questoesParaRevisar(usuarioId) {
         orderBy: { respondidaEm: 'desc' },
         select: {
             respondidaEm: true,
-            resolucaoVistaEm: true,
             questao: {
                 select: {
                     questaoId: true,
@@ -24,7 +22,7 @@ export async function questoesParaRevisar(usuarioId) {
 
     // Agrupa por mapa, mantendo a ordem da trilha (ordem, depois id)
     const porMapa = new Map();
-    for (const { respondidaEm, resolucaoVistaEm, questao } of erradas) {
+    for (const { respondidaEm, questao } of erradas) {
         const mapa = questao.mapaconceitual;
         if (!porMapa.has(mapa.mapaId)) {
             porMapa.set(mapa.mapaId, { mapaId: mapa.mapaId, nome: mapa.nome, nivel: mapa.nivel, ordem: mapa.ordem, questoes: [] });
@@ -33,8 +31,6 @@ export async function questoesParaRevisar(usuarioId) {
             questaoId: questao.questaoId,
             enunciado: questao.enunciado,
             erradaEm: respondidaEm,
-            // Viu a resolução há pouco: só pode refazer a partir desta data (null = já pode)
-            liberadaEm: liberadaEm(resolucaoVistaEm),
             alternativa: questao.alternativa
         });
     }

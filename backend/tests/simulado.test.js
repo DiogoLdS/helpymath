@@ -1,4 +1,4 @@
-// Simulados: correção no fim (tipo prova), respostas salvas e espera de 24 h para refazer.
+// Simulados: correção no fim (tipo prova), respostas salvas e refazer quando quiser.
 // Banco falso na memória: nada toca o banco de verdade.
 import { test, mock, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
@@ -66,17 +66,17 @@ test('mapa comum não é simulado', async () => {
     assert.equal((await entregarSimulado(9, 7, false, [])).status, 404);
 });
 
-test('entrega salva as respondidas, apaga as em branco e marca a espera', async () => {
+test('entrega salva as respondidas e apaga as em branco', async () => {
     const r = await entregarSimulado(9, 7, false, [
         { questaoId: 1, alternativaId: 11 },
         { questaoId: 2, alternativaId: 22 },
     ]);
     assert.equal(r.acertos, 1);
-    assert.ok(r.refazerEm > new Date());
+    assert.ok(!('refazerEm' in r));
 
     const upserts = transacao.filter((o) => o.tipo === 'upsert').map((o) => o.args);
     assert.deepEqual(upserts.map((u) => u.where.usuarioId_questaoId.questaoId), [1, 2]);
-    // Acertou: nada de espera; errou: viu o gabarito
+    // Errou: fica registrado que viu o gabarito
     assert.equal(upserts[0].update.resolucaoVistaEm, null);
     assert.ok(upserts[1].update.resolucaoVistaEm instanceof Date);
 
@@ -84,23 +84,11 @@ test('entrega salva as respondidas, apaga as em branco e marca a espera', async 
     assert.deepEqual(apagar.where, { usuarioId: 7, questaoId: { in: [3] } });
 });
 
-test('não deixa refazer antes de 24 h (admin pode)', async () => {
-    salvas = [{ questaoId: 1, alternativaId: 11, respondidaEm: new Date(Date.now() - 60 * 60 * 1000) }];
-    const aluno = await entregarSimulado(9, 7, false, [{ questaoId: 1, alternativaId: 10 }]);
-    assert.equal(aluno.status, 409);
-    assert.equal(transacao, null);
-
-    const admin = await entregarSimulado(9, 1, true, [{ questaoId: 1, alternativaId: 10 }]);
-    assert.equal(admin.status, undefined);
-    assert.ok(transacao);
-});
-
-test('depois de 24 h refaz, e a correção salva volta na prova', async () => {
-    salvas = [{ questaoId: 3, alternativaId: 32, respondidaEm: new Date(Date.now() - 25 * 60 * 60 * 1000) }];
+test('refaz logo depois de entregar, e a correção salva volta na prova', async () => {
+    salvas = [{ questaoId: 3, alternativaId: 32, respondidaEm: new Date(Date.now() - 60 * 1000) }];
     const s = await buscarSimulado(9, 7, false);
     assert.equal(s.entrega.acertos, 1);
     assert.equal(s.entrega.emBranco, 2);
-    assert.equal(s.entrega.refazerEm, null);
 
     const r = await entregarSimulado(9, 7, false, [{ questaoId: 1, alternativaId: 11 }]);
     assert.equal(r.status, undefined);

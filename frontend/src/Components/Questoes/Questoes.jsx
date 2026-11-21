@@ -9,9 +9,8 @@ import AvisoVisitante from "../Visitante/AvisoVisitante.jsx";
 import Carimbo from "../Carimbo/Carimbo.jsx";
 import { TextoComFormulas } from "../Formulas/Formula.jsx";
 import { formulasNaLinha } from "../Formulas/formulaUtils.js";
-import { cabecalhoAuth, ehVisitante, usuarioEhAdmin } from "../../utils/auth.js";
+import { cabecalhoAuth, ehVisitante } from "../../utils/auth.js";
 import RespostaQuestao from "./RespostaQuestao.jsx";
-import { quandoLibera } from "./resolucaoUtils.js";
 
 // Precisa bater com NOTA_MINIMA do backend (services/progresso.js)
 const NOTA_MINIMA = 0.6;
@@ -34,8 +33,8 @@ const Questoes = () => {
     const [questoes, setQuestoes] = useState([]);
     // Alternativa escolhida em cada questão: { questaoId: alternativaId }
     const [respostas, setRespostas] = useState({});
-    // Correção de cada questão já respondida: { questaoId: { correto, letraCorreta, revelada, resolucao, liberadaEm } }
-    // revelada: a resolução já está aberta na tela; liberadaEm: viu a resolução e só refaz a partir dessa data
+    // Correção de cada questão já respondida: { questaoId: { correto, letraCorreta, revelada, resolucao } }
+    // revelada: a resolução já está aberta na tela
     const [resultados, setResultados] = useState({});
     const [bloqueado, setBloqueado] = useState(false);
     // Enquanto as questões não chegam, mostra o spinner (e não "Nenhuma questão cadastrada")
@@ -47,8 +46,6 @@ const Questoes = () => {
     const [placar, setPlacar] = useState(null);
     // Visitante (sem conta): as respostas são corrigidas, mas não ficam salvas
     const visitante = ehVisitante();
-    // Admin confere as questões sem o prazo de 24 horas da resolução
-    const admin = usuarioEhAdmin();
 
     useEffect(() => {
         const buscarQuestoes = async () => {
@@ -80,7 +77,7 @@ const Questoes = () => {
                 const corrigidas = {};
                 for (const r of data.questoes.respostas) {
                     anteriores[r.questaoId] = r.alternativaId;
-                    corrigidas[r.questaoId] = { correto: r.correta, letraCorreta: null, revelada: false, liberadaEm: r.liberadaEm ?? null };
+                    corrigidas[r.questaoId] = { correto: r.correta, letraCorreta: null, revelada: false };
                 }
 
                 setRespostas(anteriores);
@@ -126,7 +123,7 @@ const Questoes = () => {
             // Acertou: a resolução (se houver) já vem junto e aparece aberta
             setResultados((anteriores) => ({
                 ...anteriores,
-                [questaoId]: { correto, letraCorreta, revelada: correto, resolucao: resolucao ?? null, liberadaEm: null },
+                [questaoId]: { correto, letraCorreta, revelada: correto, resolucao: resolucao ?? null },
             }));
 
             if (resultado) {
@@ -136,12 +133,7 @@ const Questoes = () => {
                 setPlacar({ acertos: resultado.acertos, total: resultado.total, mapaConcluido, proximo });
             }
         } catch (error) {
-            // Viu a resolução há pouco (em outra aba ou na Revisar): ainda não pode refazer
-            const libera = error.response?.status === 409 ? error.response.data?.liberadaEm : null;
-            const mensagem = libera
-                ? `Você viu a resolução desta questão. Pode refazer ${quandoLibera(libera)}.`
-                : 'Não foi possível enviar sua resposta. Tente de novo.';
-            setErroEnvio((anteriores) => ({ ...anteriores, [questaoId]: mensagem }));
+            setErroEnvio((anteriores) => ({ ...anteriores, [questaoId]: 'Não foi possível enviar sua resposta. Tente de novo.' }));
             console.log(error.message);
         } finally {
             setRespondendo(null);
@@ -298,7 +290,6 @@ const Questoes = () => {
                                 questaoId={questao.questaoId}
                                 resultado={resultado}
                                 temResolucao={questao.temResolucao}
-                                semPrazo={visitante || admin}
                                 onTentarDeNovo={() => tentarDeNovo(questao.questaoId)}
                                 onRevelar={(dados) => revelar(questao.questaoId, dados)}
                             />

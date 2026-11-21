@@ -2,17 +2,14 @@ import { useState } from "react";
 import api from "../../../services/api.js";
 import { cabecalhoAuth } from "../../utils/auth.js";
 import { TextoComMidia } from "../Midia/Midia.jsx";
-import { quandoLibera } from "./resolucaoUtils.js";
 
 // O que aparece embaixo da questão depois que o aluno responde (página Questões e Revisar):
 // - acertou: "Resposta correta!" e a resolução, se a questão tiver (pra conferir o raciocínio);
-// - errou: "Tentar de novo" ou "Ver resolução". Quem abre a resolução só refaz a questão
-//   24 horas depois (senão bastaria ler a resposta e responder de novo pra bater a meta).
+// - errou: "Tentar de novo" ou "Ver resolução" (e, mesmo depois de ver, pode tentar de novo).
 //
-// resultado: { correto, revelada, resolucao, letraCorreta, liberadaEm }
+// resultado: { correto, revelada, resolucao, letraCorreta }
 // onRevelar(dados): avisa a página, que guarda os dados e destaca a alternativa certa.
-// semPrazo: visitante e admin (nada fica salvo / não há meta) não esperam as 24 horas.
-const RespostaQuestao = ({ questaoId, resultado, temResolucao, semPrazo, textos = {}, onTentarDeNovo, onRevelar }) => {
+const RespostaQuestao = ({ questaoId, resultado, temResolucao, textos = {}, onTentarDeNovo, onRevelar }) => {
     const [abrindo, setAbrindo] = useState(false);
     const [erro, setErro] = useState("");
 
@@ -21,7 +18,7 @@ const RespostaQuestao = ({ questaoId, resultado, temResolucao, semPrazo, textos 
         setErro("");
         try {
             const { data } = await api.post(`/questoes/${questaoId}/resolucao`, {}, { headers: cabecalhoAuth() });
-            onRevelar({ revelada: true, resolucao: data.resolucao, letraCorreta: data.letraCorreta, liberadaEm: data.liberadaEm });
+            onRevelar({ revelada: true, resolucao: data.resolucao, letraCorreta: data.letraCorreta });
         } catch (error) {
             setErro(error.response?.data?.error ?? "Não foi possível abrir a resolução. Tente de novo.");
             console.log(error.message);
@@ -52,11 +49,9 @@ const RespostaQuestao = ({ questaoId, resultado, temResolucao, semPrazo, textos 
         <>
             <div className="feedback-linha">
                 <p className="feedback incorreto" role="status">{textos.incorreto ?? "Resposta incorreta."}</p>
-                {!resultado.liberadaEm && (
-                    <button type="button" className="botao-responder" onClick={onTentarDeNovo}>
-                        Tentar de novo
-                    </button>
-                )}
+                <button type="button" className="botao-responder" onClick={onTentarDeNovo}>
+                    Tentar de novo
+                </button>
                 {!resultado.revelada && (
                     <button type="button" className="botao-contorno" onClick={revelar} disabled={abrindo}>
                         {abrindo ? "Abrindo..." : rotuloVer}
@@ -64,14 +59,6 @@ const RespostaQuestao = ({ questaoId, resultado, temResolucao, semPrazo, textos 
                 )}
             </div>
 
-            {!resultado.revelada && !resultado.liberadaEm && !semPrazo && (
-                <p className="questao-aviso">Se abrir a resolução, você só poderá refazer esta questão daqui a 24 horas.</p>
-            )}
-            {resultado.liberadaEm && (
-                <p className="questao-aviso">
-                    Você já viu a resolução. Pode refazer esta questão {quandoLibera(resultado.liberadaEm)}.
-                </p>
-            )}
             {erro && <p className="feedback incorreto">{erro}</p>}
 
             {resultado.revelada && <Resolucao resolucao={resultado.resolucao} letraCorreta={resultado.letraCorreta} />}

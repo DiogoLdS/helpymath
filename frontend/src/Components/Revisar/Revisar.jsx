@@ -11,7 +11,6 @@ import { TextoComFormulas } from "../Formulas/Formula.jsx";
 import { formulasNaLinha } from "../Formulas/formulaUtils.js";
 import niveis from "../../data/niveis.js";
 import RespostaQuestao from "../Questoes/RespostaQuestao.jsx";
-import { quandoLibera } from "../Questoes/resolucaoUtils.js";
 import "../Questoes/Questoes.css";
 import "./Revisar.css";
 
@@ -27,7 +26,7 @@ const Revisar = () => {
     const [revisao, setRevisao] = useState(null);
     const [erro, setErro] = useState("");
     const [respostas, setRespostas] = useState({});     // { questaoId: alternativaId }
-    const [resultados, setResultados] = useState({});   // { questaoId: { correto, revelada, resolucao, letraCorreta, liberadaEm } }
+    const [resultados, setResultados] = useState({});   // { questaoId: { correto, revelada, resolucao, letraCorreta } }
     const [respondendo, setRespondendo] = useState(null);
     const [mapasConcluidos, setMapasConcluidos] = useState([]); // mapas concluídos nesta revisão
 
@@ -36,14 +35,6 @@ const Revisar = () => {
         api.get("/revisao", { headers: cabecalhoAuth() })
             .then((resposta) => {
                 setRevisao(resposta.data);
-                // Questões cuja resolução o aluno viu há pouco: ficam esperando o prazo pra refazer
-                const esperando = {};
-                for (const mapa of resposta.data.mapas) {
-                    for (const q of mapa.questoes) {
-                        if (q.liberadaEm) esperando[q.questaoId] = { correto: false, revelada: false, liberadaEm: q.liberadaEm };
-                    }
-                }
-                setResultados(esperando);
             })
             .catch((error) => {
                 if (error.response?.status === 401) {
@@ -63,16 +54,13 @@ const Revisar = () => {
         try {
             const resposta = await api.post(`/questoes/${questaoId}/responder`, { alternativaId }, { headers: cabecalhoAuth() });
             const { correto, resolucao, mapaConcluido, proximo } = resposta.data;
-            setResultados((atual) => ({ ...atual, [questaoId]: { correto, revelada: correto, resolucao: resolucao ?? null, liberadaEm: null } }));
+            setResultados((atual) => ({ ...atual, [questaoId]: { correto, revelada: correto, resolucao: resolucao ?? null } }));
 
             if (mapaConcluido && !mapasConcluidos.some((m) => m.mapaId === mapa.mapaId)) {
                 setMapasConcluidos((atual) => [...atual, { mapaId: mapa.mapaId, nome: mapa.nome, proximo, em: new Date() }]);
             }
         } catch (error) {
-            const libera = error.response?.status === 409 ? error.response.data?.liberadaEm : null;
-            window.alert(libera
-                ? `Você viu a resolução desta questão. Pode refazer ${quandoLibera(libera)}.`
-                : error.response?.data?.error ?? "Não foi possível enviar sua resposta. Tente de novo.");
+            window.alert(error.response?.data?.error ?? "Não foi possível enviar sua resposta. Tente de novo.");
             console.log(error.message);
         } finally {
             setRespondendo(null);
@@ -195,9 +183,7 @@ const Revisar = () => {
                                         resultado={resultado}
                                         textos={{
                                             correto: "Agora foi! Resposta correta.",
-                                            incorreto: resultado.liberadaEm && !resultado.revelada && !respostas[questao.questaoId]
-                                                ? "Você errou esta questão."
-                                                : "Ainda não. Que tal rever o conteúdo do mapa?",
+                                            incorreto: "Ainda não. Que tal rever o conteúdo do mapa?",
                                         }}
                                         onTentarDeNovo={() => tentarDeNovo(questao.questaoId)}
                                         onRevelar={(dados) => revelar(questao.questaoId, dados)}

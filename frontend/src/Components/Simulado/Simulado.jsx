@@ -11,11 +11,10 @@ import { TextoComFormulas } from "../Formulas/Formula.jsx";
 import { formulasNaLinha } from "../Formulas/formulaUtils.js";
 import { cabecalhoAuth, ehVisitante, usuarioEhAdmin } from "../../utils/auth.js";
 import { Resolucao } from "../Questoes/RespostaQuestao.jsx";
-import { quandoLibera } from "../Questoes/resolucaoUtils.js";
 import { contarRespondidas, limparRascunho, porcentagemDeAcerto, respostasParaEnvio } from "./simuladoUtils.js";
 
 // Simulado (ex: "ENEM 2024"): o aluno marca todas as questões e entrega no fim, como numa prova.
-// Só depois da entrega aparecem a nota, o gabarito e as resoluções. Refazer: 24 h depois (regra no backend).
+// Só depois da entrega aparecem a nota, o gabarito e as resoluções. Dá para refazer quando quiser.
 // As marcações ficam guardadas no navegador enquanto ele faz, pra não perder tudo se a página recarregar.
 
 const chaveRascunho = (mapaId) => `simulado-rascunho-${mapaId}`;
@@ -135,10 +134,7 @@ const Simulado = () => {
             setSoErradas(false);
             window.scrollTo({ top: 0, behavior: "smooth" });
         } catch (error) {
-            const refazerEm = error.response?.status === 409 ? error.response.data?.refazerEm : null;
-            setErroEntrega(refazerEm
-                ? `Você já entregou este simulado. Dá para refazer ${quandoLibera(refazerEm)}.`
-                : "Não foi possível entregar. Suas marcações continuam aqui: tente de novo.");
+            setErroEntrega("Não foi possível entregar. Suas marcações continuam aqui: tente de novo.");
             console.log(error.message);
         } finally {
             setEntregando(false);
@@ -190,7 +186,6 @@ const Simulado = () => {
                         <p className="simuladoInstrucao">
                             Marque uma alternativa em cada questão e entregue no fim. A nota, o gabarito e as
                             resoluções aparecem depois da entrega.
-                            {!visitante && !admin && " Depois de entregar, dá para refazer o simulado 24 horas depois."}
                         </p>
                     )}
 
@@ -214,13 +209,9 @@ const Simulado = () => {
                             </div>
 
                             <div className="simuladoAcoesNota">
-                                {correcao.refazerEm ? (
-                                    <p className="questao-aviso">Dá para refazer {quandoLibera(correcao.refazerEm)}.</p>
-                                ) : (
-                                    <button type="button" className="botao-responder" onClick={refazer}>
-                                        Refazer simulado
-                                    </button>
-                                )}
+                                <button type="button" className="botao-responder" onClick={refazer}>
+                                    Refazer simulado
+                                </button>
                                 {correcao.acertos < correcao.total && (
                                     <label className="simuladoFiltro">
                                         <input
