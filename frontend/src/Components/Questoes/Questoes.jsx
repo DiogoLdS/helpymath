@@ -17,10 +17,20 @@ import { quandoLibera } from "./resolucaoUtils.js";
 const NOTA_MINIMA = 0.6;
 
 const Questoes = () => {
-    useTituloPagina("Questões");
-
     const { mapaId } = useParams();
     const navigate = useNavigate();
+    // Nome do mapa no topo da página e na aba, pra saber de que assunto são as questões
+    const [nomeMapa, setNomeMapa] = useState(null);
+    useTituloPagina(nomeMapa ? `Questões: ${nomeMapa}` : "Questões");
+
+    useEffect(() => {
+        let ativo = true;
+        api.get(`/mapas/${mapaId}`)
+            .then(({ data }) => { if (ativo) setNomeMapa(data?.nome ?? null); })
+            .catch(() => {}); // sem o nome, a página continua funcionando
+        return () => { ativo = false; };
+    }, [mapaId]);
+
     const [questoes, setQuestoes] = useState([]);
     // Alternativa escolhida em cada questão: { questaoId: alternativaId }
     const [respostas, setRespostas] = useState({});
@@ -167,6 +177,11 @@ const Questoes = () => {
         <main className='mainQuestoes'>
             <Marca comLink />
             <h1>Questões</h1>
+            {nomeMapa && (
+                <p className='questoesDoMapa'>
+                    Do mapa <Link to={`/mapas/${mapaId}`}>{nomeMapa}</Link>
+                </p>
+            )}
 
             {visitante && (
                 <AvisoVisitante compacto texto="Suas respostas são corrigidas, mas não ficam salvas. Crie uma conta para guardar o progresso e liberar o próximo mapa." />
@@ -254,6 +269,7 @@ const Questoes = () => {
                                         type='button'
                                         key={alternativa.id}
                                         className={classe}
+                                        aria-pressed={selecionada}
                                         disabled={!!resultado}
                                         onClick={() => selecionarAlternativa(questao.questaoId, alternativa.id)}
                                     >

@@ -9,6 +9,18 @@
     margin-bottom: 24px;
 }
 
+/* "Do mapa Função Afim": logo abaixo do título, puxado pra perto dele */
+.mainQuestoes .questoesDoMapa {
+    margin: -14px 0 24px;
+    font-size: 16px;
+    color: #4A5A73;
+}
+
+.mainQuestoes .questoesDoMapa a {
+    font-weight: 700;
+    color: #2B4C7E;
+}
+
 .questao-card {
     background-color: var(--bg);
     border: 1px solid var(--stroke);

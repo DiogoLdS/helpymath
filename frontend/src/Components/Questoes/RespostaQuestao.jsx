@@ -35,7 +35,7 @@ const RespostaQuestao = ({ questaoId, resultado, temResolucao, semPrazo, textos 
     if (resultado.correto) {
         return (
             <>
-                <p className="feedback correto">{textos.correto ?? "Resposta correta!"}</p>
+                <p className="feedback correto" role="status">{textos.correto ?? "Resposta correta!"}</p>
                 {resultado.revelada ? (
                     resultado.resolucao && <Resolucao resolucao={resultado.resolucao} />
                 ) : temResolucao && (
@@ -51,7 +51,7 @@ const RespostaQuestao = ({ questaoId, resultado, temResolucao, semPrazo, textos 
     return (
         <>
             <div className="feedback-linha">
-                <p className="feedback incorreto">{textos.incorreto ?? "Resposta incorreta."}</p>
+                <p className="feedback incorreto" role="status">{textos.incorreto ?? "Resposta incorreta."}</p>
                 {!resultado.liberadaEm && (
                     <button type="button" className="botao-responder" onClick={onTentarDeNovo}>
                         Tentar de novo

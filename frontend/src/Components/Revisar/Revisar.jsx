@@ -170,6 +170,7 @@ const Revisar = () => {
                                                 type="button"
                                                 key={alternativa.id}
                                                 className={classe}
+                                                aria-pressed={selecionada}
                                                 disabled={!!resultado}
                                                 onClick={() => setRespostas((atual) => ({ ...atual, [questao.questaoId]: alternativa.id }))}
                                             >
