@@ -89,7 +89,7 @@ const recursos = [
     {
         icone: "↗",
         titulo: "Acompanhe sua evolução",
-        texto: "Sequência de dias estudando, pontos e metas diárias na sua página inicial.",
+        texto: "Sequência de dias estudando, pontos e meta da semana na sua página inicial.",
     },
     {
         icone: "Aa",
