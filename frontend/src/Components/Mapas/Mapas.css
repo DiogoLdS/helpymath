@@ -13,8 +13,8 @@
     max-width: 1500px;
     padding: 32px 40px;
     overflow-y: auto;
-    /* papel claro em vez de cinza: as folhas coloridas dos níveis se destacam em cima dele */
-    background-color: var(--papel, #FBF9F4);
+    /* mesmo fundo do perfil, do ranking e das simulações */
+    background-color: #DCE0E6;
     border: 5px solid #567EBB;
     border-radius: 0px 20px 20px 0px;
 }

@@ -29,9 +29,14 @@
         box-shadow: none;
     }
 
-    .App section.art .linhaLogo,
-    .App section.art .space {
+    .App section.art .linhaLogo {
         display: none;
+    }
+
+    /* Página atual na barra de baixo: o fundo azul-claro vira uma "pílula" atrás do ícone */
+    .App section.art .ativo::before {
+        inset: 8px 6px;
+        border-radius: 10px;
     }
 
     .App section.art .logo,
