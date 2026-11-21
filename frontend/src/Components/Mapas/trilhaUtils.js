@@ -97,6 +97,18 @@ export function recomendacao(mapas, niveis, nivelFoco, nivelPreferido = null) {
 
     const atual = mapaAtual(doNivel(focoChave));
 
+    // Nível em foco ainda trancado: falta concluir todos os mapas do nível de baixo
+    const pendente = doNivel(focoChave).find((m) => m.nivelPendente)?.nivelPendente;
+    if (!atual && pendente) {
+        return {
+            mensagem: frase("O nível ", destaque(nomeDoNivel(focoChave)), " abre quando você concluir ",
+                destaque(`todos os mapas do ${pendente.nome}`), "."),
+            acao: { rotulo: `Ir para ${pendente.nome}`, para: `/mapas?nivel=${pendente.nivel}` },
+            revisoes,
+            estatisticas,
+        };
+    }
+
     // Nível em foco terminado: sugere o próximo nível que ainda tem mapa
     if (!atual) {
         const proximoNivel = ordem.find((n) => n.chave !== focoChave && mapaAtual(doNivel(n.chave)));

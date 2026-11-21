@@ -18,6 +18,8 @@ const SIMBOLOS = { basico: "÷", intermediario: "f(x)", avancado: "∫", treino:
 const Trilha = ({ numero, nivel, mapas, abrindo = [] }) => {
     const atual = mapaAtual(mapas);
     const concluidos = mapas.filter((m) => m.concluido).length;
+    // Nível trancado: o aluno ainda precisa concluir todos os mapas do nível de baixo
+    const nivelPendente = mapas.find((m) => m.nivelPendente)?.nivelPendente ?? null;
 
     const pontos = mapas.map((_, i) => ({
         x: LARGURA / 2 + ZIGUEZAGUE[i % ZIGUEZAGUE.length],
@@ -26,7 +28,7 @@ const Trilha = ({ numero, nivel, mapas, abrindo = [] }) => {
 
     return (
         // "trilha-basico" e não "nivel-basico": essa já existe no Home.css e pintaria a trilha inteira
-        <section className={`trilha trilha-${nivel.chave}`}>
+        <section className={`trilha trilha-${nivel.chave}${nivelPendente ? " trancada" : ""}`}>
             <header className="trilhaUnidade">
                 <div>
                     <span className="trilhaNumero">Nível {numero}</span>
@@ -47,6 +49,16 @@ const Trilha = ({ numero, nivel, mapas, abrindo = [] }) => {
             {/* A "folha" do nível: papel quadriculado na cor do nível, com o símbolo dele bem clarinho */}
             <div className={mapas.length === 0 ? "trilhaFolha vazia" : "trilhaFolha"}>
             <span className="trilhaSimbolo" aria-hidden="true">{SIMBOLOS[nivel.chave] ?? "π"}</span>
+
+            {nivelPendente && (
+                <p className="trilhaAvisoNivel">
+                    <svg viewBox="0 0 24 30" aria-hidden="true">
+                        <path d="M6 14V9a6 6 0 0 1 12 0v5" />
+                        <rect x="3" y="13" width="18" height="14" rx="2" />
+                    </svg>
+                    <span>Este nível abre quando você concluir <strong>todos os mapas do {nivelPendente.nome}</strong>.</span>
+                </p>
+            )}
 
             {mapas.length === 0 ? (
                 <p className="trilhaVazia">Em breve: ainda não tem mapas neste nível.</p>
@@ -103,7 +115,9 @@ const Trilha = ({ numero, nivel, mapas, abrindo = [] }) => {
                                     key={mapa.mapaId}
                                     className={`trilhaMapa ${estado}`}
                                     style={estilo}
-                                    title={mapa.anterior ? `Conclua "${mapa.anterior.nome}" para liberar` : "Bloqueado"}
+                                    title={mapa.nivelPendente
+                                        ? `Conclua todos os mapas do ${mapa.nivelPendente.nome} para liberar`
+                                        : mapa.anterior ? `Conclua "${mapa.anterior.nome}" para liberar` : "Bloqueado"}
                                     aria-disabled="true"
                                 >
                                     {ficha}

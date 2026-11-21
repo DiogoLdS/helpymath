@@ -148,7 +148,9 @@ const Mapas = () => {
                                             {conteudos.length > 0 && (
                                                 <span className='mapas-resultado-conteudos'>Fala de: {conteudos.slice(0, 3).join(', ')}</span>
                                             )}
-                                            {!mapa.liberado && mapa.anterior && (
+                                            {!mapa.liberado && mapa.nivelPendente ? (
+                                                <span className='mapas-resultado-conteudos'>Conclua todos os mapas do {mapa.nivelPendente.nome} para liberar.</span>
+                                            ) : !mapa.liberado && mapa.anterior && (
                                                 <span className='mapas-resultado-conteudos'>Conclua "{mapa.anterior.nome}" para liberar.</span>
                                             )}
                                         </>

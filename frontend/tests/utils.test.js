@@ -70,6 +70,18 @@ test('Helpy: recomenda começar o próximo mapa do nível', () => {
     assert.equal(r.estatisticas.mapasConcluidos, 1);
 });
 
+test('Helpy: nível trancado manda concluir o nível de baixo', () => {
+    const niveis = [{ chave: 'basico', nome: 'Básico' }, { chave: 'intermediario', nome: 'Intermediário' }];
+    const pendente = { nivel: 'basico', nome: 'Básico' };
+    const mapas = [
+        { mapaId: 1, nome: 'Frações', nivel: 'basico', liberado: true, concluido: false, progresso: null },
+        { mapaId: 3, nome: 'Função Afim', nivel: 'intermediario', liberado: false, concluido: false, progresso: null, nivelPendente: pendente },
+    ];
+    const r = recomendacao(mapas, niveis, 'intermediario');
+    assert.deepEqual(r.acao, { rotulo: 'Ir para Básico', para: '/mapas?nivel=basico' });
+    assert.match(r.mensagem.map((p) => p.texto).join(''), /todos os mapas do Básico/);
+});
+
 test('Helpy: nível acabado sugere o próximo nível', () => {
     const niveis = [{ chave: 'basico', nome: 'Básico' }, { chave: 'intermediario', nome: 'Intermediário' }];
     const mapas = [

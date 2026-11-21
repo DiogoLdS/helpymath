@@ -74,13 +74,17 @@ function controller() {
                     return res.status(404).json("Mapa não encontrado");
                 }
 
-                // Mapa da sequência que o aluno ainda não liberou (precisa concluir o anterior do nível)
+                // Mapa que o aluno ainda não liberou: o nível dele está trancado (precisa concluir o nível de baixo inteiro)
+                // ou falta concluir o mapa anterior do nível
                 const situacao = await situacaoDoMapa(mapa.mapaId, req.usuario?.usuarioId ?? null, req.usuario?.admin ?? false);
                 if (!situacao.liberado) {
                     return res.status(403).json({
-                        error: "Conclua o mapa anterior para liberar este",
+                        error: situacao.nivelPendente
+                            ? `Conclua todos os mapas do nível ${situacao.nivelPendente.nome} para liberar este`
+                            : "Conclua o mapa anterior para liberar este",
                         bloqueado: true,
-                        anterior: situacao.anterior
+                        anterior: situacao.anterior,
+                        nivelPendente: situacao.nivelPendente
                     });
                 }
 

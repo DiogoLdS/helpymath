@@ -185,6 +185,10 @@ const BoasVindas = () => {
                             são poucas questões e ele sugere o nível certo pra você não perder tempo com o que já sabe
                             (nem pular o que ainda falta).
                         </p>
+                        <p className="bvTexto">
+                            Você fica com o seu nível e os de baixo liberados. O nível de cima abre quando você concluir
+                            todos os mapas do seu nível. O <strong>Treino</strong> é livre pra todo mundo.
+                        </p>
 
                         <div className="bvOpcoes">
                             {NIVEIS_PARTIDA.map((n) => (

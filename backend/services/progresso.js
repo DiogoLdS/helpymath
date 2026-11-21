@@ -58,9 +58,23 @@ export async function resultadoQuestoes(mapaId, usuarioId) {
     };
 }
 
+// Níveis que formam a escada da trilha, do mais fácil pro mais difícil. O Treino fica de fora: é aberto pra todos.
+export const ESCADA_DE_NIVEIS = ['basico', 'intermediario', 'avancado'];
+const NOME_DO_NIVEL = { basico: 'Básico', intermediario: 'Intermediário', avancado: 'Avançado', treino: 'Treino' };
+
+// Até qual degrau da escada o aluno já começa liberado: o nível dele (escolhido ou sugerido pelo teste)
+// e todos os de baixo. Sem nível (ou com Treino) começa no Básico.
+export function degrauInicial(nivelDoAluno) {
+    return Math.max(ESCADA_DE_NIVEIS.indexOf(nivelDoAluno), 0);
+}
+
 // Situação de todos os mapas pro usuário.
-// Mapa concluído = todos os conteúdos interativos concluídos + 60% de acerto nas questões. Dentro de cada nível os mapas seguem a ordem de criação:
-// o primeiro fica liberado e cada um dos outros libera quando o anterior (do mesmo nível) é concluído.
+// Mapa concluído = todos os conteúdos interativos concluídos + 60% de acerto nas questões.
+// Níveis: o aluno começa com o nível dele e os de baixo liberados (quem é Intermediário pode fazer o Básico,
+// mas não o Avançado). O nível seguinte só abre quando ele conclui TODOS os mapas do nível de baixo.
+// O Treino é aberto pra todos.
+// Dentro de cada nível os mapas seguem a ordem da trilha: o primeiro fica liberado e cada um dos outros
+// libera quando o anterior (do mesmo nível) é concluído.
 // Admin vê tudo liberado (precisa acessar qualquer mapa pra editar e conferir).
 // Visitante (usuarioId null, sem conta): tudo liberado e nada concluído, porque não há progresso salvo.
 export async function situacaoDosMapas(usuarioId, admin) {
@@ -70,45 +84,82 @@ export async function situacaoDosMapas(usuarioId, admin) {
         orderBy: ORDEM_DOS_MAPAS
     });
 
-    const anteriorPorNivel = {};
-    const situacao = [];
-
-    for (const mapa of mapas) {
-        const anterior = anteriorPorNivel[mapa.nivel] ?? null;
-        const liberado = visitante || admin || anterior === null || anterior.concluido;
-
-        // Mapa trancado não conta como concluído, mesmo que esteja vazio (sem conteúdos nem questões)
-        let concluido = false;
-        // Números do aluno no mapa, usados na trilha e no assistente da página de mapas (null se trancado)
-        let progresso = null;
-
-        if (liberado && !visitante) {
-            const conteudos = await progressoNoMapa(mapa.mapaId, usuarioId);
-            const questoes = await resultadoQuestoes(mapa.mapaId, usuarioId);
-
-            concluido = conteudos.pendentes.length === 0 && questoes.aprovado;
-            progresso = {
-                conteudosFeitos: conteudos.concluidos.length,
-                conteudosTotal: conteudos.total,
-                questoesRespondidas: questoes.respondidas,
-                questoesAcertos: questoes.acertos,
-                questoesTotal: questoes.total
-            };
-        }
-
-        situacao.push({
-            ...mapa,
-            concluido,
-            liberado,
-            progresso,
-            // Pra mensagem "conclua o mapa X primeiro"
-            anterior: anterior ? { mapaId: anterior.mapaId, nome: anterior.nome } : null
-        });
-
-        anteriorPorNivel[mapa.nivel] = { mapaId: mapa.mapaId, nome: mapa.nome, concluido };
+    let inicial = ESCADA_DE_NIVEIS.length; // visitante e admin: escada toda liberada
+    if (!visitante && !admin) {
+        const usuario = await prisma.usuario.findUnique({ where: { usuarioId }, select: { nivel: true } });
+        inicial = degrauInicial(usuario?.nivel);
     }
 
-    return situacao;
+    // Mapas agrupados por nível, na ordem da trilha
+    const porNivel = {};
+    for (const mapa of mapas) (porNivel[mapa.nivel] ??= []).push(mapa);
+
+    // Os níveis da escada primeiro (o de cima depende de o de baixo estar concluído), depois os outros (Treino)
+    const ordemDosNiveis = [...ESCADA_DE_NIVEIS, ...Object.keys(porNivel).filter((n) => !ESCADA_DE_NIVEIS.includes(n))];
+
+    const situacaoPorId = new Map();
+    let ultimoAberto = null; // último nível da escada liberado até agora (e se já foi concluído inteiro)
+    let escadaLivre = true;  // false depois do primeiro nível trancado: os de cima também ficam trancados
+
+    for (const nivel of ordemDosNiveis) {
+        const degrau = ESCADA_DE_NIVEIS.indexOf(nivel);
+        const naEscada = degrau !== -1;
+        const nivelLiberado = !naEscada || (escadaLivre && (degrau <= inicial || ultimoAberto.concluido));
+        // Nível aberto por ter concluído o de baixo (pra animar o cadeado do primeiro mapa dele)
+        const liberadoPorConclusao = naEscada && nivelLiberado && degrau > inicial;
+        // Nível trancado: o de baixo dele é o que precisa ser concluído inteiro
+        const deBaixo = naEscada ? ESCADA_DE_NIVEIS[degrau - 1] : null;
+        const nivelPendente = !nivelLiberado && deBaixo ? { nivel: deBaixo, nome: NOME_DO_NIVEL[deBaixo] } : null;
+
+        let anterior = null;
+        let todosConcluidos = true;
+
+        for (const mapa of porNivel[nivel] ?? []) {
+            const liberado = visitante || admin || (nivelLiberado && (anterior === null || anterior.concluido));
+
+            // Mapa trancado não conta como concluído, mesmo que esteja vazio (sem conteúdos nem questões)
+            let concluido = false;
+            // Números do aluno no mapa, usados na trilha e no assistente da página de mapas (null se trancado)
+            let progresso = null;
+
+            if (liberado && !visitante) {
+                const conteudos = await progressoNoMapa(mapa.mapaId, usuarioId);
+                const questoes = await resultadoQuestoes(mapa.mapaId, usuarioId);
+
+                concluido = conteudos.pendentes.length === 0 && questoes.aprovado;
+                progresso = {
+                    conteudosFeitos: conteudos.concluidos.length,
+                    conteudosTotal: conteudos.total,
+                    questoesRespondidas: questoes.respondidas,
+                    questoesAcertos: questoes.acertos,
+                    questoesTotal: questoes.total
+                };
+            }
+
+            situacaoPorId.set(mapa.mapaId, {
+                ...mapa,
+                concluido,
+                liberado,
+                progresso,
+                // Pra mensagem "conclua o mapa X primeiro"
+                anterior: anterior ? { mapaId: anterior.mapaId, nome: anterior.nome } : null,
+                // Nível ainda trancado: { nivel, nome } do nível que falta concluir inteiro (senão null)
+                nivelPendente: visitante || admin ? null : nivelPendente,
+                liberadoPorConclusao: !visitante && !admin && liberadoPorConclusao
+            });
+
+            anterior = { mapaId: mapa.mapaId, nome: mapa.nome, concluido };
+            if (!concluido) todosConcluidos = false;
+        }
+
+        if (naEscada) {
+            if (nivelLiberado) ultimoAberto = { nivel, concluido: todosConcluidos };
+            else escadaLivre = false;
+        }
+    }
+
+    // Devolve na ordem original da trilha
+    return mapas.map((m) => situacaoPorId.get(m.mapaId));
 }
 
 // Situação de um mapa só, com o próximo do mesmo nível (ou null se for o último)

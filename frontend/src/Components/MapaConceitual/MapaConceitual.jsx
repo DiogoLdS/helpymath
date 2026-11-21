@@ -91,7 +91,11 @@ const MapaConceitual = () => {
 
                 // Mapa da sequência ainda trancado: mostra qual precisa ser concluído antes
                 if (error.response?.status === 403 && error.response.data?.bloqueado) {
-                    setAnteriorPendente(error.response.data.anterior ?? { nome: "o mapa anterior" });
+                    const { anterior, nivelPendente } = error.response.data;
+                    // Nível trancado: precisa concluir o nível de baixo inteiro (vai pra trilha desse nível)
+                    setAnteriorPendente(nivelPendente
+                        ? { nivel: nivelPendente }
+                        : anterior ?? { nome: "o mapa anterior" });
                     return;
                 }
 
@@ -118,8 +122,14 @@ const MapaConceitual = () => {
             return (
                 <div className="mapaTrancado">
                     <h1>Este mapa ainda está bloqueado</h1>
-                    <p>Conclua o mapa <strong>{anteriorPendente.nome}</strong> para liberar este.</p>
-                    {anteriorPendente.mapaId ? (
+                    {anteriorPendente.nivel ? (
+                        <p>Este nível abre quando você concluir <strong>todos os mapas do {anteriorPendente.nivel.nome}</strong>.</p>
+                    ) : (
+                        <p>Conclua o mapa <strong>{anteriorPendente.nome}</strong> para liberar este.</p>
+                    )}
+                    {anteriorPendente.nivel ? (
+                        <Link to={`/mapas?nivel=${anteriorPendente.nivel.nivel}`} className="mapaQuestoes">Ir para o {anteriorPendente.nivel.nome}</Link>
+                    ) : anteriorPendente.mapaId ? (
                         <Link to={`/mapas/${anteriorPendente.mapaId}`} className="mapaQuestoes">Ir para {anteriorPendente.nome}</Link>
                     ) : (
                         <Link to="/mapas" className="mapaQuestoes">Ver os mapas</Link>

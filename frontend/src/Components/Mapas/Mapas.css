@@ -387,6 +387,38 @@
     border-radius: 4px;
 }
 
+/* Nível trancado (falta concluir o nível de baixo inteiro): bilhete com cadeado no topo da folha
+   e o caminho mais apagado */
+.trilhaAvisoNivel {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 16px auto 4px;
+    padding: 12px 16px;
+    max-width: 420px;
+    font-size: 15px;
+    color: var(--tinta);
+    background-color: #FFFFFF;
+    border: 2px solid var(--tinta);
+    border-radius: 4px;
+    box-shadow: 3px 3px 0 var(--cor-nivel-escura);
+}
+
+.trilhaAvisoNivel svg {
+    flex: none;
+    width: 22px;
+    height: 28px;
+    fill: none;
+    stroke: var(--cor-nivel-escura);
+    stroke-width: 2.4;
+}
+
+.trilha.trancada .trilhaCaminho {
+    opacity: 0.6;
+}
+
 /* O caminho em si: os mapas são posicionados (left/top) pelo Trilha.jsx */
 .trilhaCaminho {
     position: relative;
