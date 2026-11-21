@@ -18,6 +18,11 @@ app.use(cors({ origin: process.env.FRONTEND_URL || true }));
 
 app.use(express.json());
 
+// Rota de "saúde": responde na hora, sem usar o banco. O GitHub Actions chama ela a cada 10 minutos
+// para o servidor gratuito do Render não dormir (RNF002: páginas em até 3 segundos).
+// Não pode consultar o banco: senão o Neon também ficaria acordado o mês todo e gastaria as horas grátis.
+app.get('/saude', (req, res) => res.status(200).json({ ok: true }));
+
 // Importar rotas
 app.use(usuarioRoutes);
 app.use(conteudoRoutes);
