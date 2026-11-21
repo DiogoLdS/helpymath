@@ -14,6 +14,7 @@ const Register = lazy(() => import('./Components/Register/Register'));
 const Home = lazy(() => import('./Components/Home/Home'));
 const Mapas = lazy(() => import('./Components/Mapas/Mapas'));
 const Questoes = lazy(() => import('./Components/Questoes/Questoes'));
+const Simulado = lazy(() => import('./Components/Simulado/Simulado'));
 const MapaConceitual = lazy(() => import('./Components/MapaConceitual/MapaConceitual'));
 const AdminCriarMapa = lazy(() => import('./Components/AdminCriarMapa/AdminCriarMapa'));
 const AdminEditarMapa = lazy(() => import('./Components/AdminEditarMapa/AdminEditarMapa'));
@@ -65,6 +66,8 @@ function App() {
           <Route path="/mapas/:id" element={<MapaConceitual/>}/>
 
           <Route path="/mapas/:mapaId/questoes" element={<Questoes/>}/>
+          {/* Simulado do Treino: a prova inteira, corrigida no fim */}
+          <Route path="/mapas/:id/simulado" element={<Simulado/>}/>
 
           <Route path="/admin/mapas/criar" element={<AdminCriarMapa/>}/>
 

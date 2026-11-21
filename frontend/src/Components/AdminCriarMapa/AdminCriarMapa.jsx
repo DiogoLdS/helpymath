@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import api from "../../../services/api.js";
 import { usuarioEhAdmin } from "../../utils/auth.js";
 import Sidebar from "../Sidebar/SidebarChapeu";
@@ -10,10 +10,14 @@ import useTituloPagina from "../../utils/useTituloPagina.js";
 
 const VALORES_INICIAIS = { nome: "", conteudos: [], questoes: [] };
 
+// /admin/mapas/criar?tipo=simulado já abre na opção "Simulado" (atalho do Treino na trilha)
 const AdminCriarMapa = () => {
-    useTituloPagina("Criar mapa");
-
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const comecaSimulado = searchParams.get("tipo") === "simulado";
+    const [criandoSimulado, setCriandoSimulado] = useState(comecaSimulado);
+
+    useTituloPagina(criandoSimulado ? "Criar simulado" : "Criar mapa");
 
     const [enviando, setEnviando] = useState(false);
     const [etapaAtual, setEtapaAtual] = useState("");
@@ -42,7 +46,7 @@ const AdminCriarMapa = () => {
             .catch((error) => console.log(error.message));
     }, [storedToken, autorizado, navigate]);
 
-    const salvar = async (nome, conteudos, questoes, nivel, posicao) => {
+    const salvar = async (nome, conteudos, questoes, nivel, posicao, simulado) => {
         setErro("");
 
         const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
@@ -50,8 +54,8 @@ const AdminCriarMapa = () => {
         setEnviando(true);
 
         try {
-            setEtapaAtual("Criando mapa conceitual...");
-            const respostaMapa = await api.post("/criarMapa", { nome, nivel, posicao }, { headers });
+            setEtapaAtual(simulado ? "Criando simulado..." : "Criando mapa conceitual...");
+            const respostaMapa = await api.post("/criarMapa", { nome, nivel, posicao, simulado }, { headers });
             const mapaId = respostaMapa.data.mapaId;
 
             for (let i = 0; i < conteudos.length; i++) {
@@ -78,7 +82,7 @@ const AdminCriarMapa = () => {
                 await criarQuestaoComAlternativas(mapaId, questoes[i], headers);
             }
 
-            navigate(`/mapas/${mapaId}`);
+            navigate(simulado ? `/mapas/${mapaId}/simulado` : `/mapas/${mapaId}`);
         } catch (error) {
             if (error.response?.status === 401) {
                 navigate("/login");
@@ -106,18 +110,24 @@ const AdminCriarMapa = () => {
 
             <section className="adminPainel">
                 <div className="adminConteudo">
-                    <h1>Criar mapa conceitual</h1>
+                    <h1>{criandoSimulado ? "Criar simulado" : "Criar mapa conceitual"}</h1>
                     <p className="subtitulo">
-                        Cadastre um novo mapa conceitual e os conteúdos que farão parte dele.
+                        {criandoSimulado
+                            ? "Cadastre um simulado (ex: ENEM 2024) com as questões dele."
+                            : "Cadastre um novo mapa conceitual e os conteúdos que farão parte dele."}
                     </p>
 
                     <MapaForm
-                        valoresIniciais={VALORES_INICIAIS}
+                        // Trocar ?tipo= na URL recomeça o formulário na opção certa
+                        key={comecaSimulado ? "simulado" : "mapa"}
+                        valoresIniciais={{ ...VALORES_INICIAIS, simulado: comecaSimulado }}
+                        podeTrocarTipo
+                        onTrocarTipo={setCriandoSimulado}
                         onSubmit={salvar}
                         enviando={enviando}
                         etapaAtual={etapaAtual}
                         erro={erro}
-                        rotuloBotao="Criar mapa"
+                        rotuloBotao={criandoSimulado ? "Criar simulado" : "Criar mapa"}
                         linkCancelar="/mapas"
                         mostrarQuestoes
                         mapas={mapas}

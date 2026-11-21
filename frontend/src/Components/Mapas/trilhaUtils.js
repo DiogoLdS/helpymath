@@ -29,8 +29,9 @@ export function porcentagemDoMapa(mapa) {
 }
 
 // O mapa "da vez" de um nível: o primeiro liberado que ainda não foi concluído (ou null se acabou o nível)
+// Simulados ficam de fora: são provas avulsas, não o "próximo passo" da trilha
 export function mapaAtual(mapasDoNivel) {
-    return mapasDoNivel.find((m) => m.liberado && !m.concluido) ?? null;
+    return mapasDoNivel.find((m) => m.liberado && !m.concluido && !m.simulado) ?? null;
 }
 
 // "Bom dia", "Boa tarde" ou "Boa noite", pelo horário do computador do aluno
@@ -128,7 +129,8 @@ export function recomendacao(mapas, niveis, nivelFoco, nivelPreferido = null) {
 
     const p = atual.progresso ?? { conteudosFeitos: 0, conteudosTotal: 0, questoesRespondidas: 0, questoesAcertos: 0, questoesTotal: 0 };
     const faltamConteudos = p.conteudosTotal - p.conteudosFeitos;
-    const proximoDoNivel = doNivel(focoChave)[doNivel(focoChave).indexOf(atual) + 1];
+    // Simulado não é liberado por ninguém (está sempre aberto): o "próximo" é o próximo mapa comum
+    const proximoDoNivel = doNivel(focoChave).slice(doNivel(focoChave).indexOf(atual) + 1).find((m) => !m.simulado);
     const liberaTexto = proximoDoNivel ? ` e liberar ${proximoDoNivel.nome}` : "";
     const irAoMapa = (rotulo) => ({ rotulo, para: `/mapas/${atual.mapaId}` });
     const irAsQuestoes = { rotulo: "Fazer as questões", para: `/mapas/${atual.mapaId}/questoes` };

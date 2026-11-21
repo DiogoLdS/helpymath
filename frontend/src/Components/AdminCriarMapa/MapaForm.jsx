@@ -25,6 +25,9 @@ const TIPOS_CONTEUDO = [
 
 let proximoIdTemporario = 1;
 
+// Mesmo valor do backend (mapaConceitualController.js)
+const NIVEL_DO_SIMULADO = "treino";
+
 // Formulário usado pra criar e pra editar mapa. Ele cuida só dos campos e da validação:
 // quem salva no banco (e mostra erro/etapa) é a página que usa o formulário.
 //
@@ -34,6 +37,8 @@ let proximoIdTemporario = 1;
 // mostrarQuestoes: mostra a parte de cadastrar questões embaixo dos conteúdos
 // mapas: todos os mapas da trilha (GET /mapas), pra escolher a posição e os mapas citáveis (null enquanto carrega)
 // mapaId: o mapa que está sendo editado (fica fora das listas)
+// valoresIniciais.simulado: simulado = "mapa" do Treino só com questões, feito como prova (ex: "ENEM 2024")
+// podeTrocarTipo: mostra a escolha "Mapa conceitual / Simulado" no topo (só na criação)
 const MapaForm = ({
     valoresIniciais,
     onSubmit,
@@ -46,9 +51,14 @@ const MapaForm = ({
     mostrarQuestoes = false,
     mapas = null,
     mapaId = null,
+    podeTrocarTipo = false,
+    onTrocarTipo = null,
 }) => {
     const [nome, setNome] = useState(valoresIniciais.nome);
-    const [nivel, setNivel] = useState(valoresIniciais.nivel ?? NIVEIS[0].chave);
+    const [simulado, setSimulado] = useState(Boolean(valoresIniciais.simulado));
+    const [nivelEscolhido, setNivel] = useState(valoresIniciais.nivel ?? NIVEIS[0].chave);
+    // Simulado é sempre do Treino
+    const nivel = simulado ? NIVEL_DO_SIMULADO : nivelEscolhido;
     // null = no fim da trilha do nível
     const [posicao, setPosicao] = useState(valoresIniciais.posicao ?? null);
 
@@ -118,7 +128,12 @@ const MapaForm = ({
 
     const validar = () => {
         if (!nome.trim()) {
-            return "Informe um nome para o mapa conceitual.";
+            return simulado ? "Informe um nome para o simulado." : "Informe um nome para o mapa conceitual.";
+        }
+
+        if (simulado) {
+            if (questoes.length === 0) return "Um simulado precisa de pelo menos uma questão.";
+            return validarQuestoes(questoes);
         }
 
         if (conteudos.length > MAX_CONTEUDOS) {
@@ -154,23 +169,65 @@ const MapaForm = ({
         setErroValidacao(mensagemValidacao);
         if (mensagemValidacao) return;
 
-        onSubmit(nome.trim(), conteudos, questoes, nivel, mapas ? posicaoFinal : null);
+        // Simulado não tem conteúdos (a parte de conteúdos nem aparece)
+        onSubmit(nome.trim(), simulado ? [] : conteudos, questoes, nivel, mapas ? posicaoFinal : null, simulado);
+    };
+
+    const trocarTipo = (virarSimulado) => {
+        setSimulado(virarSimulado);
+        setPosicao(null); // muda o nível (Treino): começa no fim da trilha
+        setErroValidacao("");
+        onTrocarTipo?.(virarSimulado);
     };
 
     const mensagemErro = erroValidacao || erro;
 
     return (
         <form onSubmit={handleSubmit} className="formCriarMapa">
-            <label htmlFor="nomeMapa">Nome do mapa</label>
+            {podeTrocarTipo && (
+                <div className="tipoMapaEscolha" role="radiogroup" aria-label="O que você quer criar">
+                    <button
+                        type="button"
+                        role="radio"
+                        aria-checked={!simulado}
+                        className={simulado ? "tipoMapaOpcao" : "tipoMapaOpcao ativa"}
+                        onClick={() => trocarTipo(false)}
+                        disabled={enviando}
+                    >
+                        <strong>Mapa conceitual</strong>
+                        <span>Conteúdos para estudar e questões no fim</span>
+                    </button>
+                    <button
+                        type="button"
+                        role="radio"
+                        aria-checked={simulado}
+                        className={simulado ? "tipoMapaOpcao ativa" : "tipoMapaOpcao"}
+                        onClick={() => trocarTipo(true)}
+                        disabled={enviando}
+                    >
+                        <strong>Simulado</strong>
+                        <span>Só questões, feito como prova, no Treino</span>
+                    </button>
+                </div>
+            )}
+
+            <label htmlFor="nomeMapa">{simulado ? "Nome do simulado" : "Nome do mapa"}</label>
             <input
                 id="nomeMapa"
                 type="text"
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
-                placeholder="Ex: Probabilidades"
+                placeholder={simulado ? "Ex: ENEM 2024" : "Ex: Probabilidades"}
                 disabled={enviando}
             />
 
+            {simulado ? (
+                <p className="dicaTipo">
+                    O simulado aparece na trilha do Treino. O aluno responde todas as questões e só vê a nota,
+                    o gabarito e as resoluções quando entrega.
+                </p>
+            ) : (
+            <>
             <label htmlFor="nivelMapa">Dificuldade</label>
             <select
                 id="nivelMapa"
@@ -187,6 +244,8 @@ const MapaForm = ({
                     </option>
                 ))}
             </select>
+            </>
+            )}
 
             {/* Onde o mapa entra na trilha do nível (a ordem que o aluno segue) */}
             {mapas && (
@@ -212,6 +271,7 @@ const MapaForm = ({
                 </>
             )}
 
+            {!simulado && (
             <div className="secaoConteudos">
                 <div className="cabecalhoConteudos">
                     <h2>Conteúdos do mapa</h2>
@@ -418,9 +478,10 @@ const MapaForm = ({
                     );
                 })}
             </div>
+            )}
 
-            {mostrarQuestoes && (
-                <QuestoesForm questoes={questoes} setQuestoes={setQuestoes} enviando={enviando} />
+            {(mostrarQuestoes || simulado) && (
+                <QuestoesForm questoes={questoes} setQuestoes={setQuestoes} enviando={enviando} simulado={simulado} />
             )}
 
             {mensagemErro &&<p className="mensagemErro">{mensagemErro}</p>}

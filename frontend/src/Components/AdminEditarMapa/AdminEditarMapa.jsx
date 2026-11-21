@@ -15,13 +15,12 @@ import { mapasDoNivel } from "../AdminCriarMapa/ordemUtils.js";
 import Carregando from "../Carregando/Carregando.jsx";
 
 const AdminEditarMapa = () => {
-    useTituloPagina("Editar mapa");
-
     const { id } = useParams();
     const navigate = useNavigate();
 
     // Mapa como veio do banco: serve de base pra descobrir o que o admin mudou
     const [mapaOriginal, setMapaOriginal] = useState(null);
+    useTituloPagina(mapaOriginal?.simulado ? "Editar simulado" : "Editar mapa");
     const [questoesOriginais, setQuestoesOriginais] = useState([]);
     // Mapas da trilha: posição deste mapa no nível e os mapas que ele pode citar
     const [mapas, setMapas] = useState(null);
@@ -230,7 +229,7 @@ const AdminEditarMapa = () => {
                 await criarQuestaoComAlternativas(id, questoesNovas[i], headers);
             }
 
-            navigate(`/mapas/${id}`);
+            navigate(mapaOriginal.simulado ? `/mapas/${id}/simulado` : `/mapas/${id}`);
         } catch (error) {
             if (error.response?.status === 401) {
                 navigate("/login");
@@ -261,6 +260,7 @@ const AdminEditarMapa = () => {
     const valoresIniciais = mapaOriginal && {
         nome: mapaOriginal.nome,
         nivel: mapaOriginal.nivel,
+        simulado: Boolean(mapaOriginal.simulado),
         posicao: posicaoOriginal,
         conteudos: mapaOriginal.conteudos.map((c) => ({
             idTemp: `existente-${c.conteudoId}`,
@@ -279,9 +279,11 @@ const AdminEditarMapa = () => {
 
             <section className="adminPainel">
                 <div className="adminConteudo">
-                    <h1>Editar mapa conceitual</h1>
+                    <h1>{mapaOriginal?.simulado ? "Editar simulado" : "Editar mapa conceitual"}</h1>
                     <p className="subtitulo">
-                        Altere o nome do mapa e adicione, edite ou remova os conteúdos e as questões dele.
+                        {mapaOriginal?.simulado
+                            ? "Altere o nome do simulado e adicione, edite ou remova as questões dele."
+                            : "Altere o nome do mapa e adicione, edite ou remova os conteúdos e as questões dele."}
                     </p>
 
                     {carregando && <Carregando pagina texto="Carregando o mapa" />}
@@ -298,7 +300,7 @@ const AdminEditarMapa = () => {
                             erro={erro}
                             rotuloBotao="Salvar alterações"
                             permitirMover={false}
-                            linkCancelar={`/mapas/${id}`}
+                            linkCancelar={mapaOriginal.simulado ? `/mapas/${id}/simulado` : `/mapas/${id}`}
                             mostrarQuestoes
                             mapas={mapas}
                             mapaId={mapaOriginal.mapaId}

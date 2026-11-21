@@ -50,6 +50,21 @@ test('Básico com o nível incompleto: só o Básico e o Treino abrem', async ()
     assert.equal(s['Simulado'].liberado, true);
 });
 
+test('simulado fica sempre aberto e não tranca o mapa seguinte do Treino', async () => {
+    mapas = [
+        { mapaId: 20, nome: 'Treino 1', nivel: 'treino', simulado: false },
+        { mapaId: 21, nome: 'ENEM 2024', nivel: 'treino', simulado: true },
+        { mapaId: 22, nome: 'Treino 2', nivel: 'treino', simulado: false },
+    ];
+    nivelDoAluno = 'basico';
+    pendentes = [20]; // Treino 1 não concluído
+    const s = Object.fromEntries((await situacaoDosMapas(7, false)).map((m) => [m.nome, m]));
+    assert.equal(s['ENEM 2024'].liberado, true);
+    assert.equal(s['ENEM 2024'].concluido, false); // ainda não entregou
+    assert.equal(s['Treino 2'].liberado, false);
+    assert.equal(s['Treino 2'].anterior.nome, 'Treino 1'); // o simulado não entra na sequência
+});
+
 test('Básico concluído inteiro: abre o Intermediário (e o Avançado só depois dele)', async () => {
     const s = await situacao({ nivel: 'basico', faltando: [3] });
     assert.equal(s['Função Afim'].liberado, true);

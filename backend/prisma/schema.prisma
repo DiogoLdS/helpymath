@@ -31,7 +31,9 @@ model mapaconceitual {
   nivel        String         @default("basico") @db.VarChar(20)
   // Posição do mapa na trilha do nível (menor vem primeiro); o admin reordena no painel
   ordem        Int            @default(0)
-  mapaId       Int            @id @default(autoincrement())
+  // Simulado: "mapa" do Treino sem conteúdos, só questões, feito como prova (corrige tudo no fim)
+  simulado     Boolean        @default(false)
+  mapaId      Int            @id @default(autoincrement())
   mapaconteudo mapaconteudo[]
   questao      questao[]
 }

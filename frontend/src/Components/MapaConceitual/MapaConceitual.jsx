@@ -67,6 +67,12 @@ const MapaConceitual = () => {
 
                 const dados = resposta.data;
 
+                // Simulado não tem mapa pra mostrar: vai direto pra prova (vale pra qualquer link que caia aqui)
+                if (dados.simulado) {
+                    navigate(`/mapas/${id}/simulado`, { replace: true });
+                    return;
+                }
+
                 // Progresso do usuário nesse mapa (se falhar, o mapa abre normalmente, sem bloqueios)
                 try {
                     const respostaProgresso = await api.get(`/mapas/${id}/progresso`, { headers });

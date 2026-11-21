@@ -8,6 +8,9 @@ const NIVEIS = ['basico', 'intermediario', 'avancado', 'treino'];
 // Posição escolhida pelo admin na trilha do nível (0 = primeiro). undefined/null = não mexe (mapa novo vai pro fim)
 const posicaoValida = (posicao) => posicao === undefined || posicao === null || (Number.isInteger(posicao) && posicao >= 0);
 
+// Simulado (services/simulado.js) é sempre do Treino: o nível enviado é ignorado
+const NIVEL_DO_SIMULADO = 'treino';
+
 function controller() {
     return {
         get prisma() {
@@ -17,7 +20,9 @@ function controller() {
         // CU10 - Admin cria um novo mapa conceitual
         async criarMapa(req, res) {
             try {
-                const { nome, nivel, posicao } = req.body;
+                const { nome, posicao } = req.body;
+                const simulado = req.body.simulado === true;
+                const nivel = simulado ? NIVEL_DO_SIMULADO : req.body.nivel;
 
                 if (nivel !== undefined && !NIVEIS.includes(nivel)) {
                     return res.status(400).json("Nível inválido");
@@ -28,7 +33,7 @@ function controller() {
 
                 const novoMapa = await prisma.mapaconceitual.create({
                     // Sem nível informado, o banco usa "basico". O mapa novo entra no fim da trilha do nível.
-                    data: { nome: nome, ordem: await proximaOrdem(), ...(nivel !== undefined && { nivel }) }
+                    data: { nome: nome, ordem: await proximaOrdem(), simulado, ...(nivel !== undefined && { nivel }) }
                 });
 
                 // Admin escolheu onde o mapa entra na trilha do nível
@@ -101,6 +106,7 @@ function controller() {
                     mapaId: mapa.mapaId,
                     nome: mapa.nome,
                     nivel: mapa.nivel,
+                    simulado: mapa.simulado,
                     conteudos: mapa.mapaconteudo.map((mc) => mc.conteudo)
                 };
 
@@ -154,9 +160,10 @@ function controller() {
         async atualizarMapa(req, res) {
             try {
                 const { id } = req.params;
-                const { nome, nivel, posicao } = req.body;
+                const { nome, posicao } = req.body;
+                const simulado = typeof req.body.simulado === 'boolean' ? req.body.simulado : undefined;
 
-                if (nivel !== undefined && !NIVEIS.includes(nivel)) {
+                if (req.body.nivel !== undefined && !NIVEIS.includes(req.body.nivel)) {
                     return res.status(400).json("Nível inválido");
                 }
                 if (!posicaoValida(posicao)) {
@@ -164,7 +171,10 @@ function controller() {
                 }
 
                 // Mudou de nível: o mapa vai pro fim da trilha do nível novo (ou pra posição escolhida, logo abaixo)
-                const atual = await prisma.mapaconceitual.findUnique({ where: { mapaId: parseInt(id) }, select: { nivel: true } });
+                const atual = await prisma.mapaconceitual.findUnique({ where: { mapaId: parseInt(id) }, select: { nivel: true, simulado: true } });
+                // Simulado (o que já era ou o que está virando) fica sempre no Treino
+                const viraSimulado = simulado ?? atual?.simulado ?? false;
+                const nivel = viraSimulado ? NIVEL_DO_SIMULADO : req.body.nivel;
                 const mudouDeNivel = atual && nivel !== undefined && nivel !== atual.nivel;
 
                 // Só altera os campos enviados
@@ -173,6 +183,7 @@ function controller() {
                     data: {
                         ...(nome !== undefined && { nome }),
                         ...(nivel !== undefined && { nivel }),
+                        ...(simulado !== undefined && { simulado }),
                         ...(mudouDeNivel && { ordem: await proximaOrdem() })
                     }
                 });

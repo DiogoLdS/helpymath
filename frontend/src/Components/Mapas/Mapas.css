@@ -546,6 +546,37 @@ a.trilhaMapa:active .trilhaFicha {
     color: #4A5A73;
 }
 
+/* Etiqueta "Simulado" (com a nota, depois de entregar) embaixo do nome */
+.trilhaTipo {
+    margin-top: 3px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--cor-nivel-escura);
+}
+
+/* Atalho do admin no Treino */
+.trilhaCriarSimulado {
+    position: relative;
+    display: block;
+    width: fit-content;
+    margin: 16px auto 0;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--tinta);
+    text-decoration: none;
+    background-color: #FFFFFF;
+    border: 2px dashed var(--cor-nivel-escura);
+    border-radius: 10px;
+}
+
+.trilhaCriarSimulado:hover,
+.trilhaCriarSimulado:focus-visible {
+    border-style: solid;
+}
+
 /* Balão "COMEÇAR"/"CONTINUAR" em cima do mapa da vez */
 .trilhaBalao {
     position: absolute;

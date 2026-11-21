@@ -12,7 +12,7 @@ import { cabecalhoAuth } from "../../utils/auth.js";
 // Fórmulas (KaTeX): cada questão tem um editor de fórmulas. Ele insere no campo em que o cursor
 // estava por último (o enunciado, uma das alternativas ou a resolução), igual à explicação dos conteúdos.
 
-const QuestoesForm = ({ questoes, setQuestoes, enviando }) => {
+const QuestoesForm = ({ questoes, setQuestoes, enviando, simulado = false }) => {
     // Questões com o editor de fórmulas aberto: { idTemp: true }
     const [formulaAberta, setFormulaAberta] = useState({});
     // Campo onde a fórmula vai entrar, por questão: { idTemp: "enunciado" | "resolucao" | idTemp da alternativa }
@@ -140,7 +140,7 @@ const QuestoesForm = ({ questoes, setQuestoes, enviando }) => {
     return (
         <div className="secaoConteudos">
             <div className="cabecalhoConteudos">
-                <h2>Questões do mapa</h2>
+                <h2>{simulado ? "Questões do simulado" : "Questões do mapa"}</h2>
                 <button
                     type="button"
                     className="botaoSecundario"
@@ -153,8 +153,9 @@ const QuestoesForm = ({ questoes, setQuestoes, enviando }) => {
 
             {questoes.length === 0 && (
                 <p className="vazio">
-                    Nenhuma questão adicionada ainda. Elas aparecem para o aluno no botão
-                    "Fazer questões" do mapa.
+                    {simulado
+                        ? "Nenhuma questão adicionada ainda. O simulado precisa de pelo menos uma."
+                        : "Nenhuma questão adicionada ainda. Elas aparecem para o aluno no botão \"Fazer questões\" do mapa."}
                 </p>
             )}
 

@@ -9,6 +9,7 @@ import { idVideoYoutube, linkValido, montarMarcacaoMidia } from '../src/Componen
 import { linkDestinoValido, linkExterno, linkInterno } from '../src/utils/linkDestino.js';
 import { decodificarToken } from '../src/utils/auth.js';
 import { iniciais, inicioDaSemana, pontos, resumoDaSemana, sequenciaDeDias } from '../src/Components/Perfil/perfilUtils.js';
+import { contarRespondidas, limparRascunho, porcentagemDeAcerto, respostasParaEnvio } from '../src/Components/Simulado/simuladoUtils.js';
 
 // ---------- Busca de mapas ----------
 
@@ -319,4 +320,37 @@ test('formulário de mapa: posição no nível e mapas que podem ser citados', a
     assert.equal(mapaDoLink('/mapas/7'), 7);
     assert.equal(mapaDoLink('/mapas/7/questoes'), null);
     assert.equal(mapaDoLink('https://site.com'), null);
+});
+
+// ---------- Simulado ----------
+
+const provaDoSimulado = [
+    { questaoId: 1, alternativas: [{ id: 10 }, { id: 11 }] },
+    { questaoId: 2, alternativas: [{ id: 20 }, { id: 21 }] },
+    { questaoId: 3, alternativas: [{ id: 30 }] },
+];
+
+test('simulado: manda uma resposta por questão, com null nas em branco', () => {
+    assert.deepEqual(respostasParaEnvio(provaDoSimulado, { 1: 11, 3: 30 }), [
+        { questaoId: 1, alternativaId: 11 },
+        { questaoId: 2, alternativaId: null },
+        { questaoId: 3, alternativaId: 30 },
+    ]);
+    assert.equal(contarRespondidas(provaDoSimulado, { 1: 11, 3: 30, 99: 5 }), 2);
+});
+
+test('simulado: rascunho antigo só guarda alternativas que ainda existem', () => {
+    assert.deepEqual(limparRascunho(provaDoSimulado, { 1: 11, 2: 99, 7: 70 }), { 1: 11 });
+    assert.deepEqual(limparRascunho(provaDoSimulado, null), {});
+    assert.deepEqual(limparRascunho(provaDoSimulado, 'lixo'), {});
+});
+
+test('simulado: nota em porcentagem e trilha não aponta simulado como próximo passo', () => {
+    assert.equal(porcentagemDeAcerto(2, 3), 67);
+    assert.equal(porcentagemDeAcerto(0, 0), 0);
+    const treino = [
+        { mapaId: 1, liberado: true, concluido: false, simulado: true },
+        { mapaId: 2, liberado: true, concluido: false },
+    ];
+    assert.equal(mapaAtual(treino).mapaId, 2);
 });

@@ -80,7 +80,7 @@ export function degrauInicial(nivelDoAluno) {
 export async function situacaoDosMapas(usuarioId, admin) {
     const visitante = usuarioId === null || usuarioId === undefined;
     const mapas = await prisma.mapaconceitual.findMany({
-        select: { mapaId: true, nome: true, nivel: true },
+        select: { mapaId: true, nome: true, nivel: true, simulado: true },
         orderBy: ORDEM_DOS_MAPAS
     });
 
@@ -115,6 +115,12 @@ export async function situacaoDosMapas(usuarioId, admin) {
         let todosConcluidos = true;
 
         for (const mapa of porNivel[nivel] ?? []) {
+            // Simulado: sempre aberto e fora da sequência (não tranca nem é trancado pelos mapas do lado)
+            if (mapa.simulado) {
+                situacaoPorId.set(mapa.mapaId, await situacaoDoSimulado(mapa, usuarioId, visitante));
+                continue;
+            }
+
             const liberado = visitante || admin || (nivelLiberado && (anterior === null || anterior.concluido));
 
             // Mapa trancado não conta como concluído, mesmo que esteja vazio (sem conteúdos nem questões)
@@ -160,6 +166,26 @@ export async function situacaoDosMapas(usuarioId, admin) {
 
     // Devolve na ordem original da trilha
     return mapas.map((m) => situacaoPorId.get(m.mapaId));
+}
+
+// Simulado na trilha: sempre liberado; "concluído" = o aluno já entregou (respondeu alguma questão dele)
+async function situacaoDoSimulado(mapa, usuarioId, visitante) {
+    let concluido = false;
+    let progresso = null;
+
+    if (!visitante) {
+        const questoes = await resultadoQuestoes(mapa.mapaId, usuarioId);
+        concluido = questoes.respondidas > 0;
+        progresso = {
+            conteudosFeitos: 0,
+            conteudosTotal: 0,
+            questoesRespondidas: questoes.respondidas,
+            questoesAcertos: questoes.acertos,
+            questoesTotal: questoes.total
+        };
+    }
+
+    return { ...mapa, concluido, liberado: true, progresso, anterior: null, nivelPendente: null, liberadoPorConclusao: false };
 }
 
 // Situação de um mapa só, com o próximo do mesmo nível (ou null se for o último)

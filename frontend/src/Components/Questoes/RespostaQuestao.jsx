@@ -80,7 +80,8 @@ const RespostaQuestao = ({ questaoId, resultado, temResolucao, semPrazo, textos 
 };
 
 // Caixa da resolução. Quando o aluno errou, diz também qual era a letra certa.
-const Resolucao = ({ resolucao, letraCorreta }) => (
+// (Também usada na correção do simulado.)
+export const Resolucao =({ resolucao, letraCorreta }) => (
     <div className="resolucaoQuestao">
         <strong className="resolucaoTitulo">Resolução</strong>
         {letraCorreta && <p className="resolucaoLetra">Resposta certa: letra {letraCorreta}.</p>}

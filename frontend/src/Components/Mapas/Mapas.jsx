@@ -197,6 +197,7 @@ const Mapas = () => {
                             // Mapas antigos, sem nível salvo, entram como básico (mesmo padrão do banco)
                             mapas={mapas.filter((mapa) => (mapa.nivel ?? 'basico') === n.chave)}
                             abrindo={abrindo}
+                            admin={Boolean(decodificarToken(localStorage.getItem('token') ?? '')?.admin)}
                         />
                     ))}
                 </div>
