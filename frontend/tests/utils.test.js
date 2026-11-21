@@ -254,3 +254,16 @@ test('fórmulas de verdade continuam funcionando', () => {
     assert.deepEqual(resumo(String.raw`Use \$ para escrever um cifrão`), ['texto:Use $ para escrever um cifrão']);
     assert.deepEqual(resumo(String.raw`Lucro: $L = R\$ 10 \cdot x$`), ['texto:Lucro: ', String.raw`linha:L = R\$ 10 \cdot x`, 'texto:']);
 });
+
+/* ---------- Sessão vencida ---------- */
+
+import { tokenVencido } from '../src/utils/sessao.js';
+
+test('token vencido é reconhecido pelo exp', () => {
+    const b64 = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
+    const token = (exp) => `${b64({ alg: 'HS256' })}.${b64({ usuarioId: 1, exp })}.assinatura`;
+    const agora = Date.UTC(2026, 10, 20, 12);
+    assert.equal(tokenVencido(token(agora / 1000 - 60), agora), true);
+    assert.equal(tokenVencido(token(agora / 1000 + 3600), agora), false);
+    assert.equal(tokenVencido('isso-nao-e-token', agora), false);
+});

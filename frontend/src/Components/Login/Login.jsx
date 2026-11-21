@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import "./Login.css"
 import { Link, useNavigate } from "react-router";
 import api from '../../../services/api.js';
@@ -6,7 +6,7 @@ import Sidebar from "../Sidebar/SidebarChapeu";
 import useTituloPagina from "../../utils/useTituloPagina.js";
 import Marca from "../Marca/Marca.jsx";
 import Carregando from "../Carregando/Carregando.jsx";
-import { iniciarSessao } from "../../utils/sessao.js";
+import { apagarAvisoDeSessaoVencida, iniciarSessao, temAvisoDeSessaoVencida } from "../../utils/sessao.js";
 
 const Login = () => {
     useTituloPagina("Entrar");
@@ -17,6 +17,9 @@ const Login = () => {
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState('');
   const [mostrarAjudaSenha, setMostrarAjudaSenha] = useState(false);
+  // O login anterior venceu (7 dias): explica por que a pessoa caiu aqui
+  const [sessaoVencida] = useState(temAvisoDeSessaoVencida);
+  useEffect(() => { apagarAvisoDeSessaoVencida(); }, []);
 
   const navigate = useNavigate();
 
@@ -64,6 +67,12 @@ const Login = () => {
           <form onSubmit={logUser}>
             <Marca grande />
             <h1>Faça seu login</h1>
+
+            {sessaoVencida && (
+              <p className="avisoFormulario" role="status">
+                Sua sessão expirou. Entre de novo para continuar de onde parou.
+              </p>
+            )}
 
             <div className="input-field">
               <input type="email" id="user" name="user" aria-label="E-mail" autoComplete="email" value={email} onChange={(e) => { setEmail(e.target.value) }} placeholder="E-mail" disabled={enviando} />
