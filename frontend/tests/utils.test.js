@@ -279,3 +279,12 @@ test('token vencido é reconhecido pelo exp', () => {
     assert.equal(tokenVencido(token(agora / 1000 + 3600), agora), false);
     assert.equal(tokenVencido('isso-nao-e-token', agora), false);
 });
+
+test('explicação do nível escolhido no perfil', async () => {
+    const { explicacaoDoNivel } = await import('../src/Components/Perfil/perfilUtils.js');
+    const escada = [{ chave: 'basico', nome: 'Básico' }, { chave: 'intermediario', nome: 'Intermediário' }, { chave: 'avancado', nome: 'Avançado' }];
+    assert.equal(explicacaoDoNivel('basico', escada), 'Básico fica liberado. O Intermediário abre quando você concluir todos os mapas do Básico. O Treino é livre.');
+    assert.equal(explicacaoDoNivel('intermediario', escada), 'Básico e Intermediário ficam liberados. O Avançado abre quando você concluir todos os mapas do Intermediário. O Treino é livre.');
+    assert.equal(explicacaoDoNivel('avancado', escada), 'Básico, Intermediário e Avançado ficam liberados. O Treino é livre.');
+    assert.equal(explicacaoDoNivel(null, escada), explicacaoDoNivel('basico', escada));
+});

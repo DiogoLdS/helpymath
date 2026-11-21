@@ -239,3 +239,17 @@ export const PONTOS_POR_ACERTO = 5;
 export function pontos(stats) {
     return stats.conteudosConcluidos * PONTOS_POR_CONTEUDO + stats.acertos * PONTOS_POR_ACERTO;
 }
+
+// O que fica aberto na trilha pra quem começa num nível (escadaDeNiveis = Básico, Intermediário, Avançado, em ordem).
+// Precisa bater com a regra do backend (services/progresso.js): o nível escolhido e os de baixo ficam livres,
+// o de cima abre quando o aluno conclui todos os mapas do nível de baixo, e o Treino é livre pra todos.
+export function explicacaoDoNivel(chave, escadaDeNiveis) {
+    const i = Math.max(escadaDeNiveis.findIndex((n) => n.chave === chave), 0);
+    const nome = escadaDeNiveis[i].nome;
+    const debaixo = escadaDeNiveis.slice(0, i).map((n) => n.nome);
+    const deCima = escadaDeNiveis[i + 1]?.nome;
+
+    const livres = debaixo.length > 0 ? `${[...debaixo, nome].join(", ").replace(/, ([^,]*)$/, " e $1")} ficam liberados.` : `${nome} fica liberado.`;
+    const proximo = deCima ? ` O ${deCima} abre quando você concluir todos os mapas do ${nome}.` : "";
+    return `${livres}${proximo} O Treino é livre.`;
+}

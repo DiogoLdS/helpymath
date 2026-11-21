@@ -187,7 +187,7 @@ const BoasVindas = () => {
                         </p>
                         <p className="bvTexto">
                             Você fica com o seu nível e os de baixo liberados. O nível de cima abre quando você concluir
-                            todos os mapas do seu nível. O <strong>Treino</strong> é livre pra todo mundo.
+                            todos os mapas do seu nível. O <strong>Treino</strong> é livre pra todo mundo, e dá pra trocar de nível depois no seu perfil.
                         </p>
 
                         <div className="bvOpcoes">
@@ -266,7 +266,7 @@ const BoasVindas = () => {
                                 </li>
                             ))}
                         </ul>
-                        <p className="bvTexto">Prefere outro? Escolha abaixo; dá pra mudar quando quiser.</p>
+                        <p className="bvTexto">Prefere outro? Escolha abaixo; dá pra trocar depois no seu perfil (Editar perfil).</p>
                         <div className="bvChips">
                             {NIVEIS_PARTIDA.map((n) => (
                                 <button type="button" key={n.chave} className={nivel === n.chave ? "bvChip ativo" : "bvChip"} aria-pressed={nivel === n.chave} onClick={() => setNivel(n.chave)}>

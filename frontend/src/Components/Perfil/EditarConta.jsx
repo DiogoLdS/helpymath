@@ -1,14 +1,32 @@
 import { useState } from "react";
-import { OBJETIVOS } from "./perfilUtils.js";
+import { OBJETIVOS, explicacaoDoNivel } from "./perfilUtils.js";
+import niveis from "../../data/niveis.js";
 import Carregando from "../Carregando/Carregando.jsx";
 
-// Editar nome e objetivo de estudo, trocar a senha e excluir a conta
+// Níveis que o aluno pode escolher como ponto de partida (o Treino é livre pra todos)
+const NIVEIS_PARTIDA = niveis.filter((n) => n.chave !== "treino");
+
+// Editar nome e objetivo de estudo, trocar o nível, trocar a senha e excluir a conta
 const EditarConta = ({ usuario, onSalvar, onTrocarSenha, onExcluirConta, onFechar }) => {
     const [nome, setNome] = useState(usuario.nome);
     const [objetivo, setObjetivo] = useState(usuario.objetivo ?? "");
     const [mensagemDados, setMensagemDados] = useState("");
     const [salvandoDados, setSalvandoDados] = useState(false);
     const [salvandoSenha, setSalvandoSenha] = useState(false);
+
+    // Nível de partida: decide quais níveis da trilha ficam abertos (sem nível = Básico)
+    const nivelSalvo = NIVEIS_PARTIDA.some((n) => n.chave === usuario.nivel) ? usuario.nivel : "basico";
+    const [nivel, setNivel] = useState(nivelSalvo);
+    const [mensagemNivel, setMensagemNivel] = useState("");
+    const [salvandoNivel, setSalvandoNivel] = useState(false);
+
+    const salvarNivel = async (e) => {
+        e.preventDefault();
+        setSalvandoNivel(true);
+        const certo = await onSalvar({ nivel });
+        setSalvandoNivel(false);
+        setMensagemNivel(certo ? "Nível trocado! Sua trilha já foi atualizada." : "Não foi possível trocar. Tente de novo.");
+    };
 
     const [senhaAtual, setSenhaAtual] = useState("");
     const [novaSenha, setNovaSenha] = useState("");
@@ -90,6 +108,30 @@ const EditarConta = ({ usuario, onSalvar, onTrocarSenha, onExcluirConta, onFecha
                     {salvandoDados ? <Carregando texto="Salvando" /> : "Salvar dados"}
                 </button>
             </form>
+
+            {/* Admin já vê a trilha toda liberada: não tem nível pra trocar */}
+            {!usuario.admin && (
+                <form onSubmit={salvarNivel} className="editarContaBloco">
+                    <h3>Seu nível</h3>
+                    <label htmlFor="perfilNivel">Por onde você quer começar?</label>
+                    <select
+                        id="perfilNivel"
+                        value={nivel}
+                        onChange={(e) => { setNivel(e.target.value); setMensagemNivel(""); }}
+                    >
+                        {NIVEIS_PARTIDA.map((n) => <option key={n.chave} value={n.chave}>{n.nome}</option>)}
+                    </select>
+
+                    <p className="perfilDica">{explicacaoDoNivel(nivel, NIVEIS_PARTIDA)}</p>
+                    {nivel !== nivelSalvo && (
+                        <p className="perfilDica">Seu progresso não se perde: os mapas que você já fez continuam concluídos.</p>
+                    )}
+                    {mensagemNivel && <p className="perfilMensagem">{mensagemNivel}</p>}
+                    <button type="submit" className="perfilBotao" disabled={nivel === nivelSalvo || salvandoNivel}>
+                        {salvandoNivel ? <Carregando texto="Trocando" /> : "Trocar nível"}
+                    </button>
+                </form>
+            )}
 
             <form onSubmit={salvarSenha} className="editarContaBloco">
                 <h3>Trocar senha</h3>

@@ -67,7 +67,7 @@ const Perfil = () => {
         buscarPerfil();
     }, [navigate]);
 
-    // Salva mudanças no perfil (nome, objetivo, meta, anotações, cronograma). Devolve true se deu certo.
+    // Salva mudanças no perfil (nome, objetivo, nível, meta, anotações, cronograma). Devolve true se deu certo.
     const salvarPerfil = async (mudancas) => {
         try {
             const resposta = await api.patch("/perfil", mudancas, { headers: headers() });
@@ -76,6 +76,11 @@ const Perfil = () => {
                 localStorage.setItem("token", resposta.data.token);
             }
             setPerfil((atual) => ({ ...atual, usuario: resposta.data.usuario }));
+            // Trocou o nível: os mapas liberados mudam, então busca o perfil de novo (recomendações, "Estudando")
+            if (mudancas.nivel !== undefined) {
+                const atualizado = await api.get("/perfil", { headers: headers() });
+                setPerfil(atualizado.data);
+            }
             return true;
         } catch (error) {
             console.log(error.message);
