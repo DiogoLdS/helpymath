@@ -29,10 +29,9 @@ const MidiaEditor = ({ onInserir, disabled }) => {
         problema = "O link precisa começar com http:// ou https://";
     } else if (tipo === "video" && !idVideoYoutube(urlLimpa)) {
         problema = "Use um link de vídeo do YouTube (youtube.com/watch?v=... ou youtu.be/...).";
-    } else if (tipo === "imagem" && !descricao.trim()) {
-        // Texto alternativo é requisito de acessibilidade (RNF007)
-        problema = "Escreva uma descrição da imagem (usada por leitores de tela).";
     }
+    // A descrição da imagem é opcional: sem ela, a imagem entra sem legenda
+    // (e o leitor de tela pula a imagem, como se fosse decorativa)
 
     const trocarTipo = (novoTipo) => {
         setTipo(novoTipo);
@@ -109,7 +108,7 @@ const MidiaEditor = ({ onInserir, disabled }) => {
 
             {tipo === "imagem" && (
                 <>
-                    <label className="midiaRotulo" htmlFor={idDescricao}>Descrição da imagem</label>
+                    <label className="midiaRotulo" htmlFor={idDescricao}>Descrição da imagem (opcional)</label>
                     <input
                         id={idDescricao}
                         ref={campoDescricao}

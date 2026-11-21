@@ -11,6 +11,7 @@ import {
 } from "../AdminCriarMapa/questoesUtils.js";
 import "../AdminCriarMapa/AdminCriarMapa.css";
 import useTituloPagina from "../../utils/useTituloPagina.js";
+import { mapasDoNivel } from "../AdminCriarMapa/ordemUtils.js";
 import Carregando from "../Carregando/Carregando.jsx";
 
 const AdminEditarMapa = () => {
@@ -22,6 +23,8 @@ const AdminEditarMapa = () => {
     // Mapa como veio do banco: serve de base pra descobrir o que o admin mudou
     const [mapaOriginal, setMapaOriginal] = useState(null);
     const [questoesOriginais, setQuestoesOriginais] = useState([]);
+    // Mapas da trilha: posição deste mapa no nível e os mapas que ele pode citar
+    const [mapas, setMapas] = useState(null);
     const [carregando, setCarregando] = useState(true);
     const [erroCarga, setErroCarga] = useState("");
 
@@ -52,13 +55,15 @@ const AdminEditarMapa = () => {
                 const headers = { Authorization: `Bearer ${storedToken}` };
 
                 // Mapa (nome + conteúdos) e questões vêm de rotas diferentes; busca as duas juntas
-                const [respostaMapa, respostaQuestoes] = await Promise.all([
+                const [respostaMapa, respostaQuestoes, respostaMapas] = await Promise.all([
                     api.get(`/mapas/${id}`, { headers }),
                     api.get(`/admin/mapas/${id}/questoes`, { headers }),
+                    api.get("/mapas", { headers }),
                 ]);
 
                 setMapaOriginal(respostaMapa.data);
                 setQuestoesOriginais(respostaQuestoes.data);
+                setMapas(respostaMapas.data);
             } catch (error) {
                 if (error.response?.status === 401) {
                     navigate("/login");
@@ -79,7 +84,7 @@ const AdminEditarMapa = () => {
         buscarMapa();
     }, [id, storedToken, autorizado, navigate]);
 
-    const salvar = async (nome, conteudos, questoes, nivel) => {
+    const salvar = async (nome, conteudos, questoes, nivel, posicao) => {
         setErro("");
 
         const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
@@ -87,10 +92,11 @@ const AdminEditarMapa = () => {
         setEnviando(true);
 
         try {
-            // 1) Nome e dificuldade do mapa
-            if (nome !== mapaOriginal.nome || nivel !== mapaOriginal.nivel) {
+            // 1) Nome, dificuldade e posição na trilha do nível
+            const mudouPosicao = posicao !== null && (nivel !== mapaOriginal.nivel || posicao !== posicaoOriginal);
+            if (nome !== mapaOriginal.nome || nivel !== mapaOriginal.nivel || mudouPosicao) {
                 setEtapaAtual("Atualizando o mapa...");
-                await api.patch(`/mapas/${id}`, { nome, nivel }, { headers });
+                await api.patch(`/mapas/${id}`, { nome, nivel, ...(mudouPosicao && { posicao }) }, { headers });
             }
 
             // 2) Conteúdos que o admin tirou da lista saem do mapa
@@ -246,10 +252,16 @@ const AdminEditarMapa = () => {
         return null;
     }
 
+    // Lugar do mapa na trilha do nível dele (0 = primeiro)
+    const posicaoOriginal = mapaOriginal && mapas
+        ? Math.max(mapasDoNivel(mapas, mapaOriginal.nivel).findIndex((m) => m.mapaId === mapaOriginal.mapaId), 0)
+        : null;
+
     // Conteúdos já salvos entram no formulário com o conteudoId do banco
     const valoresIniciais = mapaOriginal && {
         nome: mapaOriginal.nome,
         nivel: mapaOriginal.nivel,
+        posicao: posicaoOriginal,
         conteudos: mapaOriginal.conteudos.map((c) => ({
             idTemp: `existente-${c.conteudoId}`,
             conteudoId: c.conteudoId,
@@ -288,6 +300,8 @@ const AdminEditarMapa = () => {
                             permitirMover={false}
                             linkCancelar={`/mapas/${id}`}
                             mostrarQuestoes
+                            mapas={mapas}
+                            mapaId={mapaOriginal.mapaId}
                         />
                     )}
                 </div>

@@ -15,7 +15,7 @@ mock.module(new URL('../services/adapter.js', import.meta.url).href, { exports: 
     $transaction: async (operacoes) => { for (const op of operacoes) await op(); },
 } } });
 
-const { moverMapa } = await import('../services/ordemMapas.js');
+const { moverMapa, posicionarMapa } = await import('../services/ordemMapas.js');
 const nomes = (nivel) => ordenar(mapas.filter((m) => m.nivel === nivel)).map((m) => m.nome);
 
 test('sobe e desce dentro do nível, sem mexer nos mapas de outro nível', async () => {
@@ -45,4 +45,28 @@ test('mapas antigos com a mesma ordem (todos 0) viram uma sequência certinha', 
     ];
     assert.equal(await moverMapa(3, 'cima'), true);
     assert.deepEqual(nomes('basico'), ['A', 'C', 'B']);
+});
+
+test('coloca o mapa na posição escolhida do nível, sem mexer nos outros níveis', async () => {
+    mapas = [
+        { mapaId: 1, nome: 'Frações', nivel: 'basico', ordem: 1 },
+        { mapaId: 2, nome: 'Probabilidade', nivel: 'basico', ordem: 2 },
+        { mapaId: 3, nome: 'Função Afim', nivel: 'intermediario', ordem: 3 },
+        { mapaId: 4, nome: 'Potências', nivel: 'basico', ordem: 4 },
+    ];
+    // Mapa novo (Potências, no fim) vai pro começo do Básico
+    assert.equal(await posicionarMapa(4, 0), true);
+    assert.deepEqual(nomes('basico'), ['Potências', 'Frações', 'Probabilidade']);
+    assert.deepEqual(nomes('intermediario'), ['Função Afim']);
+    assert.equal(mapas.find((m) => m.mapaId === 3).ordem, 3);
+
+    // Pro meio
+    assert.equal(await posicionarMapa(4, 1), true);
+    assert.deepEqual(nomes('basico'), ['Frações', 'Potências', 'Probabilidade']);
+
+    // Posição além do fim = último; mesma posição não muda nada
+    assert.equal(await posicionarMapa(1, 99), true);
+    assert.deepEqual(nomes('basico'), ['Potências', 'Probabilidade', 'Frações']);
+    assert.equal(await posicionarMapa(1, 2), false);
+    assert.equal(await posicionarMapa(42, 0), null);
 });

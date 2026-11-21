@@ -1,9 +1,12 @@
 import prisma from '../services/adapter.js';
 import { progressoNoMapa, resultadoQuestoes, situacaoDosMapas, situacaoDoMapa } from '../services/progresso.js';
-import { moverMapa as moverNaOrdem, proximaOrdem } from '../services/ordemMapas.js';
+import { moverMapa as moverNaOrdem, posicionarMapa, proximaOrdem } from '../services/ordemMapas.js';
 
 // Dificuldades possíveis de um mapa (as mesmas dos cards da página inicial)
 const NIVEIS = ['basico', 'intermediario', 'avancado', 'treino'];
+
+// Posição escolhida pelo admin na trilha do nível (0 = primeiro). undefined/null = não mexe (mapa novo vai pro fim)
+const posicaoValida = (posicao) => posicao === undefined || posicao === null || (Number.isInteger(posicao) && posicao >= 0);
 
 function controller() {
     return {
@@ -14,16 +17,22 @@ function controller() {
         // CU10 - Admin cria um novo mapa conceitual
         async criarMapa(req, res) {
             try {
-                const { nome, nivel } = req.body;
+                const { nome, nivel, posicao } = req.body;
 
                 if (nivel !== undefined && !NIVEIS.includes(nivel)) {
                     return res.status(400).json("Nível inválido");
+                }
+                if (!posicaoValida(posicao)) {
+                    return res.status(400).json("Posição inválida");
                 }
 
                 const novoMapa = await prisma.mapaconceitual.create({
                     // Sem nível informado, o banco usa "basico". O mapa novo entra no fim da trilha do nível.
                     data: { nome: nome, ordem: await proximaOrdem(), ...(nivel !== undefined && { nivel }) }
                 });
+
+                // Admin escolheu onde o mapa entra na trilha do nível
+                if (posicao !== undefined && posicao !== null) await posicionarMapa(novoMapa.mapaId, posicao);
 
                 res.status(201).json(novoMapa);
             } catch (error) {
@@ -145,13 +154,16 @@ function controller() {
         async atualizarMapa(req, res) {
             try {
                 const { id } = req.params;
-                const { nome, nivel } = req.body;
+                const { nome, nivel, posicao } = req.body;
 
                 if (nivel !== undefined && !NIVEIS.includes(nivel)) {
                     return res.status(400).json("Nível inválido");
                 }
+                if (!posicaoValida(posicao)) {
+                    return res.status(400).json("Posição inválida");
+                }
 
-                // Mudou de nível: o mapa vai pro fim da trilha do nível novo
+                // Mudou de nível: o mapa vai pro fim da trilha do nível novo (ou pra posição escolhida, logo abaixo)
                 const atual = await prisma.mapaconceitual.findUnique({ where: { mapaId: parseInt(id) }, select: { nivel: true } });
                 const mudouDeNivel = atual && nivel !== undefined && nivel !== atual.nivel;
 
@@ -164,6 +176,8 @@ function controller() {
                         ...(mudouDeNivel && { ordem: await proximaOrdem() })
                     }
                 });
+
+                if (posicao !== undefined && posicao !== null) await posicionarMapa(mapaAtualizado.mapaId, posicao);
 
                 res.status(200).json(mapaAtualizado);
             } catch (error) {

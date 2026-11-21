@@ -10,29 +10,19 @@ export async function proximaOrdem() {
     return (_max.ordem ?? 0) + 1;
 }
 
-// Sobe ou desce o mapa uma posição dentro do nível dele.
-// Renumera o nível inteiro (1, 2, 3...) já com a troca, assim nunca sobra empate.
-// Devolve null se o mapa não existe e false se ele já está na ponta.
-export async function moverMapa(mapaId, direcao) {
-    const mapa = await prisma.mapaconceitual.findUnique({ where: { mapaId }, select: { nivel: true } });
-    if (!mapa) return null;
-
-    const doNivel = await prisma.mapaconceitual.findMany({
-        where: { nivel: mapa.nivel },
+// Mapas do nível, na ordem da trilha
+async function mapasDoNivel(nivel) {
+    return prisma.mapaconceitual.findMany({
+        where: { nivel },
         orderBy: ORDEM_DOS_MAPAS,
         select: { mapaId: true, ordem: true }
     });
+}
 
-    const i = doNivel.findIndex((m) => m.mapaId === mapaId);
-    const j = direcao === 'cima' ? i - 1 : i + 1;
-    if (j < 0 || j >= doNivel.length) return false;
-
-    // As ordens que o nível já usa, em ordem: o mapa só troca de lugar, sem mexer nos outros níveis
+// Renumera o nível com a nova sequência, usando as mesmas "ordem" que o nível já tinha
+// (assim os outros níveis não mudam). Se havia ordens repetidas, usa números novos e únicos.
+async function renumerar(doNivel, novaSequencia) {
     const ordensUsadas = doNivel.map((m) => m.ordem).sort((a, b) => a - b);
-    const novaSequencia = [...doNivel];
-    [novaSequencia[i], novaSequencia[j]] = [novaSequencia[j], novaSequencia[i]];
-
-    // Se havia ordens repetidas no nível, abre espaço com números novos e únicos
     const semEmpate = new Set(ordensUsadas).size === ordensUsadas.length;
     const base = semEmpate ? null : await proximaOrdem();
 
@@ -42,6 +32,35 @@ export async function moverMapa(mapaId, direcao) {
             data: { ordem: semEmpate ? ordensUsadas[posicao] : base + posicao }
         }))
     );
+}
 
+// Coloca o mapa numa posição do nível dele (0 = primeiro). Posição maior que o nível vai pro fim.
+// Devolve null se o mapa não existe, false se ele já estava nessa posição e true se mudou.
+export async function posicionarMapa(mapaId, posicao) {
+    const mapa = await prisma.mapaconceitual.findUnique({ where: { mapaId }, select: { nivel: true } });
+    if (!mapa) return null;
+
+    const doNivel = await mapasDoNivel(mapa.nivel);
+    const i = doNivel.findIndex((m) => m.mapaId === mapaId);
+    const destino = Math.min(Math.max(posicao, 0), doNivel.length - 1);
+    if (destino === i) return false;
+
+    const novaSequencia = doNivel.filter((m) => m.mapaId !== mapaId);
+    novaSequencia.splice(destino, 0, doNivel[i]);
+    await renumerar(doNivel, novaSequencia);
     return true;
+}
+
+// Sobe ou desce o mapa uma posição dentro do nível dele (setinhas do painel).
+// Devolve null se o mapa não existe e false se ele já está na ponta.
+export async function moverMapa(mapaId, direcao) {
+    const mapa = await prisma.mapaconceitual.findUnique({ where: { mapaId }, select: { nivel: true } });
+    if (!mapa) return null;
+
+    const doNivel = await mapasDoNivel(mapa.nivel);
+    const i = doNivel.findIndex((m) => m.mapaId === mapaId);
+    const j = direcao === 'cima' ? i - 1 : i + 1;
+    if (j < 0 || j >= doNivel.length) return false;
+
+    return posicionarMapa(mapaId, j);
 }

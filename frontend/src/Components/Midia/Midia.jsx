@@ -40,7 +40,11 @@ function ImagemPrimeiroQuadro({ url, descricao }) {
                 onError={() => setEstado("erro")}
                 data-carregando={estado === "carregando" ? "" : undefined}
             />
-            <canvas className="midiaImagemImpressa" role="img" aria-label={textoSemFormulas(descricao)} />
+            {/* Sem descrição, a imagem é tratada como decorativa (o leitor de tela pula) */}
+            <canvas
+                className="midiaImagemImpressa"
+                {...(descricao ? { role: "img", "aria-label": textoSemFormulas(descricao) } : { "aria-hidden": true })}
+            />
         </>
     );
 }

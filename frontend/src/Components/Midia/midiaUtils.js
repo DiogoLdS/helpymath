@@ -17,7 +17,10 @@ export function montarMarcacaoMidia(tipo, url, descricao = "") {
         // Só "]]" (fim da marcação) e quebras de linha quebrariam a marcação. "|" e "]" sozinhos podem ficar,
         // porque aparecem em fórmulas (ex: \left| x \right| e \sqrt[3]{x})
         const descricaoLimpa = descricao.replace(/\n/g, " ").replace(/\]\]/g, "] ]").trim();
-        return `\n[[imagem:${url.trim()}|${descricaoLimpa}]]\n`;
+        // Sem descrição (é opcional): a imagem entra sem legenda
+        return descricaoLimpa
+            ? `\n[[imagem:${url.trim()}|${descricaoLimpa}]]\n`
+            : `\n[[imagem:${url.trim()}]]\n`;
     }
     return `\n[[video:${url.trim()}]]\n`;
 }

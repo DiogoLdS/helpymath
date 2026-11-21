@@ -18,6 +18,8 @@ const AdminCriarMapa = () => {
     const [enviando, setEnviando] = useState(false);
     const [etapaAtual, setEtapaAtual] = useState("");
     const [erro, setErro] = useState("");
+    // Mapas da trilha: pra escolher a posição do mapa novo e os mapas que ele pode citar
+    const [mapas, setMapas] = useState(null);
 
     // Só decide o que mostrar: quem protege de verdade é o backend (authAdmin).
     const storedToken = localStorage.getItem("token");
@@ -31,10 +33,16 @@ const AdminCriarMapa = () => {
 
         if (!autorizado) {
             navigate("/mapas");
+            return;
         }
+
+        // Sem a lista, o formulário funciona igual (o mapa vai pro fim do nível e não cita outros)
+        api.get("/mapas", { headers: { Authorization: `Bearer ${storedToken}` } })
+            .then((r) => setMapas(r.data))
+            .catch((error) => console.log(error.message));
     }, [storedToken, autorizado, navigate]);
 
-    const salvar = async (nome, conteudos, questoes, nivel) => {
+    const salvar = async (nome, conteudos, questoes, nivel, posicao) => {
         setErro("");
 
         const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
@@ -43,7 +51,7 @@ const AdminCriarMapa = () => {
 
         try {
             setEtapaAtual("Criando mapa conceitual...");
-            const respostaMapa = await api.post("/criarMapa", { nome, nivel }, { headers });
+            const respostaMapa = await api.post("/criarMapa", { nome, nivel, posicao }, { headers });
             const mapaId = respostaMapa.data.mapaId;
 
             for (let i = 0; i < conteudos.length; i++) {
@@ -112,6 +120,7 @@ const AdminCriarMapa = () => {
                         rotuloBotao="Criar mapa"
                         linkCancelar="/mapas"
                         mostrarQuestoes
+                        mapas={mapas}
                     />
                 </div>
             </section>

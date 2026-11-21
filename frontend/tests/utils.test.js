@@ -109,6 +109,8 @@ test('mídia: só links http(s) e id do YouTube em vários formatos', () => {
     }
     assert.equal(idVideoYoutube('https://vimeo.com/123'), null);
     assert.equal(montarMarcacaoMidia('imagem', ' https://x.com/a.png ', 'linha1\nlinha2]]'), '\n[[imagem:https://x.com/a.png|linha1 linha2] ]]]\n');
+    // Descrição é opcional: sem ela, a imagem entra sem legenda
+    assert.equal(montarMarcacaoMidia('imagem', 'https://x.com/a.png', '   '), '\n[[imagem:https://x.com/a.png]]\n');
 });
 
 test('links dos botões direcionais: externos, internos e os perigosos', () => {
@@ -287,4 +289,34 @@ test('explicação do nível escolhido no perfil', async () => {
     assert.equal(explicacaoDoNivel('intermediario', escada), 'Básico e Intermediário ficam liberados. O Avançado abre quando você concluir todos os mapas do Intermediário. O Treino é livre.');
     assert.equal(explicacaoDoNivel('avancado', escada), 'Básico, Intermediário e Avançado ficam liberados. O Treino é livre.');
     assert.equal(explicacaoDoNivel(null, escada), explicacaoDoNivel('basico', escada));
+});
+
+test('formulário de mapa: posição no nível e mapas que podem ser citados', async () => {
+    const { mapasDoNivel, mapasCitaveis, mapaDoLink, linkDoMapa } = await import('../src/Components/AdminCriarMapa/ordemUtils.js');
+    const niveis = [{ chave: 'basico' }, { chave: 'intermediario' }, { chave: 'avancado' }, { chave: 'treino' }];
+    const mapas = [
+        { mapaId: 1, nome: 'Frações', nivel: 'basico' },
+        { mapaId: 2, nome: 'Potências', nivel: 'basico' },
+        { mapaId: 3, nome: 'Função Afim', nivel: 'intermediario' },
+        { mapaId: 4, nome: 'Função Quadrática', nivel: 'intermediario' },
+        { mapaId: 5, nome: 'Logaritmo', nivel: 'avancado' },
+    ];
+    const nomes = (lista) => lista.map((m) => m.nome);
+
+    assert.deepEqual(nomes(mapasDoNivel(mapas, 'intermediario')), ['Função Afim', 'Função Quadrática']);
+    assert.deepEqual(nomes(mapasDoNivel(mapas, 'intermediario', 3)), ['Função Quadrática']);
+
+    // Mapa novo no Intermediário, entre Função Afim e Função Quadrática: cita o Básico inteiro e Função Afim
+    assert.deepEqual(nomes(mapasCitaveis(mapas, niveis, 'intermediario', 1)), ['Frações', 'Potências', 'Função Afim']);
+    // Primeiro do Básico: não cita nada
+    assert.deepEqual(mapasCitaveis(mapas, niveis, 'basico', 0), []);
+    // Editando Função Quadrática (mapa 4) no fim do Intermediário: não cita ele mesmo nem o Avançado
+    assert.deepEqual(nomes(mapasCitaveis(mapas, niveis, 'intermediario', 1, 4)), ['Frações', 'Potências', 'Função Afim']);
+    // Treino vem depois de todos os níveis
+    assert.equal(mapasCitaveis(mapas, niveis, 'treino', 0).length, 5);
+
+    assert.equal(linkDoMapa(7), '/mapas/7');
+    assert.equal(mapaDoLink('/mapas/7'), 7);
+    assert.equal(mapaDoLink('/mapas/7/questoes'), null);
+    assert.equal(mapaDoLink('https://site.com'), null);
 });

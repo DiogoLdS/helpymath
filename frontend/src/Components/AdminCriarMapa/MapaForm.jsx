@@ -11,6 +11,7 @@ import { validarQuestoes } from "./questoesUtils.js";
 import "./AdminCriarMapa.css";
 import Carregando from "../Carregando/Carregando.jsx";
 import simulacoes from "../../data/simulacoes.js";
+import { linkDoMapa, mapaDoLink, mapasCitaveis, mapasDoNivel } from "./ordemUtils.js";
 
 // Tipos de elemento de conteúdo, conforme seção 3.7 do TCC:
 // 1 - Botão ampliado a uma explicação (expande em janela detalhada)
@@ -27,9 +28,12 @@ let proximoIdTemporario = 1;
 // Formulário usado pra criar e pra editar mapa. Ele cuida só dos campos e da validação:
 // quem salva no banco (e mostra erro/etapa) é a página que usa o formulário.
 //
-// valoresIniciais: { nome, nivel, conteudos, questoes } - conteúdos já salvos trazem "conteudoId"
-// onSubmit(nome, conteudos, questoes, nivel): chamado só depois de passar na validação
+// valoresIniciais: { nome, nivel, posicao, conteudos, questoes } - conteúdos já salvos trazem "conteudoId";
+//   posicao = lugar do mapa na trilha do nível (0 = primeiro; sem posicao = no fim)
+// onSubmit(nome, conteudos, questoes, nivel, posicao): chamado só depois de passar na validação
 // mostrarQuestoes: mostra a parte de cadastrar questões embaixo dos conteúdos
+// mapas: todos os mapas da trilha (GET /mapas), pra escolher a posição e os mapas citáveis (null enquanto carrega)
+// mapaId: o mapa que está sendo editado (fica fora das listas)
 const MapaForm = ({
     valoresIniciais,
     onSubmit,
@@ -40,9 +44,20 @@ const MapaForm = ({
     permitirMover = true,
     linkCancelar,
     mostrarQuestoes = false,
+    mapas = null,
+    mapaId = null,
 }) => {
     const [nome, setNome] = useState(valoresIniciais.nome);
     const [nivel, setNivel] = useState(valoresIniciais.nivel ?? NIVEIS[0].chave);
+    // null = no fim da trilha do nível
+    const [posicao, setPosicao] = useState(valoresIniciais.posicao ?? null);
+
+    // Os outros mapas do nível escolhido, e a posição de verdade (null vira "depois do último")
+    const doNivel = mapas ? mapasDoNivel(mapas, nivel, mapaId) : [];
+    const posicaoFinal = Math.min(posicao ?? doNivel.length, doNivel.length);
+    // Só dá pra citar mapas que vêm antes deste na trilha (o aluno já passou por eles)
+    const citaveis = mapas ? mapasCitaveis(mapas, NIVEIS, nivel, posicaoFinal, mapaId) : [];
+    const nomeDoNivel = NIVEIS.find((n) => n.chave === nivel)?.nome ?? nivel;
     const [conteudos, setConteudos] = useState(valoresIniciais.conteudos);
     const [questoes, setQuestoes] = useState(valoresIniciais.questoes ?? []);
     const [erroValidacao, setErroValidacao] = useState("");
@@ -118,6 +133,15 @@ const MapaForm = ({
             if (Number(c.tipo) === 3 && !linkDestinoValido(c.explicacao)) {
                 return `O botão direcional "${c.titulo.trim()}" precisa de um link de destino (https://... ou /pagina-do-site).`;
             }
+
+            // Botão que cita um mapa que vem depois deste na trilha (ou que não existe mais)
+            const citado = Number(c.tipo) === 3 ? mapaDoLink(c.explicacao) : null;
+            if (mapas && citado !== null && !citaveis.some((m) => m.mapaId === citado)) {
+                const nomeCitado = mapas.find((m) => m.mapaId === citado)?.nome;
+                return nomeCitado
+                    ? `O botão "${c.titulo.trim()}" cita o mapa "${nomeCitado}", que vem depois deste na trilha. Só dá pra citar mapas que vêm antes.`
+                    : `O botão "${c.titulo.trim()}" cita um mapa que não existe mais.`;
+            }
         }
 
         return mostrarQuestoes ? validarQuestoes(questoes) : "";
@@ -130,7 +154,7 @@ const MapaForm = ({
         setErroValidacao(mensagemValidacao);
         if (mensagemValidacao) return;
 
-        onSubmit(nome.trim(), conteudos, questoes, nivel);
+        onSubmit(nome.trim(), conteudos, questoes, nivel, mapas ? posicaoFinal : null);
     };
 
     const mensagemErro = erroValidacao || erro;
@@ -151,7 +175,10 @@ const MapaForm = ({
             <select
                 id="nivelMapa"
                 value={nivel}
-                onChange={(e) => setNivel(e.target.value)}
+                onChange={(e) => {
+                    setNivel(e.target.value);
+                    setPosicao(null); // nível novo: começa no fim da trilha dele
+                }}
                 disabled={enviando}
             >
                 {NIVEIS.map((n) => (
@@ -160,6 +187,30 @@ const MapaForm = ({
                     </option>
                 ))}
             </select>
+
+            {/* Onde o mapa entra na trilha do nível (a ordem que o aluno segue) */}
+            {mapas && (
+                <>
+                    <label htmlFor="posicaoMapa">Posição na trilha do {nomeDoNivel}</label>
+                    {doNivel.length === 0 ? (
+                        <p className="dicaTipo">Este vai ser o único mapa do {nomeDoNivel} por enquanto.</p>
+                    ) : (
+                        <select
+                            id="posicaoMapa"
+                            value={posicaoFinal}
+                            onChange={(e) => setPosicao(Number(e.target.value))}
+                            disabled={enviando}
+                        >
+                            {doNivel.map((m, i) => (
+                                <option key={m.mapaId} value={i}>{i + 1}º: antes de "{m.nome}"</option>
+                            ))}
+                            <option value={doNivel.length}>
+                                {doNivel.length + 1}º: no fim, depois de "{doNivel[doNivel.length - 1].nome}"
+                            </option>
+                        </select>
+                    )}
+                </>
+            )}
 
             <div className="secaoConteudos">
                 <div className="cabecalhoConteudos">
@@ -230,6 +281,28 @@ const MapaForm = ({
                                             <option key={s.caminho} value={s.caminho}>Simulação: {s.nome}</option>
                                         ))}
                                     </select>
+                                    {/* Atalho: citar outro mapa. Só aparecem os que vêm antes deste na trilha */}
+                                    {mapas && (
+                                        <select
+                                            value={citaveis.some((m) => m.mapaId === mapaDoLink(conteudo.explicacao)) ? conteudo.explicacao.trim() : ""}
+                                            onChange={(e) => {
+                                                if (e.target.value) atualizarConteudo(conteudo.idTemp, "explicacao", e.target.value);
+                                            }}
+                                            aria-label={`Mapa citado pelo conteúdo ${index + 1}`}
+                                            disabled={enviando || citaveis.length === 0}
+                                        >
+                                            <option value="">
+                                                {citaveis.length === 0
+                                                    ? "Citar um mapa: nenhum mapa vem antes deste na trilha"
+                                                    : "Citar um mapa que vem antes deste na trilha"}
+                                            </option>
+                                            {citaveis.map((m) => (
+                                                <option key={m.mapaId} value={linkDoMapa(m.mapaId)}>
+                                                    Mapa: {m.nome} ({NIVEIS.find((n) => n.chave === (m.nivel ?? "basico"))?.nome})
+                                                </option>
+                                            ))}
+                                        </select>
+                                    )}
                                     <input
                                         type="text"
                                         value={conteudo.explicacao}
