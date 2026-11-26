@@ -8,6 +8,7 @@ import Carregando from "../Carregando/Carregando.jsx";
 import AvisoVisitante from "../Visitante/AvisoVisitante.jsx";
 import Carimbo from "../Carimbo/Carimbo.jsx";
 import { TextoComFormulas } from "../Formulas/Formula.jsx";
+import { TextoComMidia } from "../Midia/Midia.jsx";
 import { formulasNaLinha } from "../Formulas/formulaUtils.js";
 import niveis from "../../data/niveis.js";
 import RespostaQuestao from "../Questoes/RespostaQuestao.jsx";
@@ -144,7 +145,7 @@ const Revisar = () => {
                         const resultado = resultados[questao.questaoId];
                         return (
                             <article className="questao-card" key={questao.questaoId}>
-                                <div className="enunciado"><TextoComFormulas texto={questao.enunciado} /></div>
+                                <div className="enunciado"><TextoComMidia texto={questao.enunciado} /></div>
 
                                 <div className="alternativas">
                                     {questao.alternativa.map((alternativa) => {

@@ -8,7 +8,8 @@ import "./Midia.css";
 
 // Mini editor de mídia: o admin cola o link de uma imagem ou de um vídeo do YouTube,
 // confere a pré-visualização e clica em "Inserir na explicação".
-const MidiaEditor = ({ onInserir, disabled }) => {
+// soImagem: nas questões só entra imagem (sem a aba de vídeo). rotuloInserir: texto do botão.
+const MidiaEditor = ({ onInserir, disabled, soImagem = false, rotuloInserir = "Inserir na explicação" }) => {
     const [tipo, setTipo] = useState("imagem");
     const [url, setUrl] = useState("");
     const [descricao, setDescricao] = useState("");
@@ -71,7 +72,7 @@ const MidiaEditor = ({ onInserir, disabled }) => {
 
     return (
         <div className="midiaEditor">
-            <div className="midiaAbas" role="tablist">
+            {!soImagem && <div className="midiaAbas" role="tablist">
                 <button
                     type="button"
                     role="tab"
@@ -90,7 +91,7 @@ const MidiaEditor = ({ onInserir, disabled }) => {
                 >
                     Vídeo do YouTube
                 </button>
-            </div>
+            </div>}
 
             <label className="midiaRotulo" htmlFor={idUrl}>
                 {tipo === "imagem" ? "Link da imagem" : "Link do vídeo"}
@@ -178,7 +179,7 @@ const MidiaEditor = ({ onInserir, disabled }) => {
                     onClick={inserirNaExplicacao}
                     disabled={disabled || Boolean(problema)}
                 >
-                    Inserir na explicação
+                    {rotuloInserir}
                 </button>
             </div>
         </div>

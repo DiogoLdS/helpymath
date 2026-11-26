@@ -2,6 +2,8 @@ import { useRef, useState } from "react";
 import { LETRAS, MAX_FONTE, MAX_RESOLUCAO, MIN_ALTERNATIVAS, novaAlternativa, novaQuestao } from "./questoesUtils.js";
 import FormulaEditor from "../Formulas/FormulaEditor.jsx";
 import { TextoComFormulas } from "../Formulas/Formula.jsx";
+import MidiaEditor from "../Midia/MidiaEditor.jsx";
+import { TextoComMidia } from "../Midia/Midia.jsx";
 import { temFormula } from "../Formulas/formulaUtils.js";
 import api from "../../../services/api.js";
 import { cabecalhoAuth } from "../../utils/auth.js";
@@ -11,10 +13,15 @@ import { cabecalhoAuth } from "../../utils/auth.js";
 //
 // Fórmulas (KaTeX): cada questão tem um editor de fórmulas. Ele insere no campo em que o cursor
 // estava por último (o enunciado, uma das alternativas ou a resolução), igual à explicação dos conteúdos.
+//
+// Imagem: entra no texto do enunciado (ou da resolução, se o cursor estava nela) como [[imagem:link|descrição]],
+// a mesma marcação da explicação dos conteúdos. Alternativa é uma linha só, então imagem não entra nela.
 
 const QuestoesForm = ({ questoes, setQuestoes, enviando, simulado = false }) => {
     // Questões com o editor de fórmulas aberto: { idTemp: true }
     const [formulaAberta, setFormulaAberta] = useState({});
+    // Questões com o editor de imagem aberto: { idTemp: true }
+    const [imagemAberta, setImagemAberta] = useState({});
     // Campo onde a fórmula vai entrar, por questão: { idTemp: "enunciado" | "resolucao" | idTemp da alternativa }
     const [alvo, setAlvo] = useState({});
     // Os campos de verdade (pra saber a posição do cursor): chave "questao:campo"
@@ -59,6 +66,31 @@ const QuestoesForm = ({ questoes, setQuestoes, enviando, simulado = false }) => 
             const posicao = inicio + trechoFinal.length;
             campo.focus();
             campo.setSelectionRange(posicao, posicao);
+        });
+    };
+
+    // Imagem vai pra resolução se o cursor estava nela; senão, pro enunciado
+    const campoDaImagem = (questao) => (alvo[questao.idTemp] === "resolucao" ? "resolucao" : "enunciado");
+
+    const inserirImagem = (questao, trecho) => {
+        const campo = campoDaImagem(questao);
+        const chave = `${questao.idTemp}:${campo}`;
+        const el = campos.current[chave];
+        const textoAtual = questao[campo];
+        // Sem cursor no campo (ainda não clicou nele): a imagem vai pro fim
+        const usarCursor = el && alvo[questao.idTemp] === campo;
+        const inicio = usarCursor ? el.selectionStart : textoAtual.length;
+        const fim = usarCursor ? el.selectionEnd : textoAtual.length;
+        // No começo do texto não precisa da quebra de linha antes
+        const trechoFinal = inicio === 0 ? trecho.replace(/^\n/, "") : trecho;
+        atualizarQuestao(questao.idTemp, { [campo]: textoAtual.slice(0, inicio) + trechoFinal + textoAtual.slice(fim) });
+
+        requestAnimationFrame(() => {
+            const elAtual = campos.current[chave];
+            if (!elAtual) return;
+            const posicao = inicio + trechoFinal.length;
+            elAtual.focus();
+            elAtual.setSelectionRange(posicao, posicao);
         });
     };
 
@@ -296,12 +328,37 @@ const QuestoesForm = ({ questoes, setQuestoes, enviando, simulado = false }) => 
                         </>
                     )}
 
-                    {/* Como o aluno vai ver a questão, com as fórmulas desenhadas */}
-                    {(temFormula(questao.enunciado) || temFormula(questao.resolucao) || questao.alternativas.some((a) => temFormula(a.texto))) && (
+                    <button
+                        type="button"
+                        className="botaoSecundario botaoInserirMidia"
+                        onClick={() => setImagemAberta((atual) => ({ ...atual, [questao.idTemp]: !atual[questao.idTemp] }))}
+                        aria-expanded={Boolean(imagemAberta[questao.idTemp])}
+                        disabled={enviando}
+                    >
+                        {imagemAberta[questao.idTemp] ? "Fechar imagem" : "+ Inserir imagem"}
+                    </button>
+
+                    {imagemAberta[questao.idTemp] && (
+                        <>
+                            <p className="dicaTipo">
+                                A imagem entra no enunciado. Se o cursor estiver na resolução, ela entra na resolução.
+                            </p>
+                            <MidiaEditor
+                                soImagem
+                                onInserir={(trecho) => inserirImagem(questao, trecho)}
+                                disabled={enviando}
+                                rotuloInserir={campoDaImagem(questao) === "resolucao" ? "Inserir na resolução" : "Inserir no enunciado"}
+                            />
+                        </>
+                    )}
+
+                    {/* Como o aluno vai ver a questão, com as fórmulas e imagens desenhadas */}
+                    {(temFormula(questao.enunciado) || temFormula(questao.resolucao) || questao.alternativas.some((a) => temFormula(a.texto))
+                        || questao.enunciado.includes("[[") || questao.resolucao.includes("[[")) && (
                         <div className="previaExplicacao">
                             <span>Pré-visualização da questão</span>
                             <div>
-                                <div className="previaEnunciado"><TextoComFormulas texto={questao.enunciado} /></div>
+                                <div className="previaEnunciado"><TextoComMidia texto={questao.enunciado} /></div>
                                 <ol className="previaAlternativas">
                                     {questao.alternativas.map((a, i) => (
                                         <li key={a.idTemp} className={questao.indiceCorreta === i ? "correta" : undefined}>
@@ -311,7 +368,7 @@ const QuestoesForm = ({ questoes, setQuestoes, enviando, simulado = false }) => 
                                 </ol>
                                 {questao.resolucao.trim() && (
                                     <div className="previaResolucao">
-                                        <strong>Resolução:</strong> <TextoComFormulas texto={questao.resolucao} />
+                                        <strong>Resolução:</strong> <TextoComMidia texto={questao.resolucao} />
                                     </div>
                                 )}
                             </div>

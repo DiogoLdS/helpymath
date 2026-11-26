@@ -8,6 +8,7 @@ import Marca from "../Marca/Marca.jsx";
 import Carregando from "../Carregando/Carregando.jsx";
 import AvisoVisitante from "../Visitante/AvisoVisitante.jsx";
 import { TextoComFormulas } from "../Formulas/Formula.jsx";
+import { TextoComMidia } from "../Midia/Midia.jsx";
 import { formulasNaLinha } from "../Formulas/formulaUtils.js";
 import { cabecalhoAuth, ehVisitante, usuarioEhAdmin } from "../../utils/auth.js";
 import { Resolucao } from "../Questoes/RespostaQuestao.jsx";
@@ -233,7 +234,7 @@ const Simulado = () => {
                         return (
                             <section className="questao-card" key={questao.questaoId}>
                                 {questao.fonte && <span className="questao-fonte">{questao.fonte}</span>}
-                                <div className="enunciado">{indice + 1}. <TextoComFormulas texto={questao.enunciado} /></div>
+                                <div className="enunciado">{indice + 1}. <TextoComMidia texto={questao.enunciado} /></div>
 
                                 <div className="alternativas" role={item ? undefined : "radiogroup"} aria-label={`Alternativas da questão ${indice + 1}`}>
                                     {questao.alternativas.map((alternativa) => {

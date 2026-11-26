@@ -8,6 +8,7 @@ import Carregando from "../Carregando/Carregando.jsx";
 import AvisoVisitante from "../Visitante/AvisoVisitante.jsx";
 import Carimbo from "../Carimbo/Carimbo.jsx";
 import { TextoComFormulas } from "../Formulas/Formula.jsx";
+import { TextoComMidia } from "../Midia/Midia.jsx";
 import { formulasNaLinha } from "../Formulas/formulaUtils.js";
 import { cabecalhoAuth, ehVisitante } from "../../utils/auth.js";
 import RespostaQuestao from "./RespostaQuestao.jsx";
@@ -244,7 +245,7 @@ const Questoes = () => {
                 return (
                     <section className='questao-card' key={questao.questaoId}>
                         {questao.fonte && <span className='questao-fonte'>{questao.fonte}</span>}
-                        <div className='enunciado'>{indice + 1}. <TextoComFormulas texto={questao.enunciado} /></div>
+                        <div className='enunciado'>{indice + 1}. <TextoComMidia texto={questao.enunciado} /></div>
 
                         <div className='alternativas'>
                             {questao.alternativa.map((alternativa) => {

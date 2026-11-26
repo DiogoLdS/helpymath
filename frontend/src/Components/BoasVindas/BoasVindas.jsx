@@ -8,6 +8,7 @@ import Marca from "../Marca/Marca.jsx";
 import Carregando from "../Carregando/Carregando.jsx";
 import { OBJETIVOS, objetivoDe } from "../Perfil/perfilUtils.js";
 import { TextoComFormulas } from "../Formulas/Formula.jsx";
+import { TextoComMidia } from "../Midia/Midia.jsx";
 import { formulasNaLinha } from "../Formulas/formulaUtils.js";
 import "./BoasVindas.css";
 
@@ -233,7 +234,7 @@ const BoasVindas = () => {
                         <p className="bvContador">Questão {indice + 1} de {questoes.length} · {nomeDoNivel(questoes[indice].nivel)}</p>
                         <div className="bvBarra"><div style={{ width: `${(indice / questoes.length) * 100}%` }} /></div>
 
-                        <div className="bvEnunciado" role="heading" aria-level={2}><TextoComFormulas texto={questoes[indice].enunciado} /></div>
+                        <div className="bvEnunciado" role="heading" aria-level={2}><TextoComMidia texto={questoes[indice].enunciado} /></div>
                         <div className="bvAlternativas">
                             {questoes[indice].alternativas.map((a) => (
                                 <button type="button" key={a.id} className="bvAlternativa" onClick={() => responder(a.id)} disabled={ocupado}>
