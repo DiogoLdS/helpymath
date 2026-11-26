@@ -130,8 +130,9 @@ const InicioAdmin = ({ sair }) => {
     }
 
     // ---------- O que precisa de atenção (coisas que travam o aluno ou o conteúdo) ----------
+    // Simulado não tem conteúdo (só questões): o que trava ele é ficar sem questões
     const avisos = [
-        ...painel.mapas.filter((m) => m.conteudos === 0).map((m) => ({
+        ...painel.mapas.filter((m) => !m.simulado && m.conteudos === 0).map((m) => ({
             tipo: "grave", texto: `"${m.nome}" não tem nenhum conteúdo.`, mapaId: m.mapaId,
         })),
         ...painel.questoesSemCorreta.map((q) => ({
@@ -139,7 +140,10 @@ const InicioAdmin = ({ sair }) => {
             texto: `Uma questão de "${painel.mapas.find((m) => m.mapaId === q.mapaId)?.nome ?? "?"}" não tem alternativa correta: ninguém consegue acertar.`,
             mapaId: q.mapaId,
         })),
-        ...painel.mapas.filter((m) => m.questoes === 0 && m.conteudos > 0).map((m) => ({
+        ...painel.mapas.filter((m) => m.simulado && m.questoes === 0).map((m) => ({
+            tipo: "grave", texto: `O simulado "${m.nome}" não tem questões: o aluno não consegue fazer.`, mapaId: m.mapaId,
+        })),
+        ...painel.mapas.filter((m) => !m.simulado && m.questoes === 0 && m.conteudos > 0).map((m) => ({
             tipo: "aviso", texto: `"${m.nome}" não tem questões: o aluno conclui o mapa só com os conteúdos.`, mapaId: m.mapaId,
         })),
         ...niveis.filter((n) => !painel.mapas.some((m) => m.nivel === n.chave)).map((n) => ({

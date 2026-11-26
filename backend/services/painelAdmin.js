@@ -31,6 +31,7 @@ export async function dadosDoPainelAdmin() {
                 mapaId: true,
                 nome: true,
                 nivel: true,
+                simulado: true,
                 _count: { select: { mapaconteudo: true, questao: true } }
             }
         }),
@@ -69,6 +70,7 @@ export async function dadosDoPainelAdmin() {
             mapaId: m.mapaId,
             nome: m.nome,
             nivel: m.nivel,
+            simulado: m.simulado,
             conteudos: m._count.mapaconteudo,
             questoes: m._count.questao,
             respostas: porMapa.get(m.mapaId)?.respostas ?? 0,
